@@ -1,1 +1,1 @@
-web: gunicorn valorant_profile.wsgi --log-file -
+web: python manage.py migrate && gunicorn valorant_profile.wsgi --log-file -
