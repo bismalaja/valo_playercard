@@ -1,0 +1,624 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if is_edit %}Edit{% else %}Create{% endif %} Valorant Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1923 0%, #1a2633 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(15, 25, 35, 0.8);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 245, 255, 0.2);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+        }
+
+        h1 {
+            color: #00f5ff;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+        }
+
+        .subtitle {
+            color: #ff4655;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .form-section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #00f5ff;
+        }
+
+        .form-section h2 {
+            color: #00f5ff;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00f5ff;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-control option {
+            background: #1a2633;
+            color: #fff;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #00f5ff;
+            box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+        }
+
+        .dynamic-list {
+            margin-top: 20px;
+        }
+
+        .dynamic-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 70, 85, 0.3);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00f5ff 0%, #0099cc 100%);
+            color: #0f1923;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 245, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 70, 85, 0.8);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 70, 85, 1);
+            transform: translateY(-2px);
+        }
+
+        .btn-remove {
+            background: rgba(255, 50, 50, 0.6);
+            color: #fff;
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+
+        .btn-remove:hover {
+            background: rgba(255, 50, 50, 0.9);
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .alert-success {
+            background: rgba(0, 245, 85, 0.2);
+            border: 1px solid rgba(0, 245, 85, 0.5);
+            color: #00f555;
+        }
+
+        .alert-error {
+            background: rgba(255, 70, 85, 0.2);
+            border: 1px solid rgba(255, 70, 85, 0.5);
+            color: #ff4655;
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .item-number {
+            color: #ff4655;
+            font-weight: 600;
+        }
+
+        /* Team Selection Grid */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .team-option {
+            position: relative;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .team-option:hover {
+            border-color: #00f5ff;
+            background: rgba(0, 245, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .team-option.selected {
+            border-color: #00f5ff;
+            background: rgba(0, 245, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.4);
+        }
+
+        .team-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .team-option img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .team-option-name {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* Agent and Role Selection Grids */
+        .agent-grid,
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .agent-option,
+        .role-option {
+            position: relative;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .agent-option:hover,
+        .role-option:hover {
+            border-color: #ff4655;
+            background: rgba(255, 70, 85, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .agent-option.selected,
+        .role-option.selected {
+            border-color: #ff4655;
+            background: rgba(255, 70, 85, 0.2);
+            box-shadow: 0 0 15px rgba(255, 70, 85, 0.4);
+        }
+
+        .agent-option input[type="checkbox"],
+        .role-option input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .agent-option img,
+        .role-option img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .agent-option-name,
+        .role-option-name {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .agent-role-badge {
+            font-size: 11px;
+            color: #00f5ff;
+            background: rgba(0, 245, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>{% if is_edit %}Edit Your Valorant Profile{% else %}Create Your Valorant Profile{% endif %}</h1>
+        <p class="subtitle">{% if is_edit %}Update your information to modify your personalized agent card{% else %}Fill
+            in your information to generate your personalized agent card{% endif %}</p>
+
+        <!-- Hidden messages container for Toast Notifications -->
+        {% if messages %}
+        <div class="messages-data" style="display:none;">
+            {% for message in messages %}
+            <div class="message-item" data-message="{{ message }}" data-tag="{{ message.tags }}"></div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" id="profileForm">
+            {% csrf_token %}
+
+            <!-- BASIC INFO -->
+            <div class="form-section">
+                <h2>Basic Information</h2>
+
+                {% if profile_form.errors %}
+                <div class="alert alert-error">
+                    <strong>Please correct the errors below:</strong>
+                    <ul>
+                        {% for field in profile_form %}
+                        {% for error in field.errors %}
+                        <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                        {% endfor %}
+                        {% for error in profile_form.non_field_errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label>In-Game Name *</label>
+                    {{ profile_form.in_game_name }}
+                </div>
+                <div class="row" style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 2;">
+                        <label>Riot ID *</label>
+                        {{ profile_form.riot_id }}
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Tag *(e.g. #NA1)</label>
+                        {{ profile_form.riot_tag }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Profile Picture (Upload)</label>
+                    {{ profile_form.profile_picture }}
+                </div>
+                <div class="form-group">
+                    <label>Or Profile Picture URL</label>
+                    {{ profile_form.profile_picture_url }}
+                </div>
+                <div class="form-group">
+                    <label>Select Your Team</label>
+                    <div class="team-grid">
+                        {% for team in available_teams %}
+                        <label class="team-option" data-team-id="{{ team.id }}">
+                            <input type="radio" name="team" value="{{ team.id }}" {% if is_edit and profile.team.id == team.id %}checked{% endif %}>
+                            <img src="{{ team.get_icon_url }}" alt="{{ team.name }}">
+                            <div class="team-option-name">{{ team.name }}</div>
+                        </label>
+                        {% empty %}
+                        <p style="color: var(--color-text-muted); grid-column: 1/-1;">No teams available. Please add
+                            teams in the admin panel.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    {{ profile_form.bio }}
+                </div>
+            </div>
+
+            <!-- AGENTS -->
+            <div class="form-section">
+                <h2>Agents You Play</h2>
+                <p style="color: #888; margin-bottom: 15px; font-size: 14px;">Select all agents you play (click to
+                    toggle)</p>
+                <div class="agent-grid">
+                    {% for agent in available_agents %}
+                    <label
+                        class="agent-option {% if is_edit and agent in agents or agent.id in selected_agent_ids %}selected{% endif %}"
+                        data-agent-id="{{ agent.id }}">
+                        <input type="checkbox" name="agent_id" value="{{ agent.id }}" {% if is_edit and agent in agents or agent.id in selected_agent_ids %}checked{% endif %}>
+                        {% if agent.get_icon_url %}
+                        <img src="{{ agent.get_icon_url }}" alt="{{ agent.name }}">
+                        {% else %}
+                        <div
+                            style="width: 60px; height: 60px; background: rgba(255,70,85,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px; font-weight: bold; color: #ff4655;">
+                            {{ agent.name|slice:":1" }}</div>
+                        {% endif %}
+                        <div class="agent-option-name">{{ agent.name }}</div>
+                        <div class="agent-role-badge">{{ agent.role.name }}</div>
+                    </label>
+                    {% empty %}
+                    <p style="color: var(--color-text-muted); grid-column: 1/-1;">No agents available. Please add agents
+                        in the admin panel.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- ROLES -->
+            <div class="form-section">
+                <h2>Your Roles</h2>
+                <p style="color: #888; margin-bottom: 15px; font-size: 14px;">Select all roles you play (click to
+                    toggle)</p>
+                <div class="role-grid">
+                    {% for role in available_roles %}
+                    <label
+                        class="role-option {% if is_edit and role in roles or role.id in selected_role_ids %}selected{% endif %}"
+                        data-role-id="{{ role.id }}">
+                        <input type="checkbox" name="role_id" value="{{ role.id }}" {% if is_edit and role in roles or role.id in selected_role_ids %}checked{% endif %}>
+                        {% if role.get_icon_url %}
+                        <img src="{{ role.get_icon_url }}" alt="{{ role.name }}">
+                        {% else %}
+                        <div
+                            style="width: 60px; height: 60px; background: rgba(0,245,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px; font-weight: bold; color: #00f5ff;">
+                            {{ role.name|slice:":1" }}</div>
+                        {% endif %}
+                        <div class="role-option-name">{{ role.name }}</div>
+                    </label>
+                    {% empty %}
+                    <p style="color: var(--color-text-muted); grid-column: 1/-1;">No roles available. Please add roles
+                        in the admin panel.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- ABILITIES -->
+            <div class="form-section">
+                <h2>Your Characteristic Abilities (Max 4)</h2>
+                <div id="abilityList" class="dynamic-list"></div>
+                <button type="button" class="btn btn-secondary" onclick="addAbility()" id="addAbilityBtn">+ Add
+                    Ability</button>
+                <input type="hidden" name="ability_count" id="ability_count" value="0">
+            </div>
+
+            <button type="submit" class="btn btn-primary">{% if is_edit %}Update Profile{% else %}Create Profile{% endif %}</button>
+        </form>
+    </div>
+
+    <script src="{% static 'profiles/js/notifications.js' %}"></script>
+    <script>
+        let abilityCount = 0;
+
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            // Agent and Role selection interactivity (Event Delegation)
+            // Handles visual state updates for checkbox changes
+            document.querySelectorAll('input[type="checkbox"][name="agent_id"], input[type="checkbox"][name="role_id"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const label = this.closest('label');
+                    if (label) {
+                        if (this.checked) {
+                            label.classList.add('selected');
+                        } else {
+                            label.classList.remove('selected');
+                        }
+                    }
+                });
+            });
+
+            // Team selection interactivity
+            document.querySelectorAll('.team-option').forEach(option => {
+                option.addEventListener('click', function () {
+                    // Remove selected class from all options
+                    document.querySelectorAll('.team-option').forEach(opt => opt.classList.remove('selected'));
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    // Check the radio button
+                    this.querySelector('input[type="radio"]').checked = true;
+                });
+            });
+
+            // Set initial selected state if editing
+            {% if is_edit and profile.team %}
+            document.querySelector('.team-option[data-team-id="{{ profile.team.id }}"]')?.classList.add('selected');
+            {% endif %}
+
+            // Pre-populate abilities in edit mode
+            {% if is_edit %}
+            {% for ability in abilities %}
+            addAbilityWithData('{{ ability.key_binding }}', '{{ ability.ability_name }}', '{{ ability.ability_description }}');
+            {% endfor %}
+            {% endif %}
+
+            // Debug form submission
+            document.getElementById('profileForm').addEventListener('submit', function (e) {
+                // Prevent immediate submission to check state
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                console.log('=== FORM SUBMISSION DEBUG ===');
+                console.log('Agent IDs being submitted:', formData.getAll('agent_id'));
+                console.log('Role IDs being submitted:', formData.getAll('role_id'));
+                console.log('Ability count:', formData.get('ability_count'));
+
+                // Check all checkboxes
+                const agentCheckboxes = document.querySelectorAll('input[name="agent_id"]');
+                const roleCheckboxes = document.querySelectorAll('input[name="role_id"]');
+                console.log('Total agent checkboxes found:', agentCheckboxes.length);
+                console.log('Total role checkboxes found:', roleCheckboxes.length);
+                console.log('Agent checkboxes checked:', Array.from(agentCheckboxes).filter(cb => cb.checked).map(cb => cb.value));
+                console.log('Role checkboxes checked:', Array.from(roleCheckboxes).filter(cb => cb.checked).map(cb => cb.value));
+
+                // Now submit the form
+                this.submit();
+            });
+        });
+
+        function addAbility() {
+            if (abilityCount >= 4) {
+                alert('Maximum 4 abilities allowed');
+                return;
+            }
+
+            const keys = ['C', 'Q', 'E', 'X'];
+            const abilityList = document.getElementById('abilityList');
+            const div = document.createElement('div');
+            div.className = 'dynamic-item';
+            div.id = `ability_${abilityCount}`;
+            div.innerHTML = `
+                <div class="item-header">
+                    <span class="item-number">Ability ${abilityCount + 1}</span>
+                    <button type="button" class="btn btn-remove" onclick="removeItem('ability_${abilityCount}', 'ability')">Remove</button>
+                </div>
+                <div class="form-group">
+                    <label>Key Binding</label>
+                    <select name="ability_key_${abilityCount}" class="form-control" required>
+                        <option value="">Select Key</option>
+                        ${keys.map(key => `<option value="${key}">${key}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ability Name</label>
+                    <input type="text" name="ability_name_${abilityCount}" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Ability Description</label>
+                    <textarea name="ability_description_${abilityCount}" class="form-control" rows="3" required></textarea>
+                </div>
+            `;
+            abilityList.appendChild(div);
+            abilityCount++;
+            document.getElementById('ability_count').value = abilityCount;
+
+            if (abilityCount >= 4) {
+                document.getElementById('addAbilityBtn').disabled = true;
+                document.getElementById('addAbilityBtn').style.opacity = '0.5';
+            }
+        }
+
+        function addAbilityWithData(key, name, description) {
+            if (abilityCount >= 4) return;
+
+            const keys = ['C', 'Q', 'E', 'X'];
+            const abilityList = document.getElementById('abilityList');
+            const div = document.createElement('div');
+            div.className = 'dynamic-item';
+            div.id = `ability_${abilityCount}`;
+            div.innerHTML = `
+                <div class="item-header">
+                    <span class="item-number">Ability ${abilityCount + 1}</span>
+                    <button type="button" class="btn btn-remove" onclick="removeItem('ability_${abilityCount}', 'ability')">Remove</button>
+                </div>
+                <div class="form-group">
+                    <label>Key Binding</label>
+                    <select name="ability_key_${abilityCount}" class="form-control" required>
+                        <option value="">Select Key</option>
+                        ${keys.map(k => `<option value="${k}" ${k === key ? 'selected' : ''}>${k}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ability Name</label>
+                    <input type="text" name="ability_name_${abilityCount}" class="form-control" value="${name}" required>
+                </div>
+                <div class="form-group">
+                    <label>Ability Description</label>
+                    <textarea name="ability_description_${abilityCount}" class="form-control" rows="3" required>${description}</textarea>
+                </div>
+            `;
+            abilityList.appendChild(div);
+            abilityCount++;
+            document.getElementById('ability_count').value = abilityCount;
+
+            if (abilityCount >= 4) {
+                document.getElementById('addAbilityBtn').disabled = true;
+                document.getElementById('addAbilityBtn').style.opacity = '0.5';
+            }
+        }
+
+        function removeItem(id, type) {
+            document.getElementById(id).remove();
+
+            if (type === 'agent') {
+                agentCount--;
+                document.getElementById('agent_count').value = agentCount;
+            } else if (type === 'role') {
+                roleCount--;
+                document.getElementById('role_count').value = roleCount;
+            } else if (type === 'ability') {
+                abilityCount--;
+                document.getElementById('ability_count').value = abilityCount;
+                document.getElementById('addAbilityBtn').disabled = false;
+                document.getElementById('addAbilityBtn').style.opacity = '1';
+            }
+        }
+    </script>
+</body>
+
+</html>
