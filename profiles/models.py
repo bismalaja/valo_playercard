@@ -127,9 +127,11 @@ class Profile(models.Model):
         ordering = ['-created_at']
 
 
-class Ability(models.Model):
-    """Player's characteristic abilities (up to 4)."""
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='abilities')
+class AbilityTemplate(models.Model):
+    """
+    Admin-defined ability slots with standard keys and icons.
+    """
+    name = models.CharField(max_length=50, help_text="e.g. 'Ability 1', 'Ultimate'")
     KEY_CHOICES = [
         ('C', 'C'),
         ('Q', 'Q'),
@@ -137,13 +139,37 @@ class Ability(models.Model):
         ('X', 'X'),
     ]
     key_binding = models.CharField(max_length=1, choices=KEY_CHOICES)
+    icon = models.ImageField(upload_to='abilities/', blank=True, null=True)
+    icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
+    
+    def get_icon_url(self):
+        """Returns icon URL - either from upload or external link"""
+        if self.icon:
+            return self.icon.url
+        return self.icon_url or ''
+    
+    def __str__(self):
+        return f"{self.name} [{self.key_binding}]"
+    
+    class Meta:
+        ordering = ['key_binding']  # Or add a specific order field if needed
+
+
+class Ability(models.Model):
+    """Player's customization of a specific ability slot."""
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='abilities')
+    template = models.ForeignKey(AbilityTemplate, on_delete=models.CASCADE, related_name='player_abilities', null=True)
+    
+    # We keep these for the user's custom content
     ability_name = models.CharField(max_length=100)
     ability_description = models.TextField()
-    order = models.IntegerField(default=0)
+    
+    # Deprecated fields (can be removed in future migration if strictly enforcing templates)
+    # key_binding and order are now derived from the template/admin structure
 
     def __str__(self):
         return f"{self.profile.in_game_name} - {self.ability_name}"
 
     class Meta:
-        ordering = ['order']
         verbose_name_plural = 'Abilities'
+        unique_together = ['profile', 'template']

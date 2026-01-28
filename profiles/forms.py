@@ -69,9 +69,8 @@ class ProfileForm(forms.ModelForm):
 class AbilityForm(forms.ModelForm):
     class Meta:
         model = Ability
-        fields = ['key_binding', 'ability_name', 'ability_description']
+        fields = ['ability_name', 'ability_description']
         widgets = {
-            'key_binding': forms.Select(attrs={'class': 'form-control'}),
             'ability_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ability name'}),
             'ability_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Describe this ability...'}),
         }

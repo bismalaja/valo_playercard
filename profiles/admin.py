@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import Profile, Agent, Role, Ability, Team
+from .models import Profile, Agent, Role, Ability, Team, AbilityTemplate
+
+
+@admin.register(AbilityTemplate)
+class AbilityTemplateAdmin(admin.ModelAdmin):
+    list_display = ['name', 'key_binding', 'icon']
+    search_fields = ['name']
+    ordering = ['key_binding']
 
 
 @admin.register(Role)
@@ -39,5 +46,5 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Ability)
 class AbilityAdmin(admin.ModelAdmin):
-    list_display = ['ability_name', 'key_binding', 'profile', 'order']
-    list_filter = ['profile', 'key_binding']
+    list_display = ['ability_name', 'template', 'profile']
+    list_filter = ['profile', 'template']
