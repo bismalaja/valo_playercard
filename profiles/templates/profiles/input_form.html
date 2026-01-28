@@ -471,7 +471,7 @@
             <!-- MAPS -->
             <div class="form-section">
                 <h2>Favorite Maps</h2>
-                <p style="color: #888; margin-bottom: 15px; font-size: 14px;">Select your favorite maps</p>
+                <p style="color: #888; margin-bottom: 15px; font-size: 14px;">Select up to 3 favorite maps</p>
                 <div class="agent-grid">
                     {% for map in available_maps %}
                     <label class="agent-option {% if map.id in selected_map_ids %}selected{% endif %}"
@@ -492,27 +492,7 @@
                 </div>
             </div>
 
-            <!-- ABILITIES -->
-            <div class="form-section">
-                <h2>Your Characteristic Abilities</h2>
-                <div class="dynamic-list">
-                    {% for row in ability_rows %}
-                    <div class="dynamic-item">
-                        <div class="item-header">
-                            <span style="color:#00f5ff;">{{ row.template.name }}</span>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" name="ability_name_{{ row.template.id }}" class="form-control"
-                                placeholder="Ability Name" value="{{ row.ability.ability_name|default:'' }}">
-                        </div>
-                        <div class="form-group">
-                            <textarea name="ability_description_{{ row.template.id }}" class="form-control" rows="3"
-                                placeholder="Description">{{ row.ability.ability_description|default:'' }}</textarea>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
+            <!-- ABILITIES REMOVED -->
 
             <button type="submit" class="btn btn-primary">{% if is_edit %}Update Profile{% else %}Create Profile{% endif %}</button>
         </form>
@@ -524,7 +504,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             // Agent and Role selection interactivity (Event Delegation)
             // Handles visual state updates for checkbox changes
-            document.querySelectorAll('input[type="checkbox"][name="agent_id"], input[type="checkbox"][name="role_id"], input[type="checkbox"][name="map_id"]').forEach(checkbox => {
+            document.querySelectorAll('input[type="checkbox"][name="agent_id"], input[type="checkbox"][name="role_id"]').forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
                     const label = this.closest('label');
                     if (label) {
@@ -536,6 +516,49 @@
                     }
                 });
             });
+
+            // Map selection interactivity with Limit of 3
+            const mapCheckboxes = document.querySelectorAll('input[type="checkbox"][name="map_id"]');
+            
+            function updateMapSelection() {
+                const checkedMaps = document.querySelectorAll('input[type="checkbox"][name="map_id"]:checked');
+                
+                // Update styling
+                mapCheckboxes.forEach(cb => {
+                    const label = cb.closest('label');
+                     if (label) {
+                        if (cb.checked) {
+                            label.classList.add('selected');
+                        } else {
+                            label.classList.remove('selected');
+                        }
+                    }
+                });
+
+                // Enforce limit
+                if (checkedMaps.length >= 3) {
+                    mapCheckboxes.forEach(cb => {
+                        if (!cb.checked) {
+                            cb.disabled = true;
+                            cb.closest('label').style.opacity = '0.5';
+                            cb.closest('label').style.cursor = 'not-allowed';
+                        }
+                    });
+                } else {
+                    mapCheckboxes.forEach(cb => {
+                        cb.disabled = false;
+                        cb.closest('label').style.opacity = '1';
+                        cb.closest('label').style.cursor = 'pointer';
+                    });
+                }
+            }
+
+            mapCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateMapSelection);
+            });
+            
+            // Run on load to handle edit mode
+            updateMapSelection();
 
             // Team selection interactivity
             document.querySelectorAll('.team-option').forEach(option => {

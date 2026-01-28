@@ -53,6 +53,9 @@ def input_profile(request):
             # Save selected maps (ManyToMany)
             map_ids = request.POST.getlist('map_id')
             if map_ids:
+                if len(map_ids) > 3:
+                    messages.warning(request, "You can select up to 3 maps. Only the first 3 were saved.")
+                    map_ids = map_ids[:3] # Slice to keep only first 3
                 profile.maps.set(map_ids)
             
             # Save abilities (linked to templates)
@@ -144,6 +147,9 @@ def edit_profile(request, profile_id):
             profile.roles.set(role_ids if role_ids else [])
 
             map_ids = request.POST.getlist('map_id')
+            if map_ids and len(map_ids) > 3:
+                 messages.warning(request, "You can select up to 3 maps. Selection was truncated.")
+                 map_ids = map_ids[:3]
             profile.maps.set(map_ids if map_ids else [])
             
             # Delete and recreate abilities
