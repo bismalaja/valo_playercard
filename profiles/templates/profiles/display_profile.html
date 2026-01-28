@@ -102,6 +102,7 @@
         h5,
         h6,
         .agents-header__title,
+        .maps-header__title,
         .role-card__label,
         .special-abilities__title {
             font-family: var(--font-family-heading);
@@ -123,7 +124,8 @@
             z-index: 1;
         }
 
-        .agents-header {
+        .agents-header,
+        .maps-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -137,7 +139,8 @@
             overflow: hidden;
         }
 
-        .agents-header::after {
+        .agents-header::after,
+        .maps-header::after {
             content: "";
             position: absolute;
             inset: 0;
@@ -146,11 +149,13 @@
             pointer-events: none;
         }
 
-        .agents-header>* {
+        .agents-header>*,
+        .maps-header>* {
             transform: skewX(var(--skew-reset));
         }
 
-        .agents-header__title {
+        .agents-header__title,
+        .maps-header__title {
             font-size: var(--font-size-xl);
             color: var(--color-text-primary);
             padding: 12px 28px;
@@ -168,18 +173,21 @@
             transition: box-shadow 0.3s ease;
         }
 
-        .agents-header__title:hover {
+        .agents-header__title:hover,
+        .maps-header__title:hover {
             box-shadow: 0 0 18px rgba(255, 70, 85, 0.6);
         }
 
-        .agents-header__list {
+        .agents-header__list,
+        .maps-header__list {
             display: flex;
             gap: var(--spacing-sm);
             flex-wrap: wrap;
             justify-content: flex-end;
         }
 
-        .agent-avatar {
+        .agent-avatar,
+        .map-avatar {
             width: var(--avatar-size-medium);
             height: var(--avatar-size-medium);
             border-radius: var(--radius-circle);
@@ -192,12 +200,14 @@
             box-shadow: 0 0 12px rgba(0, 245, 255, 0.3);
         }
 
-        .agent-avatar img {
+        .agent-avatar img,
+        .map-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
         }
+
 
         .agent-avatar::after {
             content: "";
@@ -896,6 +906,20 @@
             </div>
             {% empty %}
             <p style="color: var(--color-text-muted);">No agents added yet</p>
+            {% endfor %}
+        </div>
+    </header>
+
+    <!-- MAPS HEADER -->
+    <header class="maps-header">
+        <h2 class="maps-header__title">Favorite Maps</h2>
+        <div class="maps-header__list">
+            {% for map in maps %}
+            <div class="map-avatar" title="{{ map.name }}">
+                <img src="{{ map.get_icon_url }}" alt="{{ map.name }}">
+            </div>
+            {% empty %}
+            <p style="color: var(--color-text-muted);">No favorite maps added yet</p>
             {% endfor %}
         </div>
     </header>

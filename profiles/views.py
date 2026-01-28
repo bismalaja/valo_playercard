@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Profile, Agent, Role, Ability, Team, AbilityTemplate
+from .models import Profile, Agent, Role, Ability, Team, AbilityTemplate, Map
 from .forms import ProfileForm
 
 def input_profile(request):
@@ -8,6 +8,7 @@ def input_profile(request):
     # Prepare variables for persisting selection on potential error
     selected_agent_ids = []
     selected_role_ids = []
+    selected_map_ids = []
 
     if request.method == 'POST':
         profile_form = ProfileForm(request.POST, request.FILES)
@@ -17,6 +18,8 @@ def input_profile(request):
             selected_agent_ids = [int(id) for id in request.POST.getlist('agent_id')]
         if request.POST.getlist('role_id'):
             selected_role_ids = [int(id) for id in request.POST.getlist('role_id')]
+        if request.POST.getlist('map_id'):
+            selected_map_ids = [int(id) for id in request.POST.getlist('map_id')]
 
         if profile_form.is_valid():
             profile = profile_form.save()
@@ -32,6 +35,12 @@ def input_profile(request):
             print(f"DEBUG: role_ids = {role_ids}")
             if role_ids:
                 profile.roles.set(role_ids)
+
+            # Save selected maps (ManyToMany)
+            map_ids = request.POST.getlist('map_id')
+            print(f"DEBUG: map_ids = {map_ids}")
+            if map_ids:
+                profile.maps.set(map_ids)
             
             # Save abilities (max 4)
             ability_count = int(request.POST.get('ability_count', 0))
@@ -61,8 +70,10 @@ def input_profile(request):
         'available_agents': Agent.objects.select_related('role').all(),
         'available_roles': Role.objects.all(),
         'available_teams': Team.objects.all(),
+        'available_maps': Map.objects.all(),
         'selected_agent_ids': selected_agent_ids,
         'selected_role_ids': selected_role_ids,
+        'selected_map_ids': selected_map_ids,
     })
 
 
@@ -79,6 +90,7 @@ def display_profile(request, profile_id):
         'profile': profile,
         'agents': profile.agents.all(),
         'roles': profile.roles.all(),
+        'maps': profile.maps.all(),
         'abilities': profile.abilities.all(),
         'teammates': teammates,
     }
@@ -99,6 +111,7 @@ def edit_profile(request, profile_id):
     # Prepare variables for persisting selection on potential error
     selected_agent_ids = []
     selected_role_ids = []
+    selected_map_ids = []
 
     if request.method == 'POST':
         profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
@@ -108,6 +121,8 @@ def edit_profile(request, profile_id):
             selected_agent_ids = [int(id) for id in request.POST.getlist('agent_id')]
         if request.POST.getlist('role_id'):
             selected_role_ids = [int(id) for id in request.POST.getlist('role_id')]
+        if request.POST.getlist('map_id'):
+            selected_map_ids = [int(id) for id in request.POST.getlist('map_id')]
 
         if profile_form.is_valid():
             profile = profile_form.save()
@@ -120,6 +135,10 @@ def edit_profile(request, profile_id):
             role_ids = request.POST.getlist('role_id')
             print(f"DEBUG EDIT: role_ids = {role_ids}")
             profile.roles.set(role_ids if role_ids else [])
+
+            map_ids = request.POST.getlist('map_id')
+            print(f"DEBUG EDIT: map_ids = {map_ids}")
+            profile.maps.set(map_ids if map_ids else [])
             
             # Delete and recreate abilities
             profile.abilities.all().delete()
@@ -151,13 +170,16 @@ def edit_profile(request, profile_id):
         'profile': profile,
         'agents': profile.agents.all(),
         'roles': profile.roles.all(),
+        'maps': profile.maps.all(),
         'abilities': profile.abilities.all(),
         'is_edit': True,
         'available_agents': Agent.objects.select_related('role').all(),
         'available_roles': Role.objects.all(),
         'available_teams': Team.objects.all(),
+        'available_maps': Map.objects.all(),
         'selected_agent_ids': selected_agent_ids,
         'selected_role_ids': selected_role_ids,
+        'selected_map_ids': selected_map_ids,
     }
     
     return render(request, 'profiles/input_form.html', context)

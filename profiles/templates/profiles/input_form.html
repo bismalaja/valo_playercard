@@ -236,7 +236,8 @@
 
         /* Agent and Role Selection Grids */
         .agent-grid,
-        .role-grid {
+        .role-grid,
+        .map-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
@@ -244,7 +245,8 @@
         }
 
         .agent-option,
-        .role-option {
+        .role-option,
+        .map-option {
             position: relative;
             cursor: pointer;
             border: 2px solid rgba(255, 255, 255, 0.2);
@@ -256,27 +258,31 @@
         }
 
         .agent-option:hover,
-        .role-option:hover {
+        .role-option:hover,
+        .map-option:hover {
             border-color: #ff4655;
             background: rgba(255, 70, 85, 0.1);
             transform: translateY(-2px);
         }
 
         .agent-option.selected,
-        .role-option.selected {
+        .role-option.selected,
+        .map-option.selected {
             border-color: #ff4655;
             background: rgba(255, 70, 85, 0.2);
             box-shadow: 0 0 15px rgba(255, 70, 85, 0.4);
         }
 
         .agent-option input[type="checkbox"],
-        .role-option input[type="checkbox"] {
+        .role-option input[type="checkbox"],
+        .map-option input[type="checkbox"] {
             position: absolute;
             opacity: 0;
         }
 
         .agent-option img,
-        .role-option img {
+        .role-option img,
+        .map-option img {
             width: 60px;
             height: 60px;
             object-fit: contain;
@@ -284,7 +290,8 @@
         }
 
         .agent-option-name,
-        .role-option-name {
+        .role-option-name,
+        .map-option-name {
             font-size: 14px;
             color: #fff;
             font-weight: 500;
@@ -439,6 +446,33 @@
                 </div>
             </div>
 
+            <!-- MAPS -->
+            <div class="form-section">
+                <h2>Favorite Maps</h2>
+                <p style="color: #888; margin-bottom: 15px; font-size: 14px;">Select your favorite maps (click to
+                    toggle)</p>
+                <div class="map-grid">
+                    {% for map in available_maps %}
+                    <label
+                        class="map-option {% if is_edit and map in maps or map.id in selected_map_ids %}selected{% endif %}"
+                        data-map-id="{{ map.id }}">
+                        <input type="checkbox" name="map_id" value="{{ map.id }}" {% if is_edit and map in maps or map.id in selected_map_ids %}checked{% endif %}>
+                        {% if map.get_icon_url %}
+                        <img src="{{ map.get_icon_url }}" alt="{{ map.name }}">
+                        {% else %}
+                        <div
+                            style="width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px; font-weight: bold; color: #ffffff;">
+                            {{ map.name|slice:":1" }}</div>
+                        {% endif %}
+                        <div class="map-option-name">{{ map.name }}</div>
+                    </label>
+                    {% empty %}
+                    <p style="color: var(--color-text-muted); grid-column: 1/-1;">No maps available. Please add maps
+                        in the admin panel.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
             <!-- ABILITIES -->
             <div class="form-section">
                 <h2>Your Characteristic Abilities (Max 4)</h2>
@@ -460,7 +494,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             // Agent and Role selection interactivity (Event Delegation)
             // Handles visual state updates for checkbox changes
-            document.querySelectorAll('input[type="checkbox"][name="agent_id"], input[type="checkbox"][name="role_id"]').forEach(checkbox => {
+            document.querySelectorAll('input[type="checkbox"][name="agent_id"], input[type="checkbox"][name="role_id"], input[type="checkbox"][name="map_id"]').forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
                     const label = this.closest('label');
                     if (label) {

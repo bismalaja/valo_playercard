@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Agent, Role, Ability, Team, AbilityTemplate
+from .models import Profile, Agent, Role, Ability, Team, AbilityTemplate, Map
 
 
 @admin.register(AbilityTemplate)
@@ -48,3 +48,9 @@ class ProfileAdmin(admin.ModelAdmin):
 class AbilityAdmin(admin.ModelAdmin):
     list_display = ['ability_name', 'template', 'profile']
     list_filter = ['profile', 'template']
+
+
+@admin.register(Map)
+class MapAdmin(admin.ModelAdmin):
+    list_display = ['name', 'icon']
+    search_fields = ['name']

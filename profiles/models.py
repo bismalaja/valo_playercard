@@ -77,6 +77,28 @@ class Team(models.Model):
         ordering = ['custom_order', 'name']
 
 
+class Map(models.Model):
+    """
+    Valorant maps that users can select as favorites.
+    Managed via Django admin.
+    """
+    name = models.CharField(max_length=50, unique=True)
+    icon = models.ImageField(upload_to='maps/', blank=True, null=True)
+    icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
+
+    def get_icon_url(self):
+        """Returns icon URL - either from upload or external link"""
+        if self.icon:
+            return self.icon.url
+        return self.icon_url or ''
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+
 # ============================================
 # USER PROFILE MODEL
 # ============================================
@@ -109,6 +131,9 @@ class Profile(models.Model):
     
     # ManyToMany: Users can select multiple roles they play
     roles = models.ManyToManyField(Role, blank=True, related_name='player_profiles')
+
+    # ManyToMany: Users can select multiple favorite maps
+    maps = models.ManyToManyField(Map, blank=True, related_name='player_profiles')
     
     bio = models.TextField(blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
