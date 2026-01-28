@@ -300,6 +300,35 @@
             display: inline-block;
             margin-top: 5px;
         }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .form-section {
+                padding: 15px;
+            }
+
+            .row-responsive {
+                flex-direction: column !important;
+            }
+
+            .team-grid,
+            .agent-grid,
+            .role-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
     </style>
 </head>
 
@@ -345,7 +374,7 @@
                     <label>In-Game Name *</label>
                     {{ profile_form.in_game_name }}
                 </div>
-                <div class="row" style="display: flex; gap: 15px;">
+                <div class="row-responsive" style="display: flex; gap: 15px;">
                     <div class="form-group" style="flex: 2;">
                         <label>Riot ID *</label>
                         {{ profile_form.riot_id }}

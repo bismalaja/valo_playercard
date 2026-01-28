@@ -861,6 +861,77 @@
             padding-left: 10px;
             line-height: 1;
         }
+
+        /* MEDIA QUERIES FOR MOBILE RESPONSIVENESS */
+        @media (max-width: 768px) {
+            :root {
+                --spacing-lg: 16px;
+                --spacing-xl: 20px;
+                --spacing-2xl: 30px;
+                --font-size-2xl: 40px;
+                --font-size-xl: 32px;
+                --avatar-size-large: 100px;
+            }
+
+            body {
+                padding: var(--spacing-md);
+            }
+
+            .agents-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+                gap: var(--spacing-md);
+            }
+
+            .agents-header__list {
+                justify-content: center;
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-agent-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .team-roster__header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .team-roster__list {
+                justify-content: center;
+            }
+
+            .role-card__content {
+                grid-template-columns: 1fr;
+            }
+            
+            .abilities-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .ability-card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .ability-card__header {
+                flex-direction: column;
+            }
+            
+            .special-abilities__decorative-bars {
+                display: none;
+            }
+
+            .map-cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
     </style>
 </head>
 

@@ -151,6 +151,27 @@
             margin-bottom: 20px;
             font-size: 2em;
         }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .profiles-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .create-btn {
+                width: 100%;
+                max-width: none;
+            }
+        }
     </style>
 </head>
 
