@@ -282,11 +282,19 @@
             display: block;
         }
 
+        .main-agent-card__content {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
         .main-agent-card__name {
             font-size: var(--font-size-2xl);
             color: var(--color-text-primary);
             letter-spacing: 6px;
             text-shadow: 0 0 12px rgba(0, 245, 255, 0.4);
+            word-break: break-word;
+            line-height: 1;
         }
 
         .team-roster {
@@ -1010,16 +1018,18 @@
                 <div class="main-agent-card__avatar">
                     <img src="{{ profile.get_profile_picture_url }}" alt="{{ profile.in_game_name }}">
                 </div>
-                <h1 class="main-agent-card__name">{{ profile.in_game_name }}</h1>
-                {% if profile.riot_id or profile.riot_tag %}
-                <div class="riot-id-display"
-                    style="text-align: center; margin-top: 5px; color: var(--color-text-muted); font-family: var(--font-family-heading); letter-spacing: 2px;">
-                    <span style="color: var(--color-text-secondary); font-weight: bold;">
-                        {{ profile.riot_id|default:profile.in_game_name }}
-                    </span>
-                    <span style="color: var(--color-accent-primary);">{{ profile.riot_tag }}</span>
+                <div class="main-agent-card__content">
+                    <h1 class="main-agent-card__name">{{ profile.in_game_name }}</h1>
+                    {% if profile.riot_id or profile.riot_tag %}
+                    <div class="riot-id-display"
+                        style="margin-top: 5px; color: var(--color-text-muted); font-family: var(--font-family-heading); letter-spacing: 2px;">
+                        <span style="color: var(--color-text-secondary); font-weight: bold;">
+                            {{ profile.riot_id|default:profile.in_game_name }}
+                        </span>
+                        <span style="color: var(--color-accent-primary);">{{ profile.riot_tag }}</span>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </section>
 
             <!-- TEAM ROSTER -->
