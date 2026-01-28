@@ -62,6 +62,7 @@ class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
     icon = models.ImageField(upload_to='teams/', blank=True, null=True)
     icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
+    custom_order = models.PositiveIntegerField(default=0, help_text="Higher numbers appear later in the list")
     
     def get_icon_url(self):
         """Returns icon URL - either from upload or external link"""
@@ -73,7 +74,7 @@ class Team(models.Model):
         return self.name
     
     class Meta:
-        ordering = ['name']
+        ordering = ['custom_order', 'name']
 
 
 # ============================================

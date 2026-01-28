@@ -17,8 +17,10 @@ class AgentAdmin(admin.ModelAdmin):
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ['name', 'icon']
+    list_display = ['name', 'custom_order', 'icon']
+    list_editable = ['custom_order']
     search_fields = ['name']
+    ordering = ['custom_order', 'name']
 
 
 class AbilityInline(admin.TabularInline):
