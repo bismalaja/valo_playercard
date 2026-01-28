@@ -519,14 +519,14 @@
 
             // Map selection interactivity with Limit of 3
             const mapCheckboxes = document.querySelectorAll('input[type="checkbox"][name="map_id"]');
-            
+
             function updateMapSelection() {
                 const checkedMaps = document.querySelectorAll('input[type="checkbox"][name="map_id"]:checked');
-                
+
                 // Update styling
                 mapCheckboxes.forEach(cb => {
                     const label = cb.closest('label');
-                     if (label) {
+                    if (label) {
                         if (cb.checked) {
                             label.classList.add('selected');
                         } else {
@@ -556,7 +556,7 @@
             mapCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', updateMapSelection);
             });
-            
+
             // Run on load to handle edit mode
             updateMapSelection();
 
