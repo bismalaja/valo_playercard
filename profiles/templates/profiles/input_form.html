@@ -493,7 +493,7 @@
             // Pre-populate abilities in edit mode
             {% if is_edit %}
             {% for ability in abilities %}
-            addAbilityWithData('{{ ability.key_binding }}', '{{ ability.ability_name }}', '{{ ability.ability_description }}');
+            addAbilityWithData('{{ ability.template.key_binding }}', '{{ ability.ability_name }}', '{{ ability.ability_description }}');
             {% endfor %}
             {% endif %}
 

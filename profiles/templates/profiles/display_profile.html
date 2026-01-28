@@ -995,11 +995,15 @@
             {% for ability in abilities %}
             <article class="ability-card">
                 <div class="ability-card__icon">
-                    <span class="ability-card__placeholder-icon">⚡</span>
+                    {% if ability.template.get_icon_url %}
+                        <img src="{{ ability.template.get_icon_url }}" alt="{{ ability.template.name }}" style="width: 50px; height: 50px; object-fit: contain;">
+                    {% else %}
+                        <span class="ability-card__placeholder-icon">⚡</span>
+                    {% endif %}
                 </div>
                 <div class="ability-card__content">
                     <div class="ability-card__header">
-                        <span class="ability-card__key">{{ ability.key_binding }}</span>
+                        <span class="ability-card__key">{{ ability.template.key_binding }}</span>
                         <h3 class="ability-card__name">{{ ability.ability_name }}</h3>
                     </div>
                     <p class="ability-card__description">{{ ability.ability_description }}</p>

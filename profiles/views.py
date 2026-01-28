@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Profile, Agent, Role, Ability, Team
+from .models import Profile, Agent, Role, Ability, Team, AbilityTemplate
 from .forms import ProfileForm
 
 def input_profile(request):
@@ -41,13 +41,15 @@ def input_profile(request):
                 ability_name = request.POST.get(f'ability_name_{i}')
                 ability_description = request.POST.get(f'ability_description_{i}')
                 if key_binding and ability_name and ability_description:
-                    Ability.objects.create(
-                        profile=profile,
-                        key_binding=key_binding,
-                        ability_name=ability_name,
-                        ability_description=ability_description,
-                        order=i
-                    )
+                    # Look up the template for this key
+                    template = AbilityTemplate.objects.filter(key_binding=key_binding).first()
+                    if template:
+                        Ability.objects.create(
+                            profile=profile,
+                            template=template,
+                            ability_name=ability_name,
+                            ability_description=ability_description
+                        )
             
             messages.success(request, 'Profile created successfully!')
             return redirect('display_profile', profile_id=profile.id)
@@ -128,13 +130,15 @@ def edit_profile(request, profile_id):
                 ability_name = request.POST.get(f'ability_name_{i}')
                 ability_description = request.POST.get(f'ability_description_{i}')
                 if key_binding and ability_name and ability_description:
-                    Ability.objects.create(
-                        profile=profile,
-                        key_binding=key_binding,
-                        ability_name=ability_name,
-                        ability_description=ability_description,
-                        order=i
-                    )
+                    # Look up the template for this key
+                    template = AbilityTemplate.objects.filter(key_binding=key_binding).first()
+                    if template:
+                        Ability.objects.create(
+                            profile=profile,
+                            template=template,
+                            ability_name=ability_name,
+                            ability_description=ability_description
+                        )
             
             messages.success(request, 'Profile updated successfully!')
             return redirect('display_profile', profile_id=profile.id)
