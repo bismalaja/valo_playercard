@@ -238,7 +238,9 @@
             padding: var(--spacing-xl);
             border: 1px solid rgba(0, 245, 255, 0.2);
             display: flex;
+            flex-direction: column;
             align-items: center;
+            text-align: center;
             gap: var(--spacing-lg);
             transform: skewX(var(--skew-angle));
             box-shadow: var(--glow-cyan);
@@ -286,10 +288,11 @@
             display: flex;
             flex-direction: column;
             min-width: 0;
+            align-items: center;
         }
 
         .main-agent-card__name {
-            font-size: var(--font-size-2xl);
+            font-size: var(--font-size-xl);
             color: var(--color-text-primary);
             letter-spacing: 6px;
             text-shadow: 0 0 12px rgba(0, 245, 255, 0.4);
