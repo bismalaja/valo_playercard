@@ -397,7 +397,8 @@
                     <div class="team-grid">
                         {% for team in available_teams %}
                         <label class="team-option" data-team-id="{{ team.id }}">
-                            <input type="radio" name="team" value="{{ team.id }}" {% if is_edit and profile.team.id == team.id %}checked{% endif %}>
+                            <input type="radio" name="team" value="{{ team.id }}" {% if is_edit and
+                                profile.team.id==team.id %}checked{% endif %}>
                             <img src="{{ team.get_icon_url }}" alt="{{ team.name }}">
                             <div class="team-option-name">{{ team.name }}</div>
                         </label>
@@ -423,7 +424,8 @@
                     <label
                         class="agent-option {% if is_edit and agent in agents or agent.id in selected_agent_ids %}selected{% endif %}"
                         data-agent-id="{{ agent.id }}">
-                        <input type="checkbox" name="agent_id" value="{{ agent.id }}" {% if is_edit and agent in agents or agent.id in selected_agent_ids %}checked{% endif %}>
+                        <input type="checkbox" name="agent_id" value="{{ agent.id }}" {% if is_edit and agent in agents
+                            or agent.id in selected_agent_ids %}checked{% endif %}>
                         {% if agent.get_icon_url %}
                         <img src="{{ agent.get_icon_url }}" alt="{{ agent.name }}">
                         {% else %}
@@ -451,7 +453,8 @@
                     <label
                         class="role-option {% if is_edit and role in roles or role.id in selected_role_ids %}selected{% endif %}"
                         data-role-id="{{ role.id }}">
-                        <input type="checkbox" name="role_id" value="{{ role.id }}" {% if is_edit and role in roles or role.id in selected_role_ids %}checked{% endif %}>
+                        <input type="checkbox" name="role_id" value="{{ role.id }}" {% if is_edit and role in roles or
+                            role.id in selected_role_ids %}checked{% endif %}>
                         {% if role.get_icon_url %}
                         <img src="{{ role.get_icon_url }}" alt="{{ role.name }}">
                         {% else %}
@@ -476,7 +479,8 @@
                     {% for map in available_maps %}
                     <label class="agent-option {% if map.id in selected_map_ids %}selected{% endif %}"
                         data-map-id="{{ map.id }}">
-                        <input type="checkbox" name="map_id" value="{{ map.id }}" {% if map.id in selected_map_ids %}checked{% endif %}>
+                        <input type="checkbox" name="map_id" value="{{ map.id }}" {% if map.id in selected_map_ids
+                            %}checked{% endif %}>
                         {% if map.get_icon_url %}
                         <img src="{{ map.get_icon_url }}" alt="{{ map.name }}">
                         {% else %}
@@ -514,7 +518,8 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">{% if is_edit %}Update Profile{% else %}Create Profile{% endif %}</button>
+            <button type="submit" class="btn btn-primary">{% if is_edit %}Update Profile{% else %}Create Profile{% endif
+                %}</button>
         </form>
     </div>
 

@@ -14,3 +14,6 @@ staticfiles/
 *.log
 local_settings.py
 .venv/
+sqlite3.db
+db.sqlite3
+db.sqlite3-journal
