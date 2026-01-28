@@ -79,24 +79,52 @@ class Team(models.Model):
 
 class Map(models.Model):
     """
-    Valorant maps that users can select as favorites.
+    Valorant maps.
     Managed via Django admin.
     """
     name = models.CharField(max_length=50, unique=True)
     icon = models.ImageField(upload_to='maps/', blank=True, null=True)
     icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
-
+    
     def get_icon_url(self):
         """Returns icon URL - either from upload or external link"""
         if self.icon:
             return self.icon.url
         return self.icon_url or ''
-
+    
     def __str__(self):
         return self.name
-
+    
     class Meta:
         ordering = ['name']
+
+
+class AbilityTemplate(models.Model):
+    """
+    Predefined abilities (C, Q, E, X) for the UI slots.
+    Managed via Django admin.
+    """
+    KEY_CHOICES = [
+        ('C', 'C'),
+        ('Q', 'Q'),
+        ('E', 'E'),
+        ('X', 'X'),
+    ]
+    name = models.CharField(max_length=50, help_text="e.g. 'Ability 1', 'Ultimate'")
+    key_binding = models.CharField(max_length=1, choices=KEY_CHOICES)
+    icon = models.ImageField(upload_to='abilities/', blank=True, null=True)
+    icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
+    
+    def get_icon_url(self):
+        if self.icon:
+            return self.icon.url
+        return self.icon_url or ''
+    
+    def __str__(self):
+        return f"{self.name} ({self.key_binding})"
+
+    class Meta:
+        ordering = ['key_binding']
 
 
 # ============================================
@@ -131,10 +159,10 @@ class Profile(models.Model):
     
     # ManyToMany: Users can select multiple roles they play
     roles = models.ManyToManyField(Role, blank=True, related_name='player_profiles')
-
-    # ManyToMany: Users can select multiple favorite maps
-    maps = models.ManyToManyField(Map, blank=True, related_name='player_profiles')
     
+    # ManyToMany: Users can select favorite maps
+    maps = models.ManyToManyField(Map, blank=True, related_name='player_profiles')
+
     bio = models.TextField(blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -152,45 +180,12 @@ class Profile(models.Model):
         ordering = ['-created_at']
 
 
-class AbilityTemplate(models.Model):
-    """
-    Admin-defined ability slots with standard keys and icons.
-    """
-    name = models.CharField(max_length=50, help_text="e.g. 'Ability 1', 'Ultimate'")
-    KEY_CHOICES = [
-        ('C', 'C'),
-        ('Q', 'Q'),
-        ('E', 'E'),
-        ('X', 'X'),
-    ]
-    key_binding = models.CharField(max_length=1, choices=KEY_CHOICES)
-    icon = models.ImageField(upload_to='abilities/', blank=True, null=True)
-    icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
-    
-    def get_icon_url(self):
-        """Returns icon URL - either from upload or external link"""
-        if self.icon:
-            return self.icon.url
-        return self.icon_url or ''
-    
-    def __str__(self):
-        return f"{self.name} [{self.key_binding}]"
-    
-    class Meta:
-        ordering = ['key_binding']  # Or add a specific order field if needed
-
-
 class Ability(models.Model):
-    """Player's customization of a specific ability slot."""
+    """Player's characteristic abilities (up to 4)."""
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='abilities')
     template = models.ForeignKey(AbilityTemplate, on_delete=models.CASCADE, related_name='player_abilities', null=True)
-    
-    # We keep these for the user's custom content
     ability_name = models.CharField(max_length=100)
     ability_description = models.TextField()
-    
-    # Deprecated fields (can be removed in future migration if strictly enforcing templates)
-    # key_binding and order are now derived from the template/admin structure
 
     def __str__(self):
         return f"{self.profile.in_game_name} - {self.ability_name}"

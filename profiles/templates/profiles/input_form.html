@@ -236,8 +236,7 @@
 
         /* Agent and Role Selection Grids */
         .agent-grid,
-        .role-grid,
-        .map-grid {
+        .role-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
@@ -245,8 +244,7 @@
         }
 
         .agent-option,
-        .role-option,
-        .map-option {
+        .role-option {
             position: relative;
             cursor: pointer;
             border: 2px solid rgba(255, 255, 255, 0.2);
@@ -258,31 +256,27 @@
         }
 
         .agent-option:hover,
-        .role-option:hover,
-        .map-option:hover {
+        .role-option:hover {
             border-color: #ff4655;
             background: rgba(255, 70, 85, 0.1);
             transform: translateY(-2px);
         }
 
         .agent-option.selected,
-        .role-option.selected,
-        .map-option.selected {
+        .role-option.selected {
             border-color: #ff4655;
             background: rgba(255, 70, 85, 0.2);
             box-shadow: 0 0 15px rgba(255, 70, 85, 0.4);
         }
 
         .agent-option input[type="checkbox"],
-        .role-option input[type="checkbox"],
-        .map-option input[type="checkbox"] {
+        .role-option input[type="checkbox"] {
             position: absolute;
             opacity: 0;
         }
 
         .agent-option img,
-        .role-option img,
-        .map-option img {
+        .role-option img {
             width: 60px;
             height: 60px;
             object-fit: contain;
@@ -290,8 +284,7 @@
         }
 
         .agent-option-name,
-        .role-option-name,
-        .map-option-name {
+        .role-option-name {
             font-size: 14px;
             color: #fff;
             font-weight: 500;
@@ -449,37 +442,48 @@
             <!-- MAPS -->
             <div class="form-section">
                 <h2>Favorite Maps</h2>
-                <p style="color: #888; margin-bottom: 15px; font-size: 14px;">Select your favorite maps (click to
-                    toggle)</p>
-                <div class="map-grid">
+                <p style="color: #888; margin-bottom: 15px; font-size: 14px;">Select your favorite maps</p>
+                <div class="agent-grid">
                     {% for map in available_maps %}
-                    <label
-                        class="map-option {% if is_edit and map in maps or map.id in selected_map_ids %}selected{% endif %}"
+                    <label class="agent-option {% if map.id in selected_map_ids %}selected{% endif %}"
                         data-map-id="{{ map.id }}">
-                        <input type="checkbox" name="map_id" value="{{ map.id }}" {% if is_edit and map in maps or map.id in selected_map_ids %}checked{% endif %}>
+                        <input type="checkbox" name="map_id" value="{{ map.id }}" {% if map.id in selected_map_ids %}checked{% endif %}>
                         {% if map.get_icon_url %}
                         <img src="{{ map.get_icon_url }}" alt="{{ map.name }}">
                         {% else %}
                         <div
-                            style="width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px; font-weight: bold; color: #ffffff;">
+                            style="width: 60px; height: 60px; background: rgba(0,245,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px; font-weight: bold; color: #00f5ff;">
                             {{ map.name|slice:":1" }}</div>
                         {% endif %}
-                        <div class="map-option-name">{{ map.name }}</div>
+                        <div class="agent-option-name">{{ map.name }}</div>
                     </label>
                     {% empty %}
-                    <p style="color: var(--color-text-muted); grid-column: 1/-1;">No maps available. Please add maps
-                        in the admin panel.</p>
+                    <p style="color: var(--color-text-muted); grid-column: 1/-1;">No maps available.</p>
                     {% endfor %}
                 </div>
             </div>
 
             <!-- ABILITIES -->
             <div class="form-section">
-                <h2>Your Characteristic Abilities (Max 4)</h2>
-                <div id="abilityList" class="dynamic-list"></div>
-                <button type="button" class="btn btn-secondary" onclick="addAbility()" id="addAbilityBtn">+ Add
-                    Ability</button>
-                <input type="hidden" name="ability_count" id="ability_count" value="0">
+                <h2>Your Characteristic Abilities</h2>
+                <div class="dynamic-list">
+                    {% for row in ability_rows %}
+                    <div class="dynamic-item">
+                        <div class="item-header">
+                            <span class="item-number" style="color:#ff4655; font-weight:bold;">KEY: {{ row.template.key_binding }}</span>
+                            <span style="color:#00f5ff;">{{ row.template.name }}</span>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="ability_name_{{ row.template.id }}" class="form-control"
+                                placeholder="Ability Name" value="{{ row.ability.ability_name|default:'' }}">
+                        </div>
+                        <div class="form-group">
+                            <textarea name="ability_description_{{ row.template.id }}" class="form-control" rows="3"
+                                placeholder="Description">{{ row.ability.ability_description|default:'' }}</textarea>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary">{% if is_edit %}Update Profile{% else %}Create Profile{% endif %}</button>
@@ -488,8 +492,6 @@
 
     <script src="{% static 'profiles/js/notifications.js' %}"></script>
     <script>
-        let abilityCount = 0;
-
         // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function () {
             // Agent and Role selection interactivity (Event Delegation)
@@ -523,135 +525,7 @@
             {% if is_edit and profile.team %}
             document.querySelector('.team-option[data-team-id="{{ profile.team.id }}"]')?.classList.add('selected');
             {% endif %}
-
-            // Pre-populate abilities in edit mode
-            {% if is_edit %}
-            {% for ability in abilities %}
-            addAbilityWithData('{{ ability.template.key_binding }}', '{{ ability.ability_name }}', '{{ ability.ability_description }}');
-            {% endfor %}
-            {% endif %}
-
-            // Debug form submission
-            document.getElementById('profileForm').addEventListener('submit', function (e) {
-                // Prevent immediate submission to check state
-                e.preventDefault();
-
-                const formData = new FormData(this);
-                console.log('=== FORM SUBMISSION DEBUG ===');
-                console.log('Agent IDs being submitted:', formData.getAll('agent_id'));
-                console.log('Role IDs being submitted:', formData.getAll('role_id'));
-                console.log('Ability count:', formData.get('ability_count'));
-
-                // Check all checkboxes
-                const agentCheckboxes = document.querySelectorAll('input[name="agent_id"]');
-                const roleCheckboxes = document.querySelectorAll('input[name="role_id"]');
-                console.log('Total agent checkboxes found:', agentCheckboxes.length);
-                console.log('Total role checkboxes found:', roleCheckboxes.length);
-                console.log('Agent checkboxes checked:', Array.from(agentCheckboxes).filter(cb => cb.checked).map(cb => cb.value));
-                console.log('Role checkboxes checked:', Array.from(roleCheckboxes).filter(cb => cb.checked).map(cb => cb.value));
-
-                // Now submit the form
-                this.submit();
-            });
         });
-
-        function addAbility() {
-            if (abilityCount >= 4) {
-                alert('Maximum 4 abilities allowed');
-                return;
-            }
-
-            const keys = ['C', 'Q', 'E', 'X'];
-            const abilityList = document.getElementById('abilityList');
-            const div = document.createElement('div');
-            div.className = 'dynamic-item';
-            div.id = `ability_${abilityCount}`;
-            div.innerHTML = `
-                <div class="item-header">
-                    <span class="item-number">Ability ${abilityCount + 1}</span>
-                    <button type="button" class="btn btn-remove" onclick="removeItem('ability_${abilityCount}', 'ability')">Remove</button>
-                </div>
-                <div class="form-group">
-                    <label>Key Binding</label>
-                    <select name="ability_key_${abilityCount}" class="form-control" required>
-                        <option value="">Select Key</option>
-                        ${keys.map(key => `<option value="${key}">${key}</option>`).join('')}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Ability Name</label>
-                    <input type="text" name="ability_name_${abilityCount}" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Ability Description</label>
-                    <textarea name="ability_description_${abilityCount}" class="form-control" rows="3" required></textarea>
-                </div>
-            `;
-            abilityList.appendChild(div);
-            abilityCount++;
-            document.getElementById('ability_count').value = abilityCount;
-
-            if (abilityCount >= 4) {
-                document.getElementById('addAbilityBtn').disabled = true;
-                document.getElementById('addAbilityBtn').style.opacity = '0.5';
-            }
-        }
-
-        function addAbilityWithData(key, name, description) {
-            if (abilityCount >= 4) return;
-
-            const keys = ['C', 'Q', 'E', 'X'];
-            const abilityList = document.getElementById('abilityList');
-            const div = document.createElement('div');
-            div.className = 'dynamic-item';
-            div.id = `ability_${abilityCount}`;
-            div.innerHTML = `
-                <div class="item-header">
-                    <span class="item-number">Ability ${abilityCount + 1}</span>
-                    <button type="button" class="btn btn-remove" onclick="removeItem('ability_${abilityCount}', 'ability')">Remove</button>
-                </div>
-                <div class="form-group">
-                    <label>Key Binding</label>
-                    <select name="ability_key_${abilityCount}" class="form-control" required>
-                        <option value="">Select Key</option>
-                        ${keys.map(k => `<option value="${k}" ${k === key ? 'selected' : ''}>${k}</option>`).join('')}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Ability Name</label>
-                    <input type="text" name="ability_name_${abilityCount}" class="form-control" value="${name}" required>
-                </div>
-                <div class="form-group">
-                    <label>Ability Description</label>
-                    <textarea name="ability_description_${abilityCount}" class="form-control" rows="3" required>${description}</textarea>
-                </div>
-            `;
-            abilityList.appendChild(div);
-            abilityCount++;
-            document.getElementById('ability_count').value = abilityCount;
-
-            if (abilityCount >= 4) {
-                document.getElementById('addAbilityBtn').disabled = true;
-                document.getElementById('addAbilityBtn').style.opacity = '0.5';
-            }
-        }
-
-        function removeItem(id, type) {
-            document.getElementById(id).remove();
-
-            if (type === 'agent') {
-                agentCount--;
-                document.getElementById('agent_count').value = agentCount;
-            } else if (type === 'role') {
-                roleCount--;
-                document.getElementById('role_count').value = roleCount;
-            } else if (type === 'ability') {
-                abilityCount--;
-                document.getElementById('ability_count').value = abilityCount;
-                document.getElementById('addAbilityBtn').disabled = false;
-                document.getElementById('addAbilityBtn').style.opacity = '1';
-            }
-        }
     </script>
 </body>
 

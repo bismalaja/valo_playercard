@@ -1,12 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Agent, Role, Ability, Team, AbilityTemplate, Map
-
-
-@admin.register(AbilityTemplate)
-class AbilityTemplateAdmin(admin.ModelAdmin):
-    list_display = ['name', 'key_binding', 'icon']
-    search_fields = ['name']
-    ordering = ['key_binding']
+from .models import Profile, Agent, Role, Ability, Team, Map, AbilityTemplate
 
 
 @admin.register(Role)
@@ -30,6 +23,19 @@ class TeamAdmin(admin.ModelAdmin):
     ordering = ['custom_order', 'name']
 
 
+@admin.register(Map)
+class MapAdmin(admin.ModelAdmin):
+    list_display = ['name', 'icon']
+    search_fields = ['name']
+
+
+@admin.register(AbilityTemplate)
+class AbilityTemplateAdmin(admin.ModelAdmin):
+    list_display = ['name', 'key_binding', 'icon']
+    list_filter = ['key_binding']
+    search_fields = ['name']
+
+
 class AbilityInline(admin.TabularInline):
     model = Ability
     extra = 1
@@ -40,17 +46,15 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display = ['in_game_name', 'team', 'created_at']
     search_fields = ['in_game_name', 'team__name']
     list_filter = ['team', 'created_at']
-    filter_horizontal = ['agents', 'roles']  # Nice UI for ManyToMany
+    filter_horizontal = ['agents', 'roles', 'maps']  # Nice UI for ManyToMany
     inlines = [AbilityInline]
 
 
 @admin.register(Ability)
 class AbilityAdmin(admin.ModelAdmin):
-    list_display = ['ability_name', 'template', 'profile']
-    list_filter = ['profile', 'template']
+    list_display = ['ability_name', 'get_template_key', 'profile']
+    list_filter = ['profile', 'template__key_binding']
 
-
-@admin.register(Map)
-class MapAdmin(admin.ModelAdmin):
-    list_display = ['name', 'icon']
-    search_fields = ['name']
+    def get_template_key(self, obj):
+        return obj.template.key_binding if obj.template else '-'
+    get_template_key.short_description = 'Key'

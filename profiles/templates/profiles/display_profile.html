@@ -102,7 +102,6 @@
         h5,
         h6,
         .agents-header__title,
-        .maps-header__title,
         .role-card__label,
         .special-abilities__title {
             font-family: var(--font-family-heading);
@@ -124,8 +123,7 @@
             z-index: 1;
         }
 
-        .agents-header,
-        .maps-header {
+        .agents-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -139,8 +137,7 @@
             overflow: hidden;
         }
 
-        .agents-header::after,
-        .maps-header::after {
+        .agents-header::after {
             content: "";
             position: absolute;
             inset: 0;
@@ -149,13 +146,11 @@
             pointer-events: none;
         }
 
-        .agents-header>*,
-        .maps-header>* {
+        .agents-header>* {
             transform: skewX(var(--skew-reset));
         }
 
-        .agents-header__title,
-        .maps-header__title {
+        .agents-header__title {
             font-size: var(--font-size-xl);
             color: var(--color-text-primary);
             padding: 12px 28px;
@@ -173,21 +168,18 @@
             transition: box-shadow 0.3s ease;
         }
 
-        .agents-header__title:hover,
-        .maps-header__title:hover {
+        .agents-header__title:hover {
             box-shadow: 0 0 18px rgba(255, 70, 85, 0.6);
         }
 
-        .agents-header__list,
-        .maps-header__list {
+        .agents-header__list {
             display: flex;
             gap: var(--spacing-sm);
             flex-wrap: wrap;
             justify-content: flex-end;
         }
 
-        .agent-avatar,
-        .map-avatar {
+        .agent-avatar {
             width: var(--avatar-size-medium);
             height: var(--avatar-size-medium);
             border-radius: var(--radius-circle);
@@ -200,14 +192,12 @@
             box-shadow: 0 0 12px rgba(0, 245, 255, 0.3);
         }
 
-        .agent-avatar img,
-        .map-avatar img {
+        .agent-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
         }
-
 
         .agent-avatar::after {
             content: "";
@@ -248,9 +238,7 @@
             padding: var(--spacing-xl);
             border: 1px solid rgba(0, 245, 255, 0.2);
             display: flex;
-            flex-direction: column;
             align-items: center;
-            text-align: center;
             gap: var(--spacing-lg);
             transform: skewX(var(--skew-angle));
             box-shadow: var(--glow-cyan);
@@ -273,9 +261,9 @@
         }
 
         .main-agent-card__avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
+            width: var(--avatar-size-large);
+            height: var(--avatar-size-large);
+            border-radius: var(--radius-circle);
             background: linear-gradient(135deg, rgba(255, 70, 85, 0.4), rgba(0, 245, 255, 0.3));
             border: 3px solid var(--color-accent-primary);
             flex-shrink: 0;
@@ -289,8 +277,8 @@
         .main-agent-card__avatar img {
             width: 100%;
             height: 100%;
+            border-radius: inherit;
             object-fit: cover;
-            border-radius: 50%;
             display: block;
         }
 
@@ -789,57 +777,89 @@
             box-shadow: 0 3px 15px rgba(220, 38, 38, 0.5);
         }
 
-        @media (max-width: 1024px) {
-            body {
-                padding: var(--spacing-lg);
-            }
-
-            .agents-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: var(--spacing-md);
-            }
-
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
+        /* MAP CARDS */
+        .map-cards-section {
+            margin-top: var(--spacing-2xl);
+            margin-bottom: var(--spacing-2xl);
+            position: relative;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: var(--spacing-md);
-            }
+        .map-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: var(--spacing-lg);
+        }
 
-            .agents-header,
-            .main-agent-card,
-            .team-roster,
-            .role-card,
-            .special-abilities,
-            .ability-card {
-                transform: none;
-            }
+        .map-card {
+            height: 160px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            background: var(--color-bg-card);
+            transform: skewX(var(--skew-angle));
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
 
-            .agents-header>*,
-            .main-agent-card>*,
-            .team-roster>*,
-            .role-card>*,
-            .special-abilities>*,
-            .ability-card>* {
-                transform: none;
-            }
+        .map-card:hover {
+            transform: skewX(var(--skew-angle)) translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 245, 255, 0.2);
+            border-color: var(--color-accent-secondary);
+        }
 
-            .main-agent-card {
-                flex-direction: column;
-                text-align: center;
-            }
+        .map-card::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-accent-secondary), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
 
-            .ability-card {
-                flex-direction: column;
-            }
+        .map-card:hover::after {
+            opacity: 1;
+        }
 
-            .abilities-grid {
-                grid-template-columns: 1fr;
-            }
+        .map-card__image {
+            width: 110%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+            transform: skewX(var(--skew-reset)) scale(1.1);
+            margin-left: -5%;
+        }
+
+        .map-card:hover .map-card__image {
+            transform: skewX(var(--skew-reset)) scale(1.15);
+        }
+
+        .map-card__overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(15, 25, 35, 0.9) 0%, transparent 60%);
+            display: flex;
+            align-items: flex-end;
+            padding: var(--spacing-md);
+            pointer-events: none;
+            transform: skewX(var(--skew-reset));
+        }
+
+        .map-card__name {
+            color: var(--color-text-primary);
+            font-family: var(--font-family-heading);
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 2px;
+            font-size: var(--font-size-lg);
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            border-left: 3px solid var(--color-accent-secondary);
+            padding-left: 10px;
+            line-height: 1;
         }
     </style>
 </head>
@@ -910,39 +930,25 @@
         </div>
     </header>
 
-    <!-- MAPS HEADER -->
-    <header class="maps-header">
-        <h2 class="maps-header__title">Favorite Maps</h2>
-        <div class="maps-header__list">
-            {% for map in maps %}
-            <div class="map-avatar" title="{{ map.name }}">
-                <img src="{{ map.get_icon_url }}" alt="{{ map.name }}">
-            </div>
-            {% empty %}
-            <p style="color: var(--color-text-muted);">No favorite maps added yet</p>
-            {% endfor %}
-        </div>
-    </header>
-
     <!-- MAIN CONTENT GRID -->
     <main class="main-grid">
         <!-- LEFT COLUMN -->
         <div class="left-column">
             <!-- MAIN AGENT CARD -->
             <section class="main-agent-card">
+                <div class="main-agent-card__avatar">
+                    <img src="{{ profile.get_profile_picture_url }}" alt="{{ profile.in_game_name }}">
+                </div>
                 <h1 class="main-agent-card__name">{{ profile.in_game_name }}</h1>
                 {% if profile.riot_id or profile.riot_tag %}
                 <div class="riot-id-display"
-                    style="text-align: center; color: var(--color-text-muted); font-family: var(--font-family-heading); letter-spacing: 2px;">
+                    style="text-align: center; margin-top: 5px; color: var(--color-text-muted); font-family: var(--font-family-heading); letter-spacing: 2px;">
                     <span style="color: var(--color-text-secondary); font-weight: bold;">
                         {{ profile.riot_id|default:profile.in_game_name }}
                     </span>
                     <span style="color: var(--color-accent-primary);">{{ profile.riot_tag }}</span>
                 </div>
                 {% endif %}
-                <div class="main-agent-card__avatar">
-                    <img src="{{ profile.get_profile_picture_url }}" alt="{{ profile.in_game_name }}">
-                </div>
             </section>
 
             <!-- TEAM ROSTER -->
@@ -1004,6 +1010,29 @@
         </div>
     </main>
 
+    <!-- FAVORITE MAPS SECTION -->
+    {% if profile.maps.exists %}
+    <section class="map-cards-section">
+        <h2 class="special-abilities__title" style="margin-bottom: var(--spacing-md);">FAVORITE MAPS</h2>
+        <div class="special-abilities__decorative-bars">
+            <div class="bar bar--long" style="background: var(--color-accent-secondary);"></div>
+            <div class="bar bar--medium" style="background: var(--color-accent-secondary);"></div>
+            <div class="bar bar--short" style="background: var(--color-accent-secondary);"></div>
+        </div>
+
+        <div class="map-cards-container">
+            {% for map in profile.maps.all %}
+            <div class="map-card">
+                <img src="{{ map.get_icon_url }}" alt="{{ map.name }}" class="map-card__image">
+                <div class="map-card__overlay">
+                    <span class="map-card__name">{{ map.name }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
     <!-- SPECIAL ABILITIES SECTION -->
     {% if abilities %}
     <section class="special-abilities">
@@ -1019,11 +1048,7 @@
             {% for ability in abilities %}
             <article class="ability-card">
                 <div class="ability-card__icon">
-                    {% if ability.template.get_icon_url %}
-                        <img src="{{ ability.template.get_icon_url }}" alt="{{ ability.template.name }}" style="width: 50px; height: 50px; object-fit: contain;">
-                    {% else %}
-                        <span class="ability-card__placeholder-icon">⚡</span>
-                    {% endif %}
+                    <span class="ability-card__placeholder-icon">⚡</span>
                 </div>
                 <div class="ability-card__content">
                     <div class="ability-card__header">

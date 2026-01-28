@@ -16,13 +16,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://web-production-cb0c0.up.railway.app',
-    'https://web-production-5ad79.up.railway.app',
-    'http://localhost:8000',
-    'http://127.0.0.1:8000',
-]
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',

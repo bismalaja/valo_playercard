@@ -1,7 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Profile, Agent, Role, Ability, Team, AbilityTemplate, Map
+from .models import Profile, Agent, Role, Ability, Team, Map, AbilityTemplate
 from .forms import ProfileForm
+
+def get_ability_rows(profile=None):
+    """Helper to prepare ability rows for the template."""
+    templates = AbilityTemplate.objects.all()
+    existing_map = {}
+    if profile:
+        existing_map = {a.template.id: a for a in profile.abilities.all() if a.template}
+    
+    rows = []
+    for t in templates:
+        rows.append({
+            'template': t,
+            'ability': existing_map.get(t.id)
+        })
+    return rows
+
 
 def input_profile(request):
     """Form page to input all profile data."""
@@ -26,39 +42,32 @@ def input_profile(request):
             
             # Save selected agents (ManyToMany)
             agent_ids = request.POST.getlist('agent_id')
-            print(f"DEBUG: agent_ids = {agent_ids}")
             if agent_ids:
                 profile.agents.set(agent_ids)
             
             # Save selected roles (ManyToMany)
             role_ids = request.POST.getlist('role_id')
-            print(f"DEBUG: role_ids = {role_ids}")
             if role_ids:
                 profile.roles.set(role_ids)
 
             # Save selected maps (ManyToMany)
             map_ids = request.POST.getlist('map_id')
-            print(f"DEBUG: map_ids = {map_ids}")
             if map_ids:
                 profile.maps.set(map_ids)
             
-            # Save abilities (max 4)
-            ability_count = int(request.POST.get('ability_count', 0))
-            print(f"DEBUG: ability_count = {ability_count}")
-            for i in range(min(ability_count, 4)):
-                key_binding = request.POST.get(f'ability_key_{i}')
-                ability_name = request.POST.get(f'ability_name_{i}')
-                ability_description = request.POST.get(f'ability_description_{i}')
-                if key_binding and ability_name and ability_description:
-                    # Look up the template for this key
-                    template = AbilityTemplate.objects.filter(key_binding=key_binding).first()
-                    if template:
-                        Ability.objects.create(
-                            profile=profile,
-                            template=template,
-                            ability_name=ability_name,
-                            ability_description=ability_description
-                        )
+            # Save abilities (linked to templates)
+            for template in AbilityTemplate.objects.all():
+                # Form fields expected to be named by template ID
+                ability_name = request.POST.get(f'ability_name_{template.id}')
+                ability_description = request.POST.get(f'ability_description_{template.id}')
+                
+                if ability_name and ability_description:
+                    Ability.objects.create(
+                        profile=profile,
+                        template=template,
+                        ability_name=ability_name,
+                        ability_description=ability_description
+                    )
             
             messages.success(request, 'Profile created successfully!')
             return redirect('display_profile', profile_id=profile.id)
@@ -71,6 +80,7 @@ def input_profile(request):
         'available_roles': Role.objects.all(),
         'available_teams': Team.objects.all(),
         'available_maps': Map.objects.all(),
+        'ability_rows': get_ability_rows(),
         'selected_agent_ids': selected_agent_ids,
         'selected_role_ids': selected_role_ids,
         'selected_map_ids': selected_map_ids,
@@ -90,7 +100,6 @@ def display_profile(request, profile_id):
         'profile': profile,
         'agents': profile.agents.all(),
         'roles': profile.roles.all(),
-        'maps': profile.maps.all(),
         'abilities': profile.abilities.all(),
         'teammates': teammates,
     }
@@ -129,40 +138,37 @@ def edit_profile(request, profile_id):
             
             # Update ManyToMany relationships
             agent_ids = request.POST.getlist('agent_id')
-            print(f"DEBUG EDIT: agent_ids = {agent_ids}")
             profile.agents.set(agent_ids if agent_ids else [])
             
             role_ids = request.POST.getlist('role_id')
-            print(f"DEBUG EDIT: role_ids = {role_ids}")
             profile.roles.set(role_ids if role_ids else [])
 
             map_ids = request.POST.getlist('map_id')
-            print(f"DEBUG EDIT: map_ids = {map_ids}")
             profile.maps.set(map_ids if map_ids else [])
             
             # Delete and recreate abilities
             profile.abilities.all().delete()
-            ability_count = int(request.POST.get('ability_count', 0))
-            print(f"DEBUG EDIT: ability_count = {ability_count}")
-            for i in range(min(ability_count, 4)):
-                key_binding = request.POST.get(f'ability_key_{i}')
-                ability_name = request.POST.get(f'ability_name_{i}')
-                ability_description = request.POST.get(f'ability_description_{i}')
-                if key_binding and ability_name and ability_description:
-                    # Look up the template for this key
-                    template = AbilityTemplate.objects.filter(key_binding=key_binding).first()
-                    if template:
-                        Ability.objects.create(
-                            profile=profile,
-                            template=template,
-                            ability_name=ability_name,
-                            ability_description=ability_description
-                        )
+            
+            for template in AbilityTemplate.objects.all():
+                ability_name = request.POST.get(f'ability_name_{template.id}')
+                ability_description = request.POST.get(f'ability_description_{template.id}')
+                
+                if ability_name and ability_description:
+                    Ability.objects.create(
+                        profile=profile,
+                        template=template,
+                        ability_name=ability_name,
+                        ability_description=ability_description
+                    )
             
             messages.success(request, 'Profile updated successfully!')
             return redirect('display_profile', profile_id=profile.id)
     else:
         profile_form = ProfileForm(instance=profile)
+        # Pre-fill selected IDs from DB
+        selected_agent_ids = list(profile.agents.values_list('id', flat=True))
+        selected_role_ids = list(profile.roles.values_list('id', flat=True))
+        selected_map_ids = list(profile.maps.values_list('id', flat=True))
     
     # Get existing data for pre-filling the form
     context = {
@@ -170,13 +176,13 @@ def edit_profile(request, profile_id):
         'profile': profile,
         'agents': profile.agents.all(),
         'roles': profile.roles.all(),
-        'maps': profile.maps.all(),
         'abilities': profile.abilities.all(),
         'is_edit': True,
         'available_agents': Agent.objects.select_related('role').all(),
         'available_roles': Role.objects.all(),
         'available_teams': Team.objects.all(),
         'available_maps': Map.objects.all(),
+        'ability_rows': get_ability_rows(profile),
         'selected_agent_ids': selected_agent_ids,
         'selected_role_ids': selected_role_ids,
         'selected_map_ids': selected_map_ids,
