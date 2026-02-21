@@ -1,0 +1,596 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ profile.in_game_name }} - Player Card</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Oswald:wght@200..700&display=swap"
+        rel="stylesheet">
+
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/granim/2.0.0/granim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            background-color: #0f1923;
+            font-family: "Arimo", sans-serif;
+            display: grid;
+            grid-template-columns: 1fr minmax(300px, 25vw) 1fr;
+            /* Responsive Center Column */
+            align-items: center;
+        }
+
+        #gradient {
+            height: 100vh;
+            width: 100vw;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* CENTER COLUMN: PROFILE PICTURE */
+        .pfp-container {
+            position: relative;
+            width: 25vw;
+            height: 25vw;
+            max-width: 350px;
+            max-height: 350px;
+            min-width: 250px;
+            min-height: 250px;
+            justify-self: center;
+            z-index: 10;
+        }
+
+        .pfp-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            background: #0f1923;
+        }
+
+        /* Glitch Layers for Circle PFP */
+        .pfp-s {
+            z-index: 9;
+            opacity: 0.6;
+            mix-blend-mode: color-dodge;
+            transform: translate(-3px, 0);
+            border-color: #00f5ff;
+        }
+
+        .pfp-b {
+            z-index: 8;
+            opacity: 0.3;
+            transform: translate(3px, 0);
+            border-color: #ff4655;
+        }
+
+        .pfp-main {
+            z-index: 10;
+        }
+
+        /* LEFT COLUMN: AGENTS & MAPS */
+        .left-panel {
+            grid-column: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            padding-right: 4vw;
+            text-align: right;
+            z-index: 12;
+            height: 100%;
+            gap: 4vh;
+        }
+
+        .data-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .section-title {
+            font-family: "Oswald", sans-serif;
+            font-size: 1.5vh;
+            color: #ff4655;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-bottom: 2px solid rgba(255, 70, 85, 0.5);
+            padding-bottom: 5px;
+            margin-bottom: 1.5vh;
+            display: inline-block;
+        }
+
+        .icon-grid {
+            display: flex;
+            gap: 1.5vh;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            max-width: 400px;
+        }
+
+        /* Responsive Icons */
+        .icon-box {
+            width: 6vh;
+            height: 6vh;
+            min-width: 40px;
+            min-height: 40px;
+            background: rgba(15, 25, 35, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .icon-box:hover {
+            background: #ff4655;
+            border-color: #ff4655;
+            transform: scale(1.1);
+        }
+
+        .icon-box img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+
+        /* RIGHT COLUMN: INFO & ROLES */
+        .right-panel {
+            grid-column: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            padding-left: 4vw;
+            text-align: left;
+            z-index: 12;
+            height: 100%;
+            gap: 4vh;
+            color: white;
+        }
+
+        /* Unique to right panel: reverse alignment of data-group for left-align */
+        .right-panel .data-group {
+            align-items: flex-start;
+        }
+
+        .right-panel .icon-grid {
+            justify-content: flex-start;
+        }
+
+        .player-identity {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 1vh;
+        }
+
+        .player-team {
+            font-family: "Arimo", sans-serif;
+            font-weight: 700;
+            letter-spacing: 3px;
+            font-size: 2vh;
+            color: #ff4655;
+            text-transform: uppercase;
+            margin-bottom: 0.5vh;
+        }
+
+        .player-name {
+            font-family: "Oswald", sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 6vh;
+            line-height: 1;
+            margin: 0;
+            color: #ece8e1;
+            text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .player-tag {
+            font-family: "Oswald", sans-serif;
+            font-size: 2vh;
+            color: #8fa1c1;
+            opacity: 0.8;
+            margin-top: 0.5vh;
+        }
+
+        .map-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vh;
+        }
+
+        .map-card {
+            display: flex;
+            align-items: center;
+            background: rgba(15, 25, 35, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            width: auto;
+            /* Changed from fixed 30vh */
+            min-width: 200px;
+            transition: all 0.3s;
+        }
+
+        .map-card:hover {
+            border-color: #00f5ff;
+            transform: translateX(-10px);
+            /* Move left on hover since it's on left side */
+            background: rgba(15, 25, 35, 0.9);
+            cursor: default;
+        }
+
+        .map-img {
+            width: 10vh;
+            height: 5vh;
+            min-width: 80px;
+            min-height: 40px;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .map-name {
+            font-family: "Oswald", sans-serif;
+            font-size: 1.8vh;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ece8e1;
+        }
+
+        /* BACKGROUND TEXT */
+        .bg-text-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            opacity: 0.05;
+            pointer-events: none;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .bg-text {
+            font-family: "Oswald", sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 30vw;
+            line-height: 0.8;
+            color: white;
+        }
+
+        /* BACK BUTTON */
+        .back-btn {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            z-index: 200;
+            color: white;
+            text-decoration: none;
+            font-family: "Oswald", sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            padding: 12px 24px;
+            background: rgba(15, 25, 35, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn:hover {
+            background: #ff4655;
+            border-color: #ff4655;
+            color: #0f1923;
+        }
+
+        .back-btn span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #ff4655;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover span {
+            background: #0f1923;
+        }
+
+        /* RESPONSIVE */
+        @media screen and (max-width: 1100px) {
+            body {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+                padding: 100px 20px 50px;
+                gap: 50px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .left-panel,
+            .right-panel {
+                align-items: center;
+                text-align: center;
+                padding: 0;
+                width: 100%;
+                gap: 30px;
+            }
+
+            .data-group,
+            .right-panel .data-group {
+                align-items: center;
+            }
+
+            .player-identity {
+                align-items: center;
+            }
+
+            .pfp-container {
+                order: 1;
+                margin-bottom: 0;
+                width: 250px;
+                height: 250px;
+            }
+
+            .right-panel {
+                order: 2;
+                /* Info under PFP */
+            }
+
+            .left-panel {
+                order: 3;
+                /* Maps/Agents at bottom */
+            }
+
+            .icon-grid,
+            .right-panel .icon-grid {
+                justify-content: center;
+            }
+
+            .section-title {
+                border-bottom: 2px solid #ff4655;
+                font-size: 1.2rem;
+            }
+
+            .player-name {
+                font-size: 3rem;
+                text-align: center;
+            }
+
+            .map-card {
+                width: 100%;
+                max-width: 350px;
+                transform: translateX(0);
+            }
+
+            .map-card:hover {
+                transform: translateX(10px);
+            }
+
+            .bg-text {
+                font-size: 20vw;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="{% url 'display_profile' profile.id %}" class="back-btn">
+        <span></span>
+        BACK
+    </a>
+
+    <canvas id="gradient"></canvas>
+
+    <div class="bg-text-container">
+        <div class="bg-text">{{ profile.in_game_name }}</div>
+    </div>
+
+    <!-- LEFT PANEL: AGENTS & FAVORITE MAPS -->
+    <div class="left-panel">
+
+        <!-- Agents -->
+        {% if profile.agents.exists %}
+        <div class="data-group">
+            <div class="section-title">AGENTS</div>
+            <div class="icon-grid">
+                {% for agent in profile.agents.all %}
+                <div class="icon-box" title="{{ agent.name }}">
+                    <img src="{{ agent.get_icon_url }}" alt="{{ agent.name }}">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Favorite Maps (Moved to Left) -->
+        {% if profile.maps.exists %}
+        <div class="data-group">
+            <div class="section-title">FAVORITE MAPS</div>
+            <div class="map-grid">
+                {% for map in profile.maps.all %}
+                <div class="map-card">
+                    {% if map.get_icon_url %}
+                    <img src="{{ map.get_icon_url }}" class="map-img" alt="{{ map.name }}">
+                    {% endif %}
+                    <span class="map-name">{{ map.name }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- CENTER: PFP -->
+    <div class="pfp-container">
+        {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" class="pfp-img pfp-b" alt="">
+        <img src="{{ profile.profile_picture.url }}" class="pfp-img pfp-s" alt="">
+        <img src="{{ profile.profile_picture.url }}" class="pfp-img pfp-main" alt="{{ profile.in_game_name }}">
+        {% else %}
+        <div class="pfp-img pfp-main"
+            style="display:flex; align-items:center; justify-content:center; color:white; font-size:100px;">?</div>
+        {% endif %}
+    </div>
+
+    <!-- RIGHT PANEL: INFO & ROLES -->
+    <div class="right-panel">
+
+        <!-- Player Identity -->
+        <div class="player-identity">
+            {% if profile.team %}
+            <div class="player-team">{{ profile.team.name }}</div>
+            {% else %}
+            <div class="player-team">FREE AGENT</div>
+            {% endif %}
+
+            <h1 class="player-name">{{ profile.in_game_name }}</h1>
+
+            {% if profile.riot_tag %}
+            <div class="player-tag">#{{ profile.riot_tag }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Roles (Moved to Right) -->
+        {% if profile.roles.exists %}
+        <div class="data-group">
+            <div class="section-title">ROLES</div>
+            <div class="icon-grid">
+                {% for role in profile.roles.all %}
+                <div class="icon-box" title="{{ role.name }}">
+                    {% if role.get_icon_url %}
+                    <img src="{{ role.get_icon_url }}" alt="{{ role.name }}">
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Teammates -->
+        {% if teammates %}
+        <div class="data-group">
+            <div class="section-title">TEAMMATES</div>
+            <div class="map-grid">
+                {% for teammate in teammates %}
+                <div class="map-card" style="width: auto; padding-right: 20px;">
+                    <div class="map-img"
+                        style="width: 5vh; height: 5vh; min-width: 40px; border-radius: 50%; overflow: hidden; border: none; margin-right: 10px;">
+                        {% if teammate.profile_picture %}
+                        <img src="{{ teammate.profile_picture.url }}" alt="{{ teammate.in_game_name }}"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                        <div
+                            style="width: 100%; height: 100%; background: #333; display: flex; align-items: center; justify-content: center; color: white;">
+                            ?</div>
+                        {% endif %}
+                    </div>
+                    <span class="map-name" style="font-size: 1.5vh;">{{ teammate.in_game_name }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Init Gradient
+        var granimInstance = new Granim({
+            element: "#gradient",
+            direction: "diagonal",
+            isPausedWhenNotInView: false,
+            stateTransitionSpeed: 200,
+            states: {
+                "default-state": {
+                    gradients: [
+                        ['#a67963', '#171d3b'],
+                        ['#0f1923', '#ff4655'],
+                        ['#171d3b', '#a67963']
+                    ],
+                    transitionSpeed: 5000
+                }
+            }
+        });
+
+        // Animations
+        anime({
+            targets: '.pfp-s',
+            translateX: [
+                { value: -3, duration: 100, delay: 2000 },
+                { value: 3, duration: 100 },
+                { value: 0, duration: 100 }
+            ],
+            opacity: [
+                { value: 0.6, duration: 1000 },
+                { value: 0.3, duration: 200, delay: 2000 },
+                { value: 0.6, duration: 200 }
+            ],
+            loop: true,
+            easing: 'linear'
+        });
+
+        anime({
+            targets: '.pfp-b',
+            scale: [1.02, 1],
+            opacity: [0.2, 0.4],
+            loop: true,
+            direction: 'alternate',
+            duration: 3000,
+            easing: 'easeInOutQuad'
+        });
+
+        // Entrance Animations
+        var tl = anime.timeline({
+            easing: 'easeOutExpo',
+            duration: 1000
+        });
+
+        tl
+            .add({
+                targets: '.pfp-container',
+                scale: [0, 1],
+                opacity: [0, 1]
+            })
+            .add({
+                targets: ['.left-panel .data-group', '.right-panel .player-identity', '.right-panel .data-group'],
+                translateY: [50, 0],
+                opacity: [0, 1],
+                delay: anime.stagger(200)
+            }, '-=500');
+
+    </script>
+</body>
+
+</html>

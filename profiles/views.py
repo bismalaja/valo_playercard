@@ -124,11 +124,10 @@ def edit_profile(request, profile_id):
     selected_agent_ids = []
     selected_role_ids = []
     selected_map_ids = []
-
     if request.method == 'POST':
         profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
         
-        # If POST, we might need these later if validation fails
+        # Capture selections from POST
         if request.POST.getlist('agent_id'):
             selected_agent_ids = [int(id) for id in request.POST.getlist('agent_id')]
         if request.POST.getlist('role_id'):
@@ -192,9 +191,25 @@ def edit_profile(request, profile_id):
         'selected_agent_ids': selected_agent_ids,
         'selected_role_ids': selected_role_ids,
         'selected_map_ids': selected_map_ids,
+        'custom_errors': {},
     }
     
     return render(request, 'profiles/input_form.html', context)
+
+
+def card_profile(request, profile_id):
+    """Display the profile as a stylized card."""
+    profile = get_object_or_404(Profile, id=profile_id)
+    
+    teammates = None
+    if profile.team:
+        teammates = Profile.objects.filter(team=profile.team).exclude(id=profile.id)
+
+    return render(request, 'profiles/card_profile.html', {
+        'profile': profile,
+        'agents': profile.agents.all(),
+        'teammates': teammates
+    })
 
 
 def delete_profile(request, profile_id):

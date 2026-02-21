@@ -5,214 +5,432 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valorant Profiles</title>
+    <title>ROSTER - Valorant Profiles</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Oswald:wght@200..700&display=swap"
+        rel="stylesheet">
+
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/granim/2.0.0/granim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
     <style>
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f1923 0%, #1a2633 100%);
-            color: #fff;
-            padding: 40px 20px;
+            margin: 0;
+            background-color: #0f1923;
+            font-family: "Arimo", sans-serif;
+            color: white;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 50px 20px;
+            position: relative;
+            z-index: 10;
         }
 
-        h1 {
-            color: #00f5ff;
-            margin-bottom: 10px;
-            font-size: 3em;
-            text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
-            text-align: center;
+        /* HEADER SECTION */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 50px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .page-title {
+            font-family: "Oswald", sans-serif;
+            font-size: 4rem;
             text-transform: uppercase;
-            letter-spacing: 4px;
+            color: #ece8e1;
+            margin: 0;
+            line-height: 1;
         }
 
-        .subtitle {
+        .page-subtitle {
             color: #ff4655;
-            margin-bottom: 40px;
-            font-size: 1.2em;
-            text-align: center;
+            font-family: "Oswald", sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
         }
 
-        .create-btn {
-            display: inline-block;
-            padding: 15px 40px;
-            background: linear-gradient(135deg, #00f5ff 0%, #0099cc 100%);
-            color: #0f1923;
+        /* ACTIONS */
+        .action-bar {
+            margin-bottom: 40px;
+        }
+
+        .valorant-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 30px;
+            background: rgba(255, 70, 85, 0.1);
+            border: 1px solid #ff4655;
+            color: white;
             text-decoration: none;
-            border-radius: 5px;
-            font-weight: 600;
-            font-size: 1.1em;
+            font-family: "Oswald", sans-serif;
             text-transform: uppercase;
             letter-spacing: 2px;
-            transition: all 0.3s;
-            margin-bottom: 40px;
-            display: block;
-            text-align: center;
-            max-width: 300px;
-            margin: 0 auto 40px;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
         }
 
-        .create-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 245, 255, 0.4);
+        .valorant-btn:hover {
+            background: #ff4655;
+            color: #0f1923;
+            box-shadow: 0 0 20px rgba(255, 70, 85, 0.4);
         }
 
+        .valorant-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .valorant-btn:hover::before {
+            left: 100%;
+        }
+
+        /* GRID */
         .profiles-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 30px;
-            margin-top: 40px;
         }
 
+        /* MENU */
+        .menu-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 20;
+        }
+
+        .menu-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+        }
+
+        .menu-btn:hover {
+            background: #ff4655;
+            border-color: #ff4655;
+        }
+
+        .menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #0f1923;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 150px;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .menu-dropdown.active {
+            display: flex;
+        }
+
+        .menu-item {
+            padding: 10px 15px;
+            color: #ece8e1;
+            text-decoration: none;
+            font-family: "Arimo", sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: left;
+            background: none;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 70, 85, 0.2);
+            color: #ff4655;
+        }
+
+        .menu-item.delete:hover {
+            background: rgba(255, 70, 85, 0.8);
+            color: white;
+        }
+
+        /* CARD */
         .profile-card {
-            background: rgba(15, 25, 35, 0.8);
+            background: rgba(15, 25, 35, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 30px;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 245, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             transition: all 0.3s;
-            text-align: center;
+            position: relative;
+            overflow: visible;
+            /* changed from hidden to allow menu */
+            text-decoration: none;
+            cursor: pointer;
         }
 
         .profile-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.3);
             border-color: #00f5ff;
+            transform: translateY(-5px);
+            background: rgba(15, 25, 35, 0.9);
         }
 
-        .profile-avatar {
+        .card-pfp {
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            margin: 0 auto 20px;
-            border: 3px solid #ff4655;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(255, 70, 85, 0.4);
-        }
-
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
             object-fit: cover;
-        }
-
-        .profile-name {
-            color: #00f5ff;
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .profile-team {
-            color: #ff4655;
-            font-size: 1em;
             margin-bottom: 20px;
-        }
-
-        .view-btn {
-            display: inline-block;
-            padding: 10px 25px;
-            background: rgba(255, 70, 85, 0.8);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: 600;
             transition: all 0.3s;
+        }
+
+        .profile-card:hover .card-pfp {
+            border-color: #00f5ff;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+
+        .card-name {
+            font-family: "Oswald", sans-serif;
+            font-size: 2rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9em;
+            color: #ece8e1;
+            margin: 0 0 5px 0;
         }
 
-        .view-btn:hover {
-            background: rgba(255, 70, 85, 1);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 70, 85, 0.4);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #8fa1c1;
-        }
-
-        .empty-state h2 {
-            color: #00f5ff;
+        .card-team {
+            font-family: "Arimo", sans-serif;
+            color: #ff4655;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
             margin-bottom: 20px;
-            font-size: 2em;
         }
 
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            body {
-                padding: 20px 10px;
-            }
+        .card-stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
 
-            h1 {
-                font-size: 2em;
-            }
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            color: #8fa1c1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-            .profiles-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
 
-            .create-btn {
-                width: 100%;
-                max-width: none;
-            }
+        .card-btn {
+            font-family: "Oswald", sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s;
+        }
+
+        .card-btn:hover {
+            background: white;
+            color: #0f1923;
+        }
+
+        .card-btn.delete {
+            border-color: #ff4655;
+            color: #ff4655;
+        }
+
+        .card-btn.delete:hover {
+            background: #ff4655;
+            color: white;
+        }
+
+        /* DECORATIONS */
+        .corner-decor {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 2px solid #ff4655;
+            transition: all 0.3s;
+            opacity: 0;
+        }
+
+        .top-left {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .bottom-right {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
+        }
+
+        .profile-card:hover .corner-decor {
+            opacity: 1;
+            width: 20px;
+            height: 20px;
         }
     </style>
 </head>
 
 <body>
-    <!-- Hidden messages container for Toast Notifications -->
-    {% if messages %}
-    <div class="messages-data" style="display:none;">
-        {% for message in messages %}
-        <div class="message-item" data-message="{{ message }}" data-tag="{{ message.tags }}"></div>
-        {% endfor %}
-    </div>
-    {% endif %}
+    <canvas id="gradient"></canvas>
 
     <div class="container">
-        <h1>Valorant Profiles</h1>
-        <p class="subtitle">Browse and create player profiles</p>
+        <div class="header">
+            <div>
+                <span class="page-subtitle">Tyloo Roster Management</span>
+                <h1 class="page-title">VALORANT PROFILES</h1>
+            </div>
+        </div>
 
-        <a href="{% url 'input_profile' %}" class="create-btn">+ Create New Profile</a>
+        <div class="action-bar">
+            <a href="{% url 'input_profile' %}" class="valorant-btn">
+                CREATE PROFILE
+            </a>
+        </div>
 
-        {% if profiles %}
         <div class="profiles-grid">
             {% for profile in profiles %}
-            <div class="profile-card">
-                <div class="profile-avatar">
-                    <img src="{{ profile.get_profile_picture_url }}" alt="{{ profile.in_game_name }}">
+            <div class="profile-card" onclick="window.location.href='{% url 'display_profile' profile.id %}'">
+                <span class="corner-decor top-left"></span>
+                <span class="corner-decor bottom-right"></span>
+
+                <div class="menu-container" onclick="event.stopPropagation()">
+                    <button class="menu-btn" onclick="this.nextElementSibling.classList.toggle('active')">⋮</button>
+                    <div class="menu-dropdown">
+                        <a href="{% url 'card_profile' profile.id %}" class="menu-item">View Card</a>
+                        <a href="{% url 'edit_profile' profile.id %}" class="menu-item">Edit</a>
+                        <button
+                            onclick="confirmDelete('{% url 'delete_profile' profile.id %}', '{{ profile.in_game_name|escapejs }}')"
+                            class="menu-item delete">Delete</button>
+                    </div>
                 </div>
-                <h2 class="profile-name">{{ profile.in_game_name }}</h2>
-                <p class="profile-team">{{ profile.team_name }}</p>
-                <a href="{% url 'display_profile' profile.id %}" class="view-btn">View Profile</a>
+
+                {% if profile.profile_picture %}
+                <img src="{{ profile.profile_picture.url }}" alt="{{ profile.in_game_name }}" class="card-pfp">
+                {% else %}
+                <div class="card-pfp"
+                    style="display:flex; align-items:center; justify-content:center; background:#1f2833; font-size:40px;">
+                    ?</div>
+                {% endif %}
+
+                <h2 class="card-name">{{ profile.in_game_name }}</h2>
+                <div class="card-team">{{ profile.team.name|default:"FREE AGENT" }}</div>
+
+                <div class="card-stats">
+                    <div class="stat-badge">{{ profile.agents.count }} AGENTS</div>
+                    <div class="stat-badge">{{ profile.maps.count }} MAPS</div>
+                </div>
+            </div>
+            {% empty %}
+            <div style="grid-column: 1/-1; text-align: center; color: #8fa1c1; padding: 50px;">
+                <h3 style="font-family:'Oswald'; font-size: 2rem;">NO AGENTS FOUND</h3>
+                <p>Recruit new agents to build your roster.</p>
             </div>
             {% endfor %}
         </div>
-        {% else %}
-        <div class="empty-state">
-            <h2>No Profiles Yet</h2>
-            <p>Create your first Valorant player profile to get started!</p>
-        </div>
-        {% endif %}
     </div>
 
-    <script src="{% static 'profiles/js/notifications.js' %}"></script>
+    <!-- Hidden form for deletion -->
+    <form id="delete-form" method="post" action="">
+        {% csrf_token %}
+    </form>
+
+    <script>
+        function confirmDelete(url, name) {
+            if (confirm("Are you sure you want to terminate agent " + name + "? This action cannot be undone.")) {
+                var form = document.getElementById('delete-form');
+                form.action = url;
+                form.submit();
+            }
+        }
+
+        var granimInstance = new Granim({
+            element: "#gradient",
+            direction: "diagonal",
+            isPausedWhenNotInView: false,
+            stateTransitionSpeed: 200,
+            states: {
+                "default-state": {
+                    gradients: [
+                        ['#a67963', '#171d3b'],
+                        ['#0f1923', '#ff4655'],
+                        ['#171d3b', '#a67963']
+                    ],
+                    transitionSpeed: 5000
+                }
+            }
+        });
+
+        anime({
+            targets: '.profile-card',
+            translateY: [20, 0],
+            opacity: [0, 1],
+            delay: anime.stagger(100),
+            easing: 'easeOutExpo'
+        });
+    </script>
 </body>
 
 </html>

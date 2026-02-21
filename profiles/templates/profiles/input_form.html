@@ -5,577 +5,543 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if is_edit %}Edit{% else %}Create{% endif %} Valorant Profile</title>
+    <title>SQUAD ENTRY - Upload Data</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Oswald:wght@200..700&display=swap"
+        rel="stylesheet">
+
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/granim/2.0.0/granim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
     <style>
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f1923 0%, #1a2633 100%);
-            color: #fff;
-            padding: 20px;
+            margin: 0;
+            background-color: #0f1923;
+            font-family: "Arimo", sans-serif;
+            color: #ece8e1;
             min-height: 100vh;
         }
 
+        #gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
-            background: rgba(15, 25, 35, 0.8);
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 30px rgba(0, 245, 255, 0.2);
-            border: 1px solid rgba(0, 245, 255, 0.3);
+            padding: 50px 20px;
+            position: relative;
+            z-index: 10;
         }
 
-        h1 {
-            color: #00f5ff;
-            margin-bottom: 10px;
-            font-size: 2.5em;
-            text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+        /* MENU */
+        .menu-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 20;
         }
 
-        .subtitle {
+        .menu-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+            border-radius: 50%;
+        }
+
+        .menu-btn:hover {
+            background: #ff4655;
+            border-color: #ff4655;
+        }
+
+        .menu-dropdown {
+            position: absolute;
+            top: 110%;
+            right: 0;
+            background: #0f1923;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 180px;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .menu-dropdown.active {
+            display: flex;
+        }
+
+        .menu-item {
+            padding: 12px 16px;
+            color: #ece8e1;
+            text-decoration: none;
+            font-family: "Oswald", sans-serif;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 70, 85, 0.2);
             color: #ff4655;
-            margin-bottom: 30px;
-            font-size: 1.1em;
+            padding-left: 20px;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        /* HEADER */
+        .header {
+            margin-bottom: 40px;
+            border-left: 5px solid #ff4655;
+            padding-left: 20px;
+        }
+
+        .header h1 {
+            font-family: "Oswald", sans-serif;
+            font-size: 3rem;
+            text-transform: uppercase;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .header p {
+            color: #8fa1c1;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        /* FORM STYLING */
+        .valorant-form {
+            background: rgba(15, 25, 35, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
         }
 
         .form-section {
-            margin-bottom: 40px;
-            padding: 25px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            border-left: 3px solid #00f5ff;
+            margin-bottom: 50px;
         }
 
-        .form-section h2 {
-            color: #00f5ff;
+        .section-title {
+            font-family: "Oswald", sans-serif;
+            color: #ff4655;
+            text-transform: uppercase;
+            font-size: 1.5rem;
             margin-bottom: 20px;
-            font-size: 1.5em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            letter-spacing: 1px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        label {
+        .form-label {
             display: block;
-            margin-bottom: 8px;
+            font-family: "Oswald", sans-serif;
             color: #00f5ff;
-            font-weight: 500;
+            /* Cyan for labels */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-size: 1rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(0, 245, 255, 0.3);
-            border-radius: 5px;
-            color: #fff;
-            font-size: 1em;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 15px;
+            font-family: "Arimo", sans-serif;
+            font-size: 1rem;
             transition: all 0.3s;
-        }
-
-        .form-control option {
-            background: #1a2633;
-            color: #fff;
         }
 
         .form-control:focus {
             outline: none;
             border-color: #00f5ff;
-            box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+            background: rgba(0, 245, 255, 0.05);
         }
 
-        .dynamic-list {
-            margin-top: 20px;
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
         }
 
-        .dynamic-item {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            border: 1px solid rgba(255, 70, 85, 0.3);
+        /* GRID SELECTORS (Team, Agents, Roles, Maps) */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
         }
 
-        .btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-right: 10px;
-            margin-top: 10px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #00f5ff 0%, #0099cc 100%);
-            color: #0f1923;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 245, 255, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 70, 85, 0.8);
-            color: #fff;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 70, 85, 1);
-            transform: translateY(-2px);
-        }
-
-        .btn-remove {
-            background: rgba(255, 50, 50, 0.6);
-            color: #fff;
-            padding: 8px 15px;
-            font-size: 0.9em;
-        }
-
-        .btn-remove:hover {
-            background: rgba(255, 50, 50, 0.9);
-        }
-
-        .messages {
-            margin-bottom: 20px;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-
-        .alert-success {
-            background: rgba(0, 245, 85, 0.2);
-            border: 1px solid rgba(0, 245, 85, 0.5);
-            color: #00f555;
-        }
-
-        .alert-error {
-            background: rgba(255, 70, 85, 0.2);
-            border: 1px solid rgba(255, 70, 85, 0.5);
-            color: #ff4655;
-        }
-
-        select.form-control {
+        .selection-item {
+            position: relative;
             cursor: pointer;
         }
 
-        .item-header {
+        .selection-item input[type="checkbox"],
+        .selection-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .selection-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            /* Rounded corners */
+            padding: 15px;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .item-number {
-            color: #ff4655;
-            font-weight: 600;
-        }
-
-        /* Team Selection Grid */
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .team-option {
-            position: relative;
-            cursor: pointer;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
+            justify-content: center;
             text-align: center;
+            height: 100%;
+            min-height: 120px;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        .team-option:hover {
-            border-color: #00f5ff;
-            background: rgba(0, 245, 255, 0.1);
+        .selection-card:hover {
+            border-color: rgba(255, 255, 255, 0.5);
             transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .team-option.selected {
-            border-color: #00f5ff;
-            background: rgba(0, 245, 255, 0.2);
-            box-shadow: 0 0 15px rgba(0, 245, 255, 0.4);
-        }
-
-        .team-option input[type="radio"] {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .team-option img {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            margin-bottom: 10px;
-        }
-
-        .team-option-name {
-            font-size: 14px;
-            color: #fff;
-            font-weight: 500;
-        }
-
-        /* Agent and Role Selection Grids */
-        .agent-grid,
-        .role-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .agent-option,
-        .role-option {
-            position: relative;
-            cursor: pointer;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .agent-option:hover,
-        .role-option:hover {
-            border-color: #ff4655;
-            background: rgba(255, 70, 85, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .agent-option.selected,
-        .role-option.selected {
-            border-color: #ff4655;
+        /* Checked State */
+        .selection-item input:checked+.selection-card {
             background: rgba(255, 70, 85, 0.2);
-            box-shadow: 0 0 15px rgba(255, 70, 85, 0.4);
+            /* Red tint */
+            border-color: #ff4655;
+            box-shadow: 0 0 15px rgba(255, 70, 85, 0.3);
         }
 
-        .agent-option input[type="checkbox"],
-        .role-option input[type="checkbox"] {
-            position: absolute;
-            opacity: 0;
-        }
-
-        .agent-option img,
-        .role-option img {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
+        .item-icon {
+            width: 50px;
+            height: 50px;
             margin-bottom: 10px;
+            object-fit: contain;
+            filter: grayscale(100%);
+            transition: all 0.3s;
         }
 
-        .agent-option-name,
-        .role-option-name {
-            font-size: 14px;
-            color: #fff;
-            font-weight: 500;
-            margin-bottom: 5px;
+        .selection-item input:checked+.selection-card .item-icon {
+            filter: grayscale(0%);
+            transform: scale(1.1);
         }
 
-        .agent-role-badge {
-            font-size: 11px;
-            color: #00f5ff;
-            background: rgba(0, 245, 255, 0.2);
-            padding: 2px 8px;
-            border-radius: 10px;
-            display: inline-block;
+        .item-name {
+            font-family: "Oswald", sans-serif;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            color: #8fa1c1;
+        }
+
+        .selection-item input:checked+.selection-card .item-name {
+            color: white;
+        }
+
+        /* Helper Text */
+        .help-text {
+            display: block;
+            font-size: 0.8rem;
+            color: #8fa1c1;
             margin-top: 5px;
         }
 
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
+        /* ACTIONS */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            margin-top: 50px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+        }
 
-            .container {
-                padding: 20px;
-            }
+        .btn {
+            padding: 15px 40px;
+            font-family: "Oswald", sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            border: 1px solid transparent;
+        }
 
-            h1 {
-                font-size: 1.8em;
-            }
+        .btn-primary {
+            background: #ff4655;
+            color: white;
+        }
 
-            .form-section {
-                padding: 15px;
-            }
+        .btn-primary:hover {
+            background: #0f1923;
+            color: #ff4655;
+            border-color: #ff4655;
+        }
 
-            .row-responsive {
-                flex-direction: column !important;
-            }
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ece8e1;
+        }
 
-            .team-grid,
-            .agent-grid,
-            .role-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            }
+        .btn-secondary:hover {
+            border-color: white;
+        }
+
+        .error-message {
+            color: #ff4655;
+            font-size: 0.9rem;
+            margin-top: 5px;
         }
     </style>
 </head>
 
 <body>
+    <canvas id="gradient"></canvas>
+
     <div class="container">
-        <h1>{% if is_edit %}Edit Your Valorant Profile{% else %}Create Your Valorant Profile{% endif %}</h1>
-        <p class="subtitle">{% if is_edit %}Update your information to modify your personalized agent card{% else %}Fill
-            in your information to generate your personalized agent card{% endif %}</p>
-
-        <!-- Hidden messages container for Toast Notifications -->
-        {% if messages %}
-        <div class="messages-data" style="display:none;">
-            {% for message in messages %}
-            <div class="message-item" data-message="{{ message }}" data-tag="{{ message.tags }}"></div>
-            {% endfor %}
+        <div class="menu-container">
+            <div class="menu-btn" onclick="this.nextElementSibling.classList.toggle('active')">≡</div>
+            <div class="menu-dropdown">
+                <a href="{% url 'profile_list' %}" class="menu-item">Roster</a>
+                {% if profile_form.instance.pk %}
+                <a href="{% url 'display_profile' profile_form.instance.pk %}" class="menu-item">View Profile</a>
+                <a href="{% url 'card_profile' profile_form.instance.pk %}" class="menu-item">Player Card</a>
+                {% endif %}
+                <a href="{% url 'profile_list' %}" class="menu-item">Cancel</a>
+            </div>
         </div>
-        {% endif %}
 
-        <form method="post" enctype="multipart/form-data" id="profileForm">
+        <div class="header">
+            <h1>{% if profile_form.instance.pk %}UPDATE PROFILE{% else %}NEW AGENT ENTRY{% endif %}</h1>
+            <p>Enter required clearance data</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="valorant-form">
             {% csrf_token %}
 
-            <!-- BASIC INFO -->
+            <!-- SECTION 1: BASIC INFO -->
             <div class="form-section">
-                <h2>Basic Information</h2>
-
-                {% if profile_form.errors %}
-                <div class="alert alert-error">
-                    <strong>Please correct the errors below:</strong>
-                    <ul>
-                        {% for field in profile_form %}
-                        {% for error in field.errors %}
-                        <li>{{ field.label }}: {{ error }}</li>
-                        {% endfor %}
-                        {% endfor %}
-                        {% for error in profile_form.non_field_errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
+                <div class="section-title">Identity</div>
 
                 <div class="form-group">
-                    <label>In-Game Name *</label>
+                    <label class="form-label">In-Game Name <span style="color:#ff4655">*</span></label>
                     {{ profile_form.in_game_name }}
+                    {% if profile_form.in_game_name.errors %}
+                    <div class="error-message">{{ profile_form.in_game_name.errors.0 }}</div>
+                    {% endif %}
                 </div>
-                <div class="row-responsive" style="display: flex; gap: 15px;">
-                    <div class="form-group" style="flex: 2;">
-                        <label>Riot ID *</label>
+
+                <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <label class="form-label">Riot ID <span style="color:#ff4655">*</span></label>
                         {{ profile_form.riot_id }}
+                        {% if profile_form.riot_id.errors %}
+                        <div class="error-message">{{ profile_form.riot_id.errors.0 }}</div>
+                        {% endif %}
                     </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label>Tag *(e.g. #NA1)</label>
+                    <div>
+                        <label class="form-label">Riot Tag (#)</label>
                         {{ profile_form.riot_tag }}
+                        {% if profile_form.riot_tag.errors %}
+                        <div class="error-message">{{ profile_form.riot_tag.errors.0 }}</div>
+                        {% endif %}
                     </div>
                 </div>
+
                 <div class="form-group">
-                    <label>Profile Picture (Upload)</label>
+                    <label class="form-label">Profile Picture (Upload)</label>
                     {{ profile_form.profile_picture }}
+                    <span class="help-text">Max size 2MB.</span>
+                    {% if profile_form.profile_picture.errors %}
+                    <div class="error-message">{{ profile_form.profile_picture.errors.0 }}</div>
+                    {% endif %}
                 </div>
+
                 <div class="form-group">
-                    <label>Or Profile Picture URL</label>
+                    <label class="form-label">Or Profile Picture URL</label>
                     {{ profile_form.profile_picture_url }}
-                </div>
-                <div class="form-group">
-                    <label>Select Your Team</label>
-                    <div class="team-grid">
-                        {% for team in available_teams %}
-                        <label class="team-option" data-team-id="{{ team.id }}">
-                            <input type="radio" name="team" value="{{ team.id }}" {% if is_edit and profile.team.id == team.id %}checked{% endif %}>
-                            <img src="{{ team.get_icon_url }}" alt="{{ team.name }}">
-                            <div class="team-option-name">{{ team.name }}</div>
-                        </label>
-                        {% empty %}
-                        <p style="color: var(--color-text-muted); grid-column: 1/-1;">No teams available. Please add
-                            teams in the admin panel.</p>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Bio</label>
-                    {{ profile_form.bio }}
+                    <span class="help-text">Paste a direct link to an image (ends in .jpg, .png, etc.)</span>
+                    {% if profile_form.profile_picture_url.errors %}
+                    <div class="error-message">{{ profile_form.profile_picture_url.errors.0 }}</div>
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- AGENTS -->
+            <!-- SECTION 2: TEAM SELECTION -->
             <div class="form-section">
-                <h2>Agents You Play</h2>
-                <p style="color: #888; margin-bottom: 15px; font-size: 14px;">Select all agents you play (click to
-                    toggle)</p>
-                <div class="agent-grid">
-                    {% for agent in available_agents %}
-                    <label
-                        class="agent-option {% if is_edit and agent in agents or agent.id in selected_agent_ids %}selected{% endif %}"
-                        data-agent-id="{{ agent.id }}">
-                        <input type="checkbox" name="agent_id" value="{{ agent.id }}" {% if is_edit and agent in agents or agent.id in selected_agent_ids %}checked{% endif %}>
-                        {% if agent.get_icon_url %}
-                        <img src="{{ agent.get_icon_url }}" alt="{{ agent.name }}">
-                        {% else %}
-                        <div
-                            style="width: 60px; height: 60px; background: rgba(255,70,85,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px; font-weight: bold; color: #ff4655;">
-                            {{ agent.name|slice:":1" }}</div>
-                        {% endif %}
-                        <div class="agent-option-name">{{ agent.name }}</div>
-                        <div class="agent-role-badge">{{ agent.role.name }}</div>
+                <div class="section-title">Team Affiliation</div>
+                <div class="selection-grid">
+                    <!-- FREE AGENT OPTION -->
+                    <label class="selection-item">
+                        <input type="radio" name="team" value="" {% if not profile_form.instance.team %}checked{% endif
+                            %}>
+                        <div class="selection-card">
+                            <span class="item-name" style="font-size:1.2rem;">FREE AGENT</span>
+                        </div>
                     </label>
-                    {% empty %}
-                    <p style="color: var(--color-text-muted); grid-column: 1/-1;">No agents available. Please add agents
-                        in the admin panel.</p>
+
+                    {% for team in available_teams %}
+                    <label class="selection-item">
+                        <input type="radio" name="team" value="{{ team.id }}" {% if
+                            profile_form.instance.team.id==team.id %}checked{% endif %}>
+                        <div class="selection-card">
+                            {% if team.get_icon_url %}
+                            <img src="{{ team.get_icon_url }}" class="item-icon" alt="{{ team.name }}">
+                            {% endif %}
+                            <span class="item-name">{{ team.name }}</span>
+                        </div>
+                    </label>
                     {% endfor %}
                 </div>
             </div>
 
-            <!-- ROLES -->
+            <!-- SECTION 3: ROLES -->
             <div class="form-section">
-                <h2>Your Roles</h2>
-                <p style="color: #888; margin-bottom: 15px; font-size: 14px;">Select all roles you play (click to
-                    toggle)</p>
-                <div class="role-grid">
+                <div class="section-title">Preferred Roles</div>
+                <div class="selection-grid">
                     {% for role in available_roles %}
-                    <label
-                        class="role-option {% if is_edit and role in roles or role.id in selected_role_ids %}selected{% endif %}"
-                        data-role-id="{{ role.id }}">
-                        <input type="checkbox" name="role_id" value="{{ role.id }}" {% if is_edit and role in roles or role.id in selected_role_ids %}checked{% endif %}>
-                        {% if role.get_icon_url %}
-                        <img src="{{ role.get_icon_url }}" alt="{{ role.name }}">
-                        {% else %}
-                        <div
-                            style="width: 60px; height: 60px; background: rgba(0,245,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px; font-weight: bold; color: #00f5ff;">
-                            {{ role.name|slice:":1" }}</div>
-                        {% endif %}
-                        <div class="role-option-name">{{ role.name }}</div>
+                    <label class="selection-item">
+                        <input type="checkbox" name="role_id" value="{{ role.id }}" {% if role.id in selected_role_ids
+                            %}checked{% endif %}>
+                        <div class="selection-card">
+                            {% if role.get_icon_url %}
+                            <img src="{{ role.get_icon_url }}" class="item-icon" alt="{{ role.name }}">
+                            {% endif %}
+                            <span class="item-name">{{ role.name }}</span>
+                        </div>
                     </label>
-                    {% empty %}
-                    <p style="color: var(--color-text-muted); grid-column: 1/-1;">No roles available. Please add roles
-                        in the admin panel.</p>
                     {% endfor %}
                 </div>
             </div>
 
-            <!-- MAPS -->
+            <!-- SECTION 4: AGENTS -->
             <div class="form-section">
-                <h2>Favorite Maps</h2>
-                <p style="color: #888; margin-bottom: 15px; font-size: 14px;">Select up to 3 favorite maps</p>
-                <div class="agent-grid">
-                    {% for map in available_maps %}
-                    <label class="agent-option {% if map.id in selected_map_ids %}selected{% endif %}"
-                        data-map-id="{{ map.id }}">
-                        <input type="checkbox" name="map_id" value="{{ map.id }}" {% if map.id in selected_map_ids %}checked{% endif %}>
-                        {% if map.get_icon_url %}
-                        <img src="{{ map.get_icon_url }}" alt="{{ map.name }}">
-                        {% else %}
-                        <div
-                            style="width: 60px; height: 60px; background: rgba(0,245,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px; font-weight: bold; color: #00f5ff;">
-                            {{ map.name|slice:":1" }}</div>
-                        {% endif %}
-                        <div class="agent-option-name">{{ map.name }}</div>
+                <div class="section-title">Active Agents <span style="color:#ff4655">*</span></div>
+                {% if custom_errors.agents %}
+                <div class="error-message" style="margin-bottom:10px;">{{ custom_errors.agents }}</div>
+                {% endif %}
+                <div class="selection-grid" style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));">
+                    {% for agent in available_agents %}
+                    <label class="selection-item">
+                        <input type="checkbox" name="agent_id" value="{{ agent.id }}" {% if agent.id in
+                            selected_agent_ids %}checked{% endif %}>
+                        <div class="selection-card">
+                            <img src="{{ agent.get_icon_url }}" class="item-icon" alt="{{ agent.name }}">
+                            <span class="item-name">{{ agent.name }}</span>
+                        </div>
                     </label>
-                    {% empty %}
-                    <p style="color: var(--color-text-muted); grid-column: 1/-1;">No maps available.</p>
                     {% endfor %}
                 </div>
             </div>
 
-            <!-- ABILITIES REMOVED -->
+            <!-- SECTION 5: MAPS -->
+            <div class="form-section">
+                <div class="section-title">Map Preferences (Max 3) <span style="color:#ff4655">*</span></div>
+                {% if custom_errors.maps %}
+                <div class="error-message" style="margin-bottom:10px;">{{ custom_errors.maps }}</div>
+                {% endif %}
+                <div class="selection-grid" style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));">
+                    {% for map in available_maps %}
+                    <label class="selection-item">
+                        <input type="checkbox" name="map_id" value="{{ map.id }}" class="map-checkbox" {% if map.id in
+                            selected_map_ids %}checked{% endif %}>
+                        <div class="selection-card">
+                            {% if map.get_icon_url %}
+                            <img src="{{ map.get_icon_url }}" class="item-icon"
+                                style="width:100%; height:80px; object-fit:cover; margin-bottom:5px;"
+                                alt="{{ map.name }}">
+                            {% endif %}
+                            <span class="item-name">{{ map.name }}</span>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
 
-            <button type="submit" class="btn btn-primary">{% if is_edit %}Update Profile{% else %}Create Profile{% endif %}</button>
+            <div class="form-actions">
+                <a href="{% url 'profile_list' %}" class="btn btn-secondary">CANCEL</a>
+                <button type="submit" class="btn btn-primary">SAVE DATA</button>
+            </div>
         </form>
     </div>
 
-    <script src="{% static 'profiles/js/notifications.js' %}"></script>
     <script>
-        // Wait for DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function () {
-            // Agent and Role selection interactivity (Event Delegation)
-            // Handles visual state updates for checkbox changes
-            document.querySelectorAll('input[type="checkbox"][name="agent_id"], input[type="checkbox"][name="role_id"]').forEach(checkbox => {
-                checkbox.addEventListener('change', function () {
-                    const label = this.closest('label');
-                    if (label) {
-                        if (this.checked) {
-                            label.classList.add('selected');
-                        } else {
-                            label.classList.remove('selected');
-                        }
-                    }
-                });
-            });
-
-            // Map selection interactivity with Limit of 3
-            const mapCheckboxes = document.querySelectorAll('input[type="checkbox"][name="map_id"]');
-
-            function updateMapSelection() {
-                const checkedMaps = document.querySelectorAll('input[type="checkbox"][name="map_id"]:checked');
-
-                // Update styling
-                mapCheckboxes.forEach(cb => {
-                    const label = cb.closest('label');
-                    if (label) {
-                        if (cb.checked) {
-                            label.classList.add('selected');
-                        } else {
-                            label.classList.remove('selected');
-                        }
-                    }
-                });
-
-                // Enforce limit
-                if (checkedMaps.length >= 3) {
-                    mapCheckboxes.forEach(cb => {
-                        if (!cb.checked) {
-                            cb.disabled = true;
-                            cb.closest('label').style.opacity = '0.5';
-                            cb.closest('label').style.cursor = 'not-allowed';
-                        }
-                    });
-                } else {
-                    mapCheckboxes.forEach(cb => {
-                        cb.disabled = false;
-                        cb.closest('label').style.opacity = '1';
-                        cb.closest('label').style.cursor = 'pointer';
-                    });
+        var granimInstance = new Granim({
+            element: "#gradient",
+            direction: "diagonal",
+            isPausedWhenNotInView: false,
+            stateTransitionSpeed: 200,
+            states: {
+                "default-state": {
+                    gradients: [
+                        ['#a67963', '#171d3b'],
+                        ['#0f1923', '#ff4655'],
+                        ['#171d3b', '#a67963']
+                    ],
+                    transitionSpeed: 5000
                 }
             }
+        });
 
-            mapCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', updateMapSelection);
+        // Add class to default django rendered inputs
+        document.querySelectorAll('input[type="text"], input[type="number"], textarea, select').forEach(el => {
+            el.classList.add('form-control');
+        });
+
+        // Map Checkbox Limit
+        const mapCheckboxes = document.querySelectorAll('.map-checkbox');
+        const MAX_MAPS = 3;
+
+        mapCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const checkedCount = document.querySelectorAll('.map-checkbox:checked').length;
+                if (checkedCount > MAX_MAPS) {
+                    checkbox.checked = false;
+                    alert('You can only select up to ' + MAX_MAPS + ' maps.');
+                }
             });
+        });
 
-            // Run on load to handle edit mode
-            updateMapSelection();
-
-            // Team selection interactivity
-            document.querySelectorAll('.team-option').forEach(option => {
-                option.addEventListener('click', function () {
-                    // Remove selected class from all options
-                    document.querySelectorAll('.team-option').forEach(opt => opt.classList.remove('selected'));
-                    // Add selected class to clicked option
-                    this.classList.add('selected');
-                    // Check the radio button
-                    this.querySelector('input[type="radio"]').checked = true;
-                });
-            });
-
-            // Set initial selected state if editing
-            {% if is_edit and profile.team %}
-            document.querySelector('.team-option[data-team-id="{{ profile.team.id }}"]')?.classList.add('selected');
-            {% endif %}
+        anime({
+            targets: '.valorant-form',
+            translateY: [50, 0],
+            opacity: [0, 1],
+            duration: 800,
+            easing: 'easeOutExpo'
         });
     </script>
 </body>
