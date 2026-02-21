@@ -407,8 +407,7 @@
                 <div class="selection-grid">
                     <!-- FREE AGENT OPTION -->
                     <label class="selection-item">
-                        <input type="radio" name="team" value="" {% if not profile_form.instance.team %}checked{% endif
-                            %}>
+                        <input type="radio" name="team" value="" {% if not profile_form.instance.team %}checked{% endif %}>
                         <div class="selection-card">
                             <span class="item-name" style="font-size:1.2rem;">FREE AGENT</span>
                         </div>
@@ -416,8 +415,7 @@
 
                     {% for team in available_teams %}
                     <label class="selection-item">
-                        <input type="radio" name="team" value="{{ team.id }}" {% if
-                            profile_form.instance.team.id==team.id %}checked{% endif %}>
+                        <input type="radio" name="team" value="{{ team.id }}" {% if profile_form.instance.team.id == team.id %}checked{% endif %}>
                         <div class="selection-card">
                             {% if team.get_icon_url %}
                             <img src="{{ team.get_icon_url }}" class="item-icon" alt="{{ team.name }}">
@@ -435,8 +433,7 @@
                 <div class="selection-grid">
                     {% for role in available_roles %}
                     <label class="selection-item">
-                        <input type="checkbox" name="role_id" value="{{ role.id }}" {% if role.id in selected_role_ids
-                            %}checked{% endif %}>
+                        <input type="checkbox" name="role_id" value="{{ role.id }}" {% if role.id in selected_role_ids %}checked{% endif %}>
                         <div class="selection-card">
                             {% if role.get_icon_url %}
                             <img src="{{ role.get_icon_url }}" class="item-icon" alt="{{ role.name }}">
@@ -457,8 +454,7 @@
                 <div class="selection-grid" style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));">
                     {% for agent in available_agents %}
                     <label class="selection-item">
-                        <input type="checkbox" name="agent_id" value="{{ agent.id }}" {% if agent.id in
-                            selected_agent_ids %}checked{% endif %}>
+                        <input type="checkbox" name="agent_id" value="{{ agent.id }}" {% if agent.id in selected_agent_ids %}checked{% endif %}>
                         <div class="selection-card">
                             <img src="{{ agent.get_icon_url }}" class="item-icon" alt="{{ agent.name }}">
                             <span class="item-name">{{ agent.name }}</span>
@@ -477,8 +473,7 @@
                 <div class="selection-grid" style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));">
                     {% for map in available_maps %}
                     <label class="selection-item">
-                        <input type="checkbox" name="map_id" value="{{ map.id }}" class="map-checkbox" {% if map.id in
-                            selected_map_ids %}checked{% endif %}>
+                        <input type="checkbox" name="map_id" value="{{ map.id }}" class="map-checkbox" {% if map.id in selected_map_ids %}checked{% endif %}>
                         <div class="selection-card">
                             {% if map.get_icon_url %}
                             <img src="{{ map.get_icon_url }}" class="item-icon"
