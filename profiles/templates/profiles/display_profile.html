@@ -369,7 +369,7 @@
             {% endif %}
 
             <div class="header-info">
-                <span class="header-tag">#{{ profile.riot_tag|default:"XXXX" }}</span>
+                <span class="header-tag">{{ profile.riot_tag|default:"#XXXX" }}</span>
                 <h1>{{ profile.in_game_name }}</h1>
 
                 <div class="header-affiliation"
