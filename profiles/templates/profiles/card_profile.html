@@ -18,394 +18,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/granim/2.0.0/granim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            margin: 0;
-            background-color: #0f1923;
-            font-family: "Arimo", sans-serif;
-            display: grid;
-            grid-template-columns: 1fr minmax(300px, 25vw) 1fr;
-            /* Responsive Center Column */
-            align-items: center;
-        }
-
-        #gradient {
-            height: 100vh;
-            width: 100vw;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* CENTER COLUMN: PROFILE PICTURE */
-        .pfp-container {
-            position: relative;
-            width: 25vw;
-            height: 25vw;
-            max-width: 350px;
-            max-height: 350px;
-            min-width: 250px;
-            min-height: 250px;
-            justify-self: center;
-            z-index: 10;
-        }
-
-        .pfp-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-            background: #0f1923;
-        }
-
-        /* Glitch Layers for Circle PFP */
-        .pfp-s {
-            z-index: 9;
-            opacity: 0.6;
-            mix-blend-mode: color-dodge;
-            transform: translate(-3px, 0);
-            border-color: #00f5ff;
-        }
-
-        .pfp-b {
-            z-index: 8;
-            opacity: 0.3;
-            transform: translate(3px, 0);
-            border-color: #ff4655;
-        }
-
-        .pfp-main {
-            z-index: 10;
-        }
-
-        /* LEFT COLUMN: AGENTS & MAPS */
-        .left-panel {
-            grid-column: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            justify-content: center;
-            padding-right: 4vw;
-            text-align: right;
-            z-index: 12;
-            height: 100%;
-            gap: 4vh;
-        }
-
-        .data-group {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .section-title {
-            font-family: "Oswald", sans-serif;
-            font-size: 1.5vh;
-            color: #ff4655;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            border-bottom: 2px solid rgba(255, 70, 85, 0.5);
-            padding-bottom: 5px;
-            margin-bottom: 1.5vh;
-            display: inline-block;
-        }
-
-        .icon-grid {
-            display: flex;
-            gap: 1.5vh;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            max-width: 400px;
-        }
-
-        /* Responsive Icons */
-        .icon-box {
-            width: 6vh;
-            height: 6vh;
-            min-width: 40px;
-            min-height: 40px;
-            background: rgba(15, 25, 35, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .icon-box:hover {
-            background: #ff4655;
-            border-color: #ff4655;
-            transform: scale(1.1);
-        }
-
-        .icon-box img {
-            width: 80%;
-            height: 80%;
-            object-fit: contain;
-        }
-
-        /* RIGHT COLUMN: INFO & ROLES */
-        .right-panel {
-            grid-column: 3;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: center;
-            padding-left: 4vw;
-            text-align: left;
-            z-index: 12;
-            height: 100%;
-            gap: 4vh;
-            color: white;
-        }
-
-        /* Unique to right panel: reverse alignment of data-group for left-align */
-        .right-panel .data-group {
-            align-items: flex-start;
-        }
-
-        .right-panel .icon-grid {
-            justify-content: flex-start;
-        }
-
-        .player-identity {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            margin-bottom: 1vh;
-        }
-
-        .player-team {
-            font-family: "Arimo", sans-serif;
-            font-weight: 700;
-            letter-spacing: 3px;
-            font-size: 2vh;
-            color: #ff4655;
-            text-transform: uppercase;
-            margin-bottom: 0.5vh;
-        }
-
-        .player-name {
-            font-family: "Oswald", sans-serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 6vh;
-            line-height: 1;
-            margin: 0;
-            color: #ece8e1;
-            text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
-        }
-
-        .player-tag {
-            font-family: "Oswald", sans-serif;
-            font-size: 2vh;
-            color: #8fa1c1;
-            opacity: 0.8;
-            margin-top: 0.5vh;
-        }
-
-        .map-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5vh;
-        }
-
-        .map-card {
-            display: flex;
-            align-items: center;
-            background: rgba(15, 25, 35, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 5px;
-            width: auto;
-            /* Changed from fixed 30vh */
-            min-width: 200px;
-            transition: all 0.3s;
-        }
-
-        .map-card:hover {
-            border-color: #00f5ff;
-            transform: translateX(-10px);
-            /* Move left on hover since it's on left side */
-            background: rgba(15, 25, 35, 0.9);
-            cursor: default;
-        }
-
-        .map-img {
-            width: 10vh;
-            height: 5vh;
-            min-width: 80px;
-            min-height: 40px;
-            object-fit: cover;
-            margin-right: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .map-name {
-            font-family: "Oswald", sans-serif;
-            font-size: 1.8vh;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #ece8e1;
-        }
-
-        /* BACKGROUND TEXT */
-        .bg-text-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1;
-            opacity: 0.05;
-            pointer-events: none;
-            white-space: nowrap;
-            user-select: none;
-        }
-
-        .bg-text {
-            font-family: "Oswald", sans-serif;
-            font-weight: 900;
-            text-transform: uppercase;
-            font-size: 30vw;
-            line-height: 0.8;
-            color: white;
-        }
-
-        /* BACK BUTTON */
-        .back-btn {
-            position: absolute;
-            top: 40px;
-            left: 40px;
-            z-index: 200;
-            color: white;
-            text-decoration: none;
-            font-family: "Oswald", sans-serif;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            padding: 12px 24px;
-            background: rgba(15, 25, 35, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .back-btn:hover {
-            background: #ff4655;
-            border-color: #ff4655;
-            color: #0f1923;
-        }
-
-        .back-btn span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #ff4655;
-            transition: background 0.3s;
-        }
-
-        .back-btn:hover span {
-            background: #0f1923;
-        }
-
-        /* RESPONSIVE */
-        @media screen and (max-width: 1100px) {
-            body {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto auto;
-                height: auto;
-                min-height: 100vh;
-                overflow-y: auto;
-                padding: 100px 20px 50px;
-                gap: 50px;
-                display: flex;
-                flex-direction: column;
-            }
-
-            .left-panel,
-            .right-panel {
-                align-items: center;
-                text-align: center;
-                padding: 0;
-                width: 100%;
-                gap: 30px;
-            }
-
-            .data-group,
-            .right-panel .data-group {
-                align-items: center;
-            }
-
-            .player-identity {
-                align-items: center;
-            }
-
-            .pfp-container {
-                order: 1;
-                margin-bottom: 0;
-                width: 250px;
-                height: 250px;
-            }
-
-            .right-panel {
-                order: 2;
-                /* Info under PFP */
-            }
-
-            .left-panel {
-                order: 3;
-                /* Maps/Agents at bottom */
-            }
-
-            .icon-grid,
-            .right-panel .icon-grid {
-                justify-content: center;
-            }
-
-            .section-title {
-                border-bottom: 2px solid #ff4655;
-                font-size: 1.2rem;
-            }
-
-            .player-name {
-                font-size: 3rem;
-                text-align: center;
-            }
-
-            .map-card {
-                width: 100%;
-                max-width: 350px;
-                transform: translateX(0);
-            }
-
-            .map-card:hover {
-                transform: translateX(10px);
-            }
-
-            .bg-text {
-                font-size: 20vw;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'profiles/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'profiles/css/card_profile.css' %}">
 </head>
 
 <body>
+    {% if messages %}
+    <div class="messages-data" aria-hidden="true" style="display: none;">
+        {% for message in messages %}
+        <div class="message-item" data-message="{{ message|escapejs }}" data-tag="{{ message.tags }}"></div>
+        {% endfor %}
+    </div>
+    <noscript>
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    </noscript>
+    {% endif %}
 
     <a href="{% url 'display_profile' profile.id %}" class="back-btn">
         <span></span>
@@ -418,10 +49,7 @@
         <div class="bg-text">{{ profile.in_game_name }}</div>
     </div>
 
-    <!-- LEFT PANEL: AGENTS & FAVORITE MAPS -->
     <div class="left-panel">
-
-        <!-- Agents -->
         {% if profile.agents.exists %}
         <div class="data-group">
             <div class="section-title">AGENTS</div>
@@ -435,7 +63,6 @@
         </div>
         {% endif %}
 
-        <!-- Favorite Maps (Moved to Left) -->
         {% if profile.maps.exists %}
         <div class="data-group">
             <div class="section-title">FAVORITE MAPS</div>
@@ -453,7 +80,6 @@
         {% endif %}
     </div>
 
-    <!-- CENTER: PFP -->
     <div class="pfp-container">
         {% if profile.profile_picture %}
         <img src="{{ profile.profile_picture.url }}" class="pfp-img pfp-b" alt="">
@@ -465,10 +91,7 @@
         {% endif %}
     </div>
 
-    <!-- RIGHT PANEL: INFO & ROLES -->
     <div class="right-panel">
-
-        <!-- Player Identity -->
         <div class="player-identity">
             {% if profile.team %}
             <div class="player-team">{{ profile.team.name }}</div>
@@ -483,7 +106,6 @@
             {% endif %}
         </div>
 
-        <!-- Roles (Moved to Right) -->
         {% if profile.roles.exists %}
         <div class="data-group">
             <div class="section-title">ROLES</div>
@@ -499,7 +121,6 @@
         </div>
         {% endif %}
 
-        <!-- Teammates -->
         {% if teammates %}
         <div class="data-group">
             <div class="section-title">TEAMMATES</div>
@@ -525,8 +146,8 @@
         {% endif %}
     </div>
 
+    <script src="{% static 'profiles/js/notifications.js' %}"></script>
     <script>
-        // Init Gradient
         var granimInstance = new Granim({
             element: "#gradient",
             direction: "diagonal",
@@ -544,7 +165,6 @@
             }
         });
 
-        // Animations
         anime({
             targets: '.pfp-s',
             translateX: [
@@ -571,7 +191,6 @@
             easing: 'easeInOutQuad'
         });
 
-        // Entrance Animations
         var tl = anime.timeline({
             easing: 'easeOutExpo',
             duration: 1000
@@ -589,7 +208,6 @@
                 opacity: [0, 1],
                 delay: anime.stagger(200)
             }, '-=500');
-
     </script>
 </body>
 

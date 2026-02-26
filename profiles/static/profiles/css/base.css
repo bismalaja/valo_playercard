@@ -1,0 +1,404 @@
+/* ============================================================
+   BASE.CSS  —  Shared styles across all Valorant Profile pages
+   ============================================================ */
+body {
+  overflow: auto;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#gradient {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  body {
+    overflow: auto;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  #gradient {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: -1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .agent-fb {
+    position: absolute;
+    height: 120vh;
+    bottom: -25vh;
+    transform: translatex(-50%);
+    left: 50%;
+    z-index: 2;
+  }
+  .agent-fb-S,
+  .agent-fb-B {
+    z-index: 1;
+  }
+
+  /* img {
+    filter: drop-shadow(15px 0px 0 #a0745d) drop-shadow(-5px 0px 0px #3f5382);
+  } */
+
+  .agent-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: auto;
+    z-index: 10;
+  }
+
+  .text-master {
+    position: absolute;
+    display: grid;
+    grid-template-columns: 6fr 4fr;
+    width: 100vw;
+    height: 100vh;
+    z-index: 12;
+  }
+
+  .text-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(
+      to left,
+      rgba(0, 0, 0, 0.5),
+      60%,
+      rgba(0, 0, 0, 0)
+    );
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .hero {
+    font-family: "Oswald", sans-serif;
+    font-optical-sizing: auto;
+    color: white;
+  }
+  .hero-role {
+    font-family: "Arimo", sans-serif;
+    font-weight: 250;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    font-size: 1.4vw;
+    user-select: none;
+  }
+  .hero-name {
+    font-size: min(10vw, 120px);
+    font-weight: 600;
+    font-style: normal;
+    text-transform: uppercase;
+    color: #eaeeb2;
+    margin-left: -0.6vw;
+    user-select: none;
+  }
+  .hero-desc {
+    font-family: "Arimo", sans-serif;
+    color: #eaeeb2;
+    font-weight: 500;
+    max-width: 25vw;
+    margin-top: 20px;
+    font-size: min(1.4vw, 20px);
+    line-height: min(1.9vw, 20px);
+    user-select: none;
+  }
+
+  .names-bg {
+    position: absolute;
+    z-index: -1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100vw;
+    pointer-events: none;
+  }
+  .names-bg > .hero-name {
+    color: rgba(255, 255, 255, 0.05);
+    line-height: min(17vw, 210px);
+    font-size: min(20vw, 250px);
+    align-self: center;
+    justify-self: center;
+  }
+
+  @media screen and (max-width: 600px) {
+    .text-master {
+      position: absolute;
+      display: grid;
+      grid-template-columns: 0fr 4fr;
+      width: 100vw;
+      height: 100vh;
+      z-index: 12;
+    }
+    .text-wrap {
+      justify-content: end;
+      padding-bottom: 25vw;
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 1),
+        25%,
+        rgba(0, 0, 0, 0)
+        50%
+      );
+    }
+    .hero {
+      text-align: center;
+      justify-self: center;
+      align-self: center;
+    }
+    .hero-role {
+      letter-spacing: 7px;
+      font-size: max(3vw, 20px);
+      font-weight: 400;
+    }
+    .hero-name {
+      font-size: max(20vw, 120px);
+    }
+    .hero-desc {
+      max-width: 360px;
+      margin-top: 10px;
+      font-size: max(3vw, 20px);
+      line-height: max(1.9vw, 25px);
+    }
+    .names-bg > .hero-name {
+      color: rgba(255, 255, 255, 0.05);
+      line-height: min(25vw, 210px);
+      font-size: min(30vw, 250px);
+    }
+  }
+
+  .nav {
+    position: absolute;
+    z-index: 100;
+    bottom: 5vh;
+  }
+  .nav > .portrait-container img {
+    width: 50px;
+    margin: 0px 5px;
+    border: 1px solid rgba(255,255,255,0.5);
+    cursor: pointer; 
+  }
+
+/* ── Page header ── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 50px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 20px;
+}
+
+.page-title {
+  font-family: "Oswald", sans-serif;
+  font-size: 4rem;
+  text-transform: uppercase;
+  color: #ece8e1;
+  margin: 0;
+  line-height: 1;
+}
+
+.page-subtitle {
+  color: #ff4655;
+  font-family: "Oswald", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+}
+
+/* ── Action bar ── */
+.action-bar {
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── Primary button ── */
+.valorant-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 30px;
+  background: rgba(255, 70, 85, 0.1);
+  border: 1px solid #ff4655;
+  color: white;
+  text-decoration: none;
+  font-family: "Oswald", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 1.1rem;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.valorant-btn:hover {
+  background: #ff4655;
+  color: white;
+  box-shadow: 0 0 20px rgba(255, 70, 85, 0.5);
+  transform: translateY(-2px);
+}
+
+.valorant-btn.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ece8e1;
+}
+
+.valorant-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #00f5ff;
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+}
+
+/* ── Card ── */
+.profile-card {
+  background: rgba(15, 25, 35, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s;
+  position: relative;
+  overflow: visible;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.profile-card:hover {
+  border-color: #00f5ff;
+  transform: translateY(-5px);
+  background: rgba(15, 25, 35, 0.9);
+}
+
+.card-name {
+  font-family: "Oswald", sans-serif;
+  font-size: 2rem;
+  text-transform: uppercase;
+  color: #ece8e1;
+  margin: 0 0 5px 0;
+}
+
+/* ── Dropdown menu (shared pattern) ── */
+.menu-container {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 20;
+}
+
+.menu-btn {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1.2rem;
+  border-radius: 50%;
+}
+
+.menu-btn:hover {
+  background: #ff4655;
+  border-color: #ff4655;
+}
+
+.menu-dropdown {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #0f1923;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 180px;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+}
+
+.menu-dropdown.active {
+  display: flex;
+}
+
+.menu-item {
+  padding: 12px 16px;
+  color: #ece8e1;
+  text-decoration: none;
+  font-family: "Oswald", sans-serif;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: rgba(255, 70, 85, 0.2);
+  color: #ff4655;
+  padding-left: 20px;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+/* ── Noscript / fallback message banners ── */
+.messages {
+  margin-bottom: 20px;
+}
+
+.message {
+  padding: 15px;
+  margin-bottom: 10px;
+  border-left: 4px solid;
+  background: rgba(15, 25, 35, 0.8);
+}
+
+.message.success {
+  border-color: #00f5ff;
+  color: #00f5ff;
+}
+.message.error {
+  border-color: #ff4655;
+  color: #ff4655;
+}
+.message.warning {
+  border-color: #ffc107;
+  color: #ffc107;
+}
+.message.info {
+  border-color: #8fa1c1;
+  color: #8fa1c1;
+}

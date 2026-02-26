@@ -1,0 +1,53 @@
+/* riot_info.css */
+
+.profile-card {
+  background: rgba(26, 42, 58, 0.92);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+  padding: 2.5rem 2rem;
+  margin: 2rem auto;
+  max-width: 600px;
+  color: #fff;
+  text-align: center;
+}
+
+.card-name {
+  font-family: "Oswald", sans-serif;
+  font-size: 2rem;
+  color: #eaeeb2;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.valorant-form {
+  margin-top: 1.5rem;
+}
+
+.valorant-btn {
+  background: #ff4655;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  font-family: "Oswald", sans-serif;
+  font-size: 1rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 8px;
+  display: inline-block;
+  width: 100%;
+}
+.valorant-btn:hover {
+  background: #e13c4c;
+}
+
+@media (max-width: 600px) {
+  .profile-card {
+    padding: 1rem 0.5rem;
+  }
+  .card-name {
+    font-size: 1.3rem;
+  }
+}

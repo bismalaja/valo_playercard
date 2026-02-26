@@ -1,0 +1,43 @@
+{% extends "profiles/base.html" %}
+{% load static %}
+{% block title %}My Account{% endblock %}
+{% block content %}
+<div class="profile-card" style="max-width: 700px; margin: 0 auto; padding: 40px; text-align: left;">
+    <h2 class="card-name" style="text-align: center; margin-bottom: 20px;">My Account</h2>
+
+    <div style="margin-bottom: 20px;">
+        <div style="color:#8fa1c1; text-transform: uppercase; font-size: 0.9rem;">Username</div>
+        <div style="font-family:'Oswald', sans-serif; font-size:1.6rem;">{{ user.username }}</div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <div style="color:#8fa1c1; text-transform: uppercase; font-size: 0.9rem;">Riot ID / Tag</div>
+        {% if riot_info %}
+        <div style="font-family:'Oswald', sans-serif; font-size:1.2rem;">
+            {{ riot_info.riot_id }}{% if riot_info.riot_tag %}#{{ riot_info.riot_tag }}{% endif %}
+        </div>
+        <a href="{% url 'riot_info' %}" class="valorant-btn secondary"
+            style="padding:8px 15px; font-size:0.9rem; margin-top:8px; display:inline-block;">Edit Riot Info</a>
+        {% else %}
+        <div style="color:#ff4655;">Not set</div>
+        <a href="{% url 'riot_info' %}" class="valorant-btn"
+            style="padding:8px 15px; font-size:0.9rem; margin-top:8px; display:inline-block;">Set Riot Info</a>
+        {% endif %}
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <div style="color:#8fa1c1; text-transform: uppercase; font-size: 0.9rem;">Claimed Profile</div>
+        {% if claimed_profile %}
+        <div style="font-family:'Oswald', sans-serif; font-size:1.2rem;">{{ claimed_profile.in_game_name }}</div>
+        <div style="color:#8fa1c1;">Riot: {{ claimed_profile.riot_id }}{% if claimed_profile.riot_tag %}#{{
+            claimed_profile.riot_tag }}{% endif %}</div>
+        <a href="{% url 'display_profile' claimed_profile.id %}" class="valorant-btn secondary"
+            style="padding:8px 15px; font-size:0.9rem; margin-top:8px; display:inline-block;">View Profile</a>
+        {% else %}
+        <div style="color:#ff4655;">No profile claimed yet.</div>
+        <a href="{% url 'profile_list' %}" class="valorant-btn"
+            style="padding:8px 15px; font-size:0.9rem; margin-top:8px; display:inline-block;">Browse Profiles</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

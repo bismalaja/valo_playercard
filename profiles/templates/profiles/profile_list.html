@@ -1,436 +1,117 @@
+{% extends 'profiles/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROSTER - Valorant Profiles</title>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'profiles/css/profile_list.css' %}">
+{% endblock %}
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Oswald:wght@200..700&display=swap"
-        rel="stylesheet">
+{% block content %}
 
-    <!-- Dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/granim/2.0.0/granim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            background-color: #0f1923;
-            font-family: "Arimo", sans-serif;
-            color: white;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        #gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 50px 20px;
-            position: relative;
-            z-index: 10;
-        }
-
-        /* HEADER SECTION */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 50px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 20px;
-        }
-
-        .page-title {
-            font-family: "Oswald", sans-serif;
-            font-size: 4rem;
-            text-transform: uppercase;
-            color: #ece8e1;
-            margin: 0;
-            line-height: 1;
-        }
-
-        .page-subtitle {
-            color: #ff4655;
-            font-family: "Oswald", sans-serif;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        /* ACTIONS */
-        .action-bar {
-            margin-bottom: 40px;
-        }
-
-        .valorant-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 15px 30px;
-            background: rgba(255, 70, 85, 0.1);
-            border: 1px solid #ff4655;
-            color: white;
-            text-decoration: none;
-            font-family: "Oswald", sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 1.1rem;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .valorant-btn:hover {
-            background: #ff4655;
-            color: #0f1923;
-            box-shadow: 0 0 20px rgba(255, 70, 85, 0.4);
-        }
-
-        .valorant-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .valorant-btn:hover::before {
-            left: 100%;
-        }
-
-        /* GRID */
-        .profiles-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        /* MENU */
-        .menu-container {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 20;
-        }
-
-        .menu-btn {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 1.2rem;
-        }
-
-        .menu-btn:hover {
-            background: #ff4655;
-            border-color: #ff4655;
-        }
-
-        .menu-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: #0f1923;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            min-width: 150px;
-            display: none;
-            flex-direction: column;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-        }
-
-        .menu-dropdown.active {
-            display: flex;
-        }
-
-        .menu-item {
-            padding: 10px 15px;
-            color: #ece8e1;
-            text-decoration: none;
-            font-family: "Arimo", sans-serif;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            text-align: left;
-            background: none;
-            border: none;
-            width: 100%;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        .menu-item:hover {
-            background: rgba(255, 70, 85, 0.2);
-            color: #ff4655;
-        }
-
-        .menu-item.delete:hover {
-            background: rgba(255, 70, 85, 0.8);
-            color: white;
-        }
-
-        /* CARD */
-        .profile-card {
-            background: rgba(15, 25, 35, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: all 0.3s;
-            position: relative;
-            overflow: visible;
-            /* changed from hidden to allow menu */
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .profile-card:hover {
-            border-color: #00f5ff;
-            transform: translateY(-5px);
-            background: rgba(15, 25, 35, 0.9);
-        }
-
-        .card-pfp {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            object-fit: cover;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-
-        .profile-card:hover .card-pfp {
-            border-color: #00f5ff;
-            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
-        }
-
-        .card-name {
-            font-family: "Oswald", sans-serif;
-            font-size: 2rem;
-            text-transform: uppercase;
-            color: #ece8e1;
-            margin: 0 0 5px 0;
-        }
-
-        .card-team {
-            font-family: "Arimo", sans-serif;
-            color: #ff4655;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-
-        .card-stats {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-badge {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 5px 10px;
-            font-size: 0.8rem;
-            color: #8fa1c1;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .card-btn {
-            font-family: "Oswald", sans-serif;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: white;
-            text-decoration: none;
-            padding: 8px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.2s;
-        }
-
-        .card-btn:hover {
-            background: white;
-            color: #0f1923;
-        }
-
-        .card-btn.delete {
-            border-color: #ff4655;
-            color: #ff4655;
-        }
-
-        .card-btn.delete:hover {
-            background: #ff4655;
-            color: white;
-        }
-
-        /* DECORATIONS */
-        .corner-decor {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            border: 2px solid #ff4655;
-            transition: all 0.3s;
-            opacity: 0;
-        }
-
-        .top-left {
-            top: 0;
-            left: 0;
-            border-right: none;
-            border-bottom: none;
-        }
-
-        .bottom-right {
-            bottom: 0;
-            right: 0;
-            border-left: none;
-            border-top: none;
-        }
-
-        .profile-card:hover .corner-decor {
-            opacity: 1;
-            width: 20px;
-            height: 20px;
-        }
-    </style>
-</head>
-
-<body>
-    <canvas id="gradient"></canvas>
-
-    <div class="container">
-        <div class="header">
-            <div>
+<canvas id="gradient"></canvas>
+<div class="container">
+    <div class="header">
+        <div>
+            <a href="/" style="text-decoration: none;">
                 <span class="page-subtitle">Tyloo Roster Management</span>
                 <h1 class="page-title">VALORANT PROFILES</h1>
-            </div>
-        </div>
-
-        <div class="action-bar">
-            <a href="{% url 'input_profile' %}" class="valorant-btn">
-                CREATE PROFILE
             </a>
         </div>
-
-        <div class="profiles-grid">
-            {% for profile in profiles %}
-            <div class="profile-card" onclick="window.location.href='{% url 'display_profile' profile.id %}'">
-                <span class="corner-decor top-left"></span>
-                <span class="corner-decor bottom-right"></span>
-
-                <div class="menu-container" onclick="event.stopPropagation()">
-                    <button class="menu-btn" onclick="this.nextElementSibling.classList.toggle('active')">⋮</button>
-                    <div class="menu-dropdown">
-                        <a href="{% url 'card_profile' profile.id %}" class="menu-item">View Card</a>
-                        <a href="{% url 'edit_profile' profile.id %}" class="menu-item">Edit</a>
-                        <button
-                            onclick="confirmDelete('{% url 'delete_profile' profile.id %}', '{{ profile.in_game_name|escapejs }}')"
-                            class="menu-item delete">Delete</button>
-                    </div>
-                </div>
-
-                {% if profile.profile_picture %}
-                <img src="{{ profile.profile_picture.url }}" alt="{{ profile.in_game_name }}" class="card-pfp">
-                {% else %}
-                <div class="card-pfp"
-                    style="display:flex; align-items:center; justify-content:center; background:#1f2833; font-size:40px;">
-                    ?</div>
-                {% endif %}
-
-                <h2 class="card-name">{{ profile.in_game_name }}</h2>
-                <div class="card-team">{{ profile.team.name|default:"FREE AGENT" }}</div>
-
-                <div class="card-stats">
-                    <div class="stat-badge">{{ profile.agents.count }} AGENTS</div>
-                    <div class="stat-badge">{{ profile.maps.count }} MAPS</div>
-                </div>
-            </div>
-            {% empty %}
-            <div style="grid-column: 1/-1; text-align: center; color: #8fa1c1; padding: 50px;">
-                <h3 style="font-family:'Oswald'; font-size: 2rem;">NO AGENTS FOUND</h3>
-                <p>Recruit new agents to build your roster.</p>
-            </div>
-            {% endfor %}
+        <div class="auth-links">
+            {% if user.is_authenticated %}
+            {% if not user.profile_id %}
+            <a href="{% url 'input_profile' %}" class="valorant-btn">CREATE PROFILE</a>
+            {% else %}
+            <a href="{% url 'display_profile' user.profile_id %}" class="valorant-btn secondary">My Profile</a>
+            {% endif %}
+            {% else %}
+            <a href="/accounts/login/" class="valorant-btn secondary"
+                style="padding: 8px 15px; font-size: 0.9rem; margin-right: 10px;">Log In</a>
+            <a href="/signup/" class="valorant-btn" style="padding: 8px 15px; font-size: 0.9rem;">Sign Up</a>
+            {% endif %}
         </div>
     </div>
-
+    <div class="profiles-grid">
+        {% for profile in profiles %}
+        <div class="profile-card" onclick="window.location.href='{% url 'display_profile' profile.id %}'">
+            <span class="corner-decor top-left"></span>
+            <span class="corner-decor bottom-right"></span>
+            <div class="menu-container" onclick="event.stopPropagation()">
+                <button class="menu-btn" onclick="this.nextElementSibling.classList.toggle('active')">⋮</button>
+                <div class="menu-dropdown">
+                    <a href="{% url 'card_profile' profile.id %}" class="menu-item">View Card</a>
+                    {% if user.is_authenticated and profile.user_id == user.id %}
+                    <a href="{% url 'edit_profile' profile.id %}" class="menu-item">Edit</a>
+                    <button
+                        onclick="confirmDelete('{% url 'delete_profile' profile.id %}', '{{ profile.in_game_name|escapejs }}')"
+                        class="menu-item delete">Delete</button>
+                    {% endif %}
+                    {% if user.is_authenticated and not user.profile_id and not profile.user_id %}
+                    <a href="{% url 'claim_profile' profile.id %}" class="menu-item">Claim</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% if profile.user_id %}
+            <div class="stat-badge"
+                style="position:absolute; top:10px; left:10px; background: rgba(0,245,255,0.15); border-color:#00f5ff; color:#00f5ff;">
+                Claimed</div>
+            {% else %}
+            <div class="stat-badge"
+                style="position:absolute; top:10px; left:10px; background: rgba(255,70,85,0.15); border-color:#ff4655; color:#ff4655;">
+                Unclaimed</div>
+            {% endif %}
+            {% if profile.profile_picture %}
+            <img src="{{ profile.profile_picture.url }}" alt="{{ profile.in_game_name }}" class="card-pfp">
+            {% else %}
+            <div class="card-pfp"
+                style="display:flex; align-items:center; justify-content:center; background:#1f2833; font-size:40px;">
+                ?</div>
+            {% endif %}
+            <h2 class="card-name">{{ profile.in_game_name }}</h2>
+            <div class="card-team">#{{ profile.team_name }}</div>
+            <div class="card-stats">
+                <div class="stat-badge">{{ profile.agents.count }} AGENTS</div>
+                <div class="stat-badge">{{ profile.maps.count }} MAPS</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
     <!-- Hidden form for deletion -->
     <form id="delete-form" method="post" action="">
-        {% csrf_token %}
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     </form>
-
-    <script>
-        function confirmDelete(url, name) {
-            if (confirm("Are you sure you want to terminate agent " + name + "? This action cannot be undone.")) {
-                var form = document.getElementById('delete-form');
-                form.action = url;
-                form.submit();
+</div>
+<script>
+    var granimInstance = new Granim({
+        element: '#gradient',
+        direction: 'diagonal',
+        isPausedWhenNotInView: true,
+        states: {
+            "default-state": {
+                gradients: [
+                    ['#0f1923', '#1a2a3a'],
+                    ['#1a2a3a', '#0f1923'],
+                    ['#0f1923', '#2a1a2a']
+                ],
+                transitionSpeed: 7000
             }
         }
-
-        var granimInstance = new Granim({
-            element: "#gradient",
-            direction: "diagonal",
-            isPausedWhenNotInView: false,
-            stateTransitionSpeed: 200,
-            states: {
-                "default-state": {
-                    gradients: [
-                        ['#a67963', '#171d3b'],
-                        ['#0f1923', '#ff4655'],
-                        ['#171d3b', '#a67963']
-                    ],
-                    transitionSpeed: 5000
-                }
-            }
-        });
-
-        anime({
-            targets: '.profile-card',
-            translateY: [20, 0],
-            opacity: [0, 1],
-            delay: anime.stagger(100),
-            easing: 'easeOutExpo'
-        });
-    </script>
-</body>
-
-</html>
+    });
+</script>
+<script src="{% static 'profiles/js/notifications.js' %}"></script>
+<script>
+    function confirmDelete(url, name) {
+        if (confirm("Are you sure you want to terminate agent " + name + "? This action cannot be undone.")) {
+            var form = document.getElementById('delete-form');
+            form.action = url;
+            form.submit();
+        }
+    }
+    anime({
+        targets: '.profile-card',
+        translateY: [20, 0],
+        opacity: [0, 1],
+        delay: anime.stagger(100),
+        easing: 'easeOutExpo'
+    });
+</script>
+{% endblock %}

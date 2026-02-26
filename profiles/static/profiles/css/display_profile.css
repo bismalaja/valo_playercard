@@ -1,0 +1,112 @@
+/* display_profile.css */
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 0 1rem 0;
+  border-bottom: 2px solid #1a2a3a;
+}
+
+.profile-header .profile-name {
+  font-family: "Oswald", sans-serif;
+  font-size: 2.5rem;
+  color: #eaeeb2;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.profile-header .profile-role {
+  font-family: "Arimo", sans-serif;
+  font-size: 1.2rem;
+  color: #8fa1c1;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+}
+
+.profile-details {
+  margin-top: 2rem;
+  background: rgba(26, 42, 58, 0.7);
+  border-radius: 12px;
+  padding: 2rem;
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.menu-container {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  z-index: 20;
+}
+
+.menu-btn {
+  background: #0f1923;
+  color: #eaeeb2;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  transition: background 0.2s;
+}
+.menu-btn:hover {
+  background: #1a2a3a;
+}
+
+.menu-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  background: #1a2a3a;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  margin-top: 0.5rem;
+  min-width: 180px;
+}
+.menu-dropdown.active {
+  display: block;
+}
+.menu-item {
+  display: block;
+  padding: 0.75rem 1.5rem;
+  color: #eaeeb2;
+  text-decoration: none;
+  font-family: "Oswald", sans-serif;
+  font-size: 1rem;
+  border-bottom: 1px solid #22334a;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.menu-item:last-child {
+  border-bottom: none;
+}
+.menu-item:hover {
+  background: #ff4655;
+  color: #fff;
+}
+
+.profile-card {
+  background: rgba(26, 42, 58, 0.85);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+  padding: 2.5rem;
+  margin: 2rem auto;
+  max-width: 700px;
+}
+
+@media (max-width: 600px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .profile-card {
+    padding: 1rem;
+  }
+  .menu-container {
+    top: 1rem;
+    right: 1rem;
+  }
+}

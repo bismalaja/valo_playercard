@@ -1,10 +1,10 @@
 // Notification System
 // Handles floating toast notifications for Django messages and client-side events
 
-(function() {
-    // 1. Inject CSS Styles
-    const style = document.createElement('style');
-    style.textContent = `
+(function () {
+  // 1. Inject CSS Styles
+  const style = document.createElement("style");
+  style.textContent = `
         #toast-container {
             position: fixed;
             top: 20px;
@@ -61,65 +61,69 @@
             to { opacity: 0; transform: translateY(-20px); }
         }
     `;
-    document.head.appendChild(style);
+  document.head.appendChild(style);
 
-    // 2. Create Container
-    let container = document.getElementById('toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        document.body.appendChild(container);
-    }
+  // 2. Create Container
+  let container = document.getElementById("toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toast-container";
+    document.body.appendChild(container);
+  }
 
-    // 3. Define Global Function
-    window.showToast = function(message, type = 'info') {
-        // Map Django types to our CSS classes
-        const typeMap = {
-            'success': 'success',
-            'error': 'error',
-            'warning': 'warning',
-            'info': 'info',
-            'debug': 'info'
-        };
-        const className = typeMap[type] || type;
-
-        const toast = document.createElement('div');
-        toast.className = `toast-notification ${className}`;
-        
-        const textSpan = document.createElement('span');
-        textSpan.textContent = message;
-        toast.appendChild(textSpan);
-
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'toast-close';
-        closeBtn.innerHTML = '&times;';
-        closeBtn.onclick = () => removeToast(toast);
-        toast.appendChild(closeBtn);
-
-        container.appendChild(toast);
-
-        // Auto remove
-        setTimeout(() => removeToast(toast), 5000);
+  // 3. Define Global Function
+  window.showToast = function (message, type = "info") {
+    // Map Django types to our CSS classes
+    const typeMap = {
+      success: "success",
+      error: "error",
+      warning: "warning",
+      info: "info",
+      debug: "info",
     };
+    const className = typeMap[type] || type;
 
-    function removeToast(toast) {
-        toast.style.animation = 'fadeOut 0.5s ease-out forwards';
-        toast.addEventListener('animationend', () => {
-            if (toast.parentNode) toast.parentNode.removeChild(toast);
-        });
-    }
+    const toast = document.createElement("div");
+    toast.className = `toast-notification ${className}`;
 
-    // 4. Initialize from existing HTML messages (Django integration)
-    document.addEventListener('DOMContentLoaded', () => {
-        const messageContainer = document.querySelector('.messages-data');
-        if (messageContainer) {
-            const messages = messageContainer.querySelectorAll('.message-item');
-            messages.forEach(item => {
-                const text = item.getAttribute('data-message');
-                const tag = item.getAttribute('data-tag');
-                showToast(text, tag);
-            });
-        }
+    const textSpan = document.createElement("span");
+    textSpan.textContent = message;
+    toast.appendChild(textSpan);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "toast-close";
+    closeBtn.innerHTML = "&times;";
+    closeBtn.onclick = () => removeToast(toast);
+    toast.appendChild(closeBtn);
+
+    container.appendChild(toast);
+
+    // Auto remove
+    setTimeout(() => removeToast(toast), 5000);
+  };
+
+  function removeToast(toast) {
+    toast.style.animation = "fadeOut 0.5s ease-out forwards";
+    toast.addEventListener("animationend", () => {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
     });
+  }
 
+  // 4. Initialize from existing HTML messages (Django integration)
+  const initFromMessages = () => {
+    const messageContainer = document.querySelector(".messages-data");
+    if (!messageContainer) return;
+    const messages = messageContainer.querySelectorAll(".message-item");
+    messages.forEach((item) => {
+      const text = item.getAttribute("data-message");
+      const tag = item.getAttribute("data-tag");
+      showToast(text, tag);
+    });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFromMessages);
+  } else {
+    initFromMessages();
+  }
 })();

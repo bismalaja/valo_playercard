@@ -1,0 +1,94 @@
+{% extends "profiles/base.html" %}
+
+{% block title %}Sign Up - Valorant Profiles{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'profiles/css/forms.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 600px; margin-top: 50px;">
+    <div class="profile-card" style="padding: 40px;">
+        <h2 class="card-name" style="text-align: center; margin-bottom: 30px;">SIGN UP</h2>
+
+        <form method="post" class="valorant-form">
+            {% csrf_token %}
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label"
+                    style="display: block; margin-bottom: 8px; color: #8fa1c1; font-family: 'Oswald', sans-serif; text-transform: uppercase;">Username</label>
+                <input type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}"
+                    value="{{ form.username.value|default_if_none:'' }}" placeholder="Username" class="form-control"
+                    style="width:100%; padding:12px 15px; background: rgba(15, 25, 35, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: white;"
+                    required>
+                {% for error in form.username.errors %}
+                <div style="color: #ff4655; font-size: 0.85rem; margin-top: 5px;">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label"
+                    style="display: block; margin-bottom: 8px; color: #8fa1c1; font-family: 'Oswald', sans-serif; text-transform: uppercase;">Riot
+                    ID</label>
+                <input type="text" name="{{ form.riot_id.html_name }}" id="{{ form.riot_id.id_for_label }}"
+                    value="{{ form.riot_id.value|default_if_none:'' }}" placeholder="Riot ID (e.g. Tyloo)"
+                    class="form-control"
+                    style="width:100%; padding:12px 15px; background: rgba(15, 25, 35, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: white;"
+                    required>
+                {% for error in form.riot_id.errors %}
+                <div style="color: #ff4655; font-size: 0.85rem; margin-top: 5px;">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label"
+                    style="display: block; margin-bottom: 8px; color: #8fa1c1; font-family: 'Oswald', sans-serif; text-transform: uppercase;">Riot
+                    Tag</label>
+                <input type="text" name="{{ form.riot_tag.html_name }}" id="{{ form.riot_tag.id_for_label }}"
+                    value="{{ form.riot_tag.value|default_if_none:'' }}" placeholder="#NA1" class="form-control"
+                    style="width:100%; padding:12px 15px; background: rgba(15, 25, 35, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: white;">
+                {% for error in form.riot_tag.errors %}
+                <div style="color: #ff4655; font-size: 0.85rem; margin-top: 5px;">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label"
+                    style="display: block; margin-bottom: 8px; color: #8fa1c1; font-family: 'Oswald', sans-serif; text-transform: uppercase;">Password</label>
+                <input type="password" name="{{ form.password1.html_name }}" id="{{ form.password1.id_for_label }}"
+                    placeholder="Password" class="form-control"
+                    style="width:100%; padding:12px 15px; background: rgba(15, 25, 35, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: white;"
+                    required>
+                {% for error in form.password1.errors %}
+                <div style="color: #ff4655; font-size: 0.85rem; margin-top: 5px;">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label"
+                    style="display: block; margin-bottom: 8px; color: #8fa1c1; font-family: 'Oswald', sans-serif; text-transform: uppercase;">Confirm
+                    Password</label>
+                <input type="password" name="{{ form.password2.html_name }}" id="{{ form.password2.id_for_label }}"
+                    placeholder="Confirm Password" class="form-control"
+                    style="width:100%; padding:12px 15px; background: rgba(15, 25, 35, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: white;"
+                    required>
+                {% for error in form.password2.errors %}
+                <div style="color: #ff4655; font-size: 0.85rem; margin-top: 5px;">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button type="submit" class="valorant-btn"
+                    style="width: 100%; padding: 15px; font-size: 1.2rem; background: #ff4655; color: white; border: none; font-family: 'Oswald', sans-serif; text-transform: uppercase; cursor: pointer; transition: all 0.3s;">
+                    Create Account
+                </button>
+            </div>
+        </form>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <p style="color: #8fa1c1;">Already have an account? <a href="{% url 'login' %}"
+                    style="color: #00f5ff; text-decoration: none;">Log in here</a></p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

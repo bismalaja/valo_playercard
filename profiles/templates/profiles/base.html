@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Valorant Profiles{% endblock %}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Oswald:wght@200..700&display=swap"
+        rel="stylesheet">
+
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/granim/2.0.0/granim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'profiles/css/base.css' %}">
+    {% endblock %}
+
+</head>
+
+<body>
+    <canvas id="gradient"></canvas>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <a href="{% url 'profile_list' %}" style="text-decoration: none;">
+                    <span class="page-subtitle">Tyloo Roster Management</span>
+                    <h1 class="page-title">VALORANT PROFILES</h1>
+                </a>
+            </div>
+            <div class="auth-links">
+                {% if user.is_authenticated %}
+                <span style="margin-right: 15px; color: #8fa1c1;">Welcome, {{ user.username }}</span>
+                <a href="{% url 'account_overview' %}" class="valorant-btn secondary"
+                    style="padding: 8px 15px; font-size: 0.9rem; margin-right: 10px;">My Account</a>
+                {% if user.profile_id %}
+                <a href="{% url 'display_profile' user.profile_id %}" class="valorant-btn secondary"
+                    style="padding: 8px 15px; font-size: 0.9rem;">My Profile</a>
+                {% endif %}
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="valorant-btn secondary"
+                        style="padding: 8px 15px; font-size: 0.9rem; cursor: pointer;">Log Out</button>
+                </form>
+                {% else %}
+                <a href="{% url 'login' %}" class="valorant-btn secondary"
+                    style="padding: 8px 15px; font-size: 0.9rem; margin-right: 10px;">Log In</a>
+                <a href="{% url 'signup' %}" class="valorant-btn" style="padding: 8px 15px; font-size: 0.9rem;">Sign
+                    Up</a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="messages-data" aria-hidden="true" style="display: none;">
+            {% for message in messages %}
+            <div class="message-item" data-message="{{ message|escapejs }}" data-tag="{{ message.tags }}"></div>
+            {% endfor %}
+        </div>
+        <noscript>
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        </noscript>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        // Background Gradient Animation
+        var granimInstance = new Granim({
+            element: '#gradient',
+            direction: 'diagonal',
+            isPausedWhenNotInView: true,
+            states: {
+                "default-state": {
+                    gradients: [
+                        ['#0f1923', '#1a2a3a'],
+                        ['#1a2a3a', '#0f1923'],
+                        ['#0f1923', '#2a1a2a']
+                    ],
+                    transitionSpeed: 7000
+                }
+            }
+        });
+    </script>
+    <script src="{% static 'profiles/js/notifications.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

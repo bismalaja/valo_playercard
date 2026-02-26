@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import User
 
 
 # ============================================
@@ -127,6 +128,26 @@ class AbilityTemplate(models.Model):
         ordering = ['key_binding']
 
 
+class UserRiot(models.Model):
+    """Stores Riot credentials provided at signup for claim verification."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='riot_info')
+    riot_id = models.CharField(max_length=50)
+    riot_tag = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        validators=[
+            RegexValidator(
+                regex=r'^#[a-zA-Z0-9]{2,5}$',
+                message='Tag must start with # and be followed by 2-5 alphanumeric characters (e.g. #NA1, #12345)'
+            )
+        ],
+    )
+
+    def __str__(self):
+        return f"{self.user.username} ({self.riot_id}{self.riot_tag or ''})"
+
+
 # ============================================
 # USER PROFILE MODEL
 # ============================================
@@ -136,6 +157,7 @@ class Profile(models.Model):
     Player profile with basic info and selections.
     Users select from pre-existing agents, roles, and teams.
     """
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='profile')
     in_game_name = models.CharField(max_length=100)
     riot_id = models.CharField(max_length=50, default='', help_text="Your Riot ID name (e.g. 'Tyloo')")
     riot_tag = models.CharField(

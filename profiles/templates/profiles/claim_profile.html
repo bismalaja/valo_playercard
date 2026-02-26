@@ -1,0 +1,21 @@
+{% extends "profiles/base.html" %}
+
+{% block title %}Claim Profile{% endblock %}
+
+{% block content %}
+<div class="profile-card" style="max-width: 600px; margin: 0 auto; padding: 40px;">
+    <h2 class="card-name" style="text-align: center; margin-bottom: 10px;">Claim Profile</h2>
+    <p style="text-align: center; color: #8fa1c1; margin-bottom: 25px;">
+        Claim profile for <strong>{{ profile.in_game_name }}</strong>.
+        This will use your account Riot ID/Tag from signup. You cannot claim another profile.
+    </p>
+
+    <form method="post" class="valorant-form" style="text-align: center;">
+        {% csrf_token %}
+        <button type="submit" class="valorant-btn"
+            style="width: 100%; padding: 15px; font-size: 1.1rem; background: #ff4655; color: white; border: none; font-family: 'Oswald', sans-serif; text-transform: uppercase; cursor: pointer; transition: all 0.3s;">
+            Yes, I'm sure
+        </button>
+    </form>
+</div>
+{% endblock %}

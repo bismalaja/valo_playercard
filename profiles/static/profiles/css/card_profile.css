@@ -1,0 +1,68 @@
+/* card_profile.css */
+
+.card-profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  background: rgba(26, 42, 58, 0.8);
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+  padding: 2.5rem 2rem;
+  margin: 2rem auto;
+  max-width: 600px;
+}
+
+.card-profile-header {
+  font-family: "Oswald", sans-serif;
+  font-size: 2.2rem;
+  color: #eaeeb2;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  letter-spacing: 2px;
+}
+
+.card-profile-details {
+  width: 100%;
+  background: rgba(15, 25, 35, 0.7);
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: #fff;
+  margin-bottom: 1.5rem;
+}
+
+.card-profile-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.card-profile-btn {
+  background: #ff4655;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  font-family: "Oswald", sans-serif;
+  font-size: 1rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.card-profile-btn.secondary {
+  background: #1a2a3a;
+  color: #eaeeb2;
+}
+.card-profile-btn:hover {
+  background: #e13c4c;
+}
+
+@media (max-width: 600px) {
+  .card-profile-container {
+    padding: 1rem 0.5rem;
+  }
+  .card-profile-header {
+    font-size: 1.5rem;
+  }
+}

@@ -1,4 +1,7 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 from .models import Profile, Ability
 
 class ProfileForm(forms.ModelForm):
@@ -74,3 +77,49 @@ class AbilityForm(forms.ModelForm):
             'ability_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ability name'}),
             'ability_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Describe this ability...'}),
         }
+
+
+class SignupForm(UserCreationForm):
+    riot_id = forms.CharField(
+        max_length=50,
+        required=True,
+        label='Riot ID',
+        widget=forms.TextInput(attrs={'placeholder': 'Riot ID (e.g. Tyloo)'}),
+    )
+    riot_tag = forms.CharField(
+        max_length=10,
+        required=False,
+        label='Riot Tag',
+        validators=[
+            RegexValidator(
+                regex=r'^#[a-zA-Z0-9]{2,5}$',
+                message='Tag must start with # and be followed by 2-5 alphanumeric characters (e.g. #NA1, #12345)',
+            )
+        ],
+        widget=forms.TextInput(attrs={'placeholder': '#NA1'}),
+    )
+
+    class Meta:
+        model = User
+        fields = ('username',)
+
+
+class RiotInfoForm(forms.Form):
+    riot_id = forms.CharField(
+        max_length=50,
+        required=True,
+        label='Riot ID',
+        widget=forms.TextInput(attrs={'placeholder': 'Riot ID (e.g. Tyloo)'}),
+    )
+    riot_tag = forms.CharField(
+        max_length=10,
+        required=False,
+        label='Riot Tag',
+        validators=[
+            RegexValidator(
+                regex=r'^#[a-zA-Z0-9]{2,5}$',
+                message='Tag must start with # and be followed by 2-5 alphanumeric characters (e.g. #NA1, #12345)'
+            )
+        ],
+        widget=forms.TextInput(attrs={'placeholder': '#NA1'}),
+    )

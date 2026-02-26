@@ -1,0 +1,67 @@
+/* forms.css */
+
+.valorant-form {
+  background: rgba(26, 42, 58, 0.92);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+  padding: 2.5rem 2rem;
+  margin: 2rem auto;
+  max-width: 400px;
+  color: #fff;
+}
+
+.valorant-form label {
+  font-family: "Oswald", sans-serif;
+  color: #eaeeb2;
+  text-transform: uppercase;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.valorant-form input,
+.valorant-form select,
+.valorant-form textarea {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #22334a;
+  background: #0f1923;
+  color: #eaeeb2;
+  font-family: "Arimo", sans-serif;
+  margin-bottom: 1.2rem;
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+.valorant-form input:focus,
+.valorant-form select:focus,
+.valorant-form textarea:focus {
+  border: 1.5px solid #ff4655;
+  outline: none;
+}
+
+.valorant-btn {
+  background: #ff4655;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  font-family: "Oswald", sans-serif;
+  font-size: 1rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.valorant-btn.secondary {
+  background: #1a2a3a;
+  color: #eaeeb2;
+}
+.valorant-btn:hover {
+  background: #e13c4c;
+}
+
+@media (max-width: 600px) {
+  .valorant-form {
+    padding: 1rem 0.5rem;
+  }
+}
