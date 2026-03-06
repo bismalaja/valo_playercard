@@ -589,6 +589,18 @@
             easing: 'easeInOutQuad'
         });
 
+        // Scale bg-text so long names never overflow the viewport
+        function fitBgText() {
+            var el = document.querySelector('.bg-text');
+            el.style.fontSize = '30vw';
+            var scale = window.innerWidth / el.scrollWidth;
+            if (scale < 1) {
+                el.style.fontSize = (30 * scale * 0.95) + 'vw';
+            }
+        }
+        fitBgText();
+        window.addEventListener('resize', fitBgText);
+
         // Entrance Animations
         var tl = anime.timeline({
             easing: 'easeOutExpo',
