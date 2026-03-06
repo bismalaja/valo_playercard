@@ -399,50 +399,6 @@ def card_profile(request, profile_id):
     })
 
 
-def download_card_profile(request, profile_id):
-    """Generate and serve a downloadable image of the card profile.
-
-    Query params:
-        format  — 'png' (default), 'jpeg', or 'pdf'
-    """
-    import io as _io
-    from django.http import HttpResponse
-    from .utils.card_image import build_card_image
-
-    profile = get_object_or_404(Profile, id=profile_id)
-
-    teammates = None
-    if profile.team:
-        teammates = Profile.objects.filter(team=profile.team).exclude(id=profile.id)
-
-    fmt = request.GET.get('format', 'png').lower()
-    if fmt not in ('png', 'jpeg', 'jpg', 'pdf'):
-        fmt = 'png'
-    if fmt == 'jpg':
-        fmt = 'jpeg'
-
-    img = build_card_image(profile, teammates)
-    img_rgb = img.convert('RGB')
-
-    buf = _io.BytesIO()
-    pil_format = fmt.upper()
-    save_kwargs = {'quality': 90} if pil_format == 'JPEG' else {}
-    img_rgb.save(buf, format=pil_format, **save_kwargs)
-    buf.seek(0)
-
-    ext_map  = {'PNG': 'png', 'JPEG': 'jpg', 'PDF': 'pdf'}
-    mime_map = {'PNG': 'image/png', 'JPEG': 'image/jpeg', 'PDF': 'application/pdf'}
-    ext          = ext_map.get(pil_format, 'png')
-    content_type = mime_map.get(pil_format, 'image/png')
-
-    safe_name = profile.in_game_name.replace(' ', '_')
-    filename  = f"{safe_name}_card.{ext}"
-
-    response = HttpResponse(buf.getvalue(), content_type=content_type)
-    response['Content-Disposition'] = f'attachment; filename="{filename}"'
-    return response
-
-
 def delete_profile(request, profile_id):
     """Delete a profile — owner only."""
     profile = get_object_or_404(Profile, id=profile_id)
