@@ -21,7 +21,7 @@ class SignUpForm(UserCreationForm):
     )
     riot_tag = forms.CharField(
         max_length=10,
-        required=False,
+        required=True,
         validators=[
             RegexValidator(
                 regex=r'^#[a-zA-Z0-9]{2,5}$',
@@ -30,9 +30,9 @@ class SignUpForm(UserCreationForm):
         ],
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': '#NA1  (optional)',
+            'placeholder': '#NA1',
         }),
-        help_text='Optional — the # tag portion of your Riot ID',
+        help_text='The # tag portion of your Riot ID (e.g. #NA1)',
     )
 
     class Meta:

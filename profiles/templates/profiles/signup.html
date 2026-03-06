@@ -43,7 +43,7 @@
                     <span class="field-hint">Your Riot name (without the # tag)</span>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Riot Tag <span class="field-optional">(optional)</span></label>
+                    <label class="form-label">Riot Tag <span class="required-star">*</span></label>
                     {{ form.riot_tag }}
                     {% if form.riot_tag.errors %}
                     <span class="field-error">{{ form.riot_tag.errors|join:", " }}</span>
