@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
@@ -18,9 +20,13 @@ class Role(models.Model):
     icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
     
     def get_icon_url(self):
-        """Returns icon URL - either from upload or external link"""
+        """Returns icon URL - verifies uploaded file exists before returning its URL"""
         if self.icon:
-            return self.icon.url
+            try:
+                if os.path.exists(self.icon.path):
+                    return self.icon.url
+            except (ValueError, NotImplementedError):
+                pass
         return self.icon_url or ''
     
     def __str__(self):
@@ -43,9 +49,13 @@ class Agent(models.Model):
     icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
     
     def get_icon_url(self):
-        """Returns icon URL - either from upload or external link"""
+        """Returns icon URL - verifies uploaded file exists before returning its URL"""
         if self.icon:
-            return self.icon.url
+            try:
+                if os.path.exists(self.icon.path):
+                    return self.icon.url
+            except (ValueError, NotImplementedError):
+                pass
         return self.icon_url or ''
     
     def __str__(self):
@@ -66,9 +76,13 @@ class Team(models.Model):
     custom_order = models.PositiveIntegerField(default=0, help_text="Higher numbers appear later in the list")
     
     def get_icon_url(self):
-        """Returns icon URL - either from upload or external link"""
+        """Returns icon URL - verifies uploaded file exists before returning its URL"""
         if self.icon:
-            return self.icon.url
+            try:
+                if os.path.exists(self.icon.path):
+                    return self.icon.url
+            except (ValueError, NotImplementedError):
+                pass
         return self.icon_url or ''
     
     def __str__(self):
@@ -88,9 +102,13 @@ class Map(models.Model):
     icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
     
     def get_icon_url(self):
-        """Returns icon URL - either from upload or external link"""
+        """Returns icon URL - verifies uploaded file exists before returning its URL"""
         if self.icon:
-            return self.icon.url
+            try:
+                if os.path.exists(self.icon.path):
+                    return self.icon.url
+            except (ValueError, NotImplementedError):
+                pass
         return self.icon_url or ''
     
     def __str__(self):
@@ -118,7 +136,11 @@ class AbilityTemplate(models.Model):
     
     def get_icon_url(self):
         if self.icon:
-            return self.icon.url
+            try:
+                if os.path.exists(self.icon.path):
+                    return self.icon.url
+            except (ValueError, NotImplementedError):
+                pass
         return self.icon_url or ''
     
     def __str__(self):

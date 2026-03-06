@@ -37,7 +37,7 @@ class Command(BaseCommand):
         for role_data in roles:
             role, created = Role.objects.update_or_create(
                 name=role_data['name'],
-                defaults={'icon_url': role_data['icon_url']}
+                defaults={'icon_url': role_data['icon_url'], 'icon': None}
             )
             if created:
                 self.stdout.write(self.style.SUCCESS(f'Role "{role_data["name"]}" created.'))
@@ -86,7 +86,7 @@ class Command(BaseCommand):
             if role_obj:
                 agent, created = Agent.objects.update_or_create(
                     name=agent_data['name'], 
-                    defaults={'role': role_obj, 'icon_url': agent_data['icon_url']}
+                    defaults={'role': role_obj, 'icon_url': agent_data['icon_url'], 'icon': None}
                 )
                 if created:
                     self.stdout.write(self.style.SUCCESS(f'Agent "{agent_data["name"]}" created.'))
@@ -116,7 +116,7 @@ class Command(BaseCommand):
         for map_data in maps:
             map_obj, created = Map.objects.update_or_create(
                 name=map_data['name'],
-                defaults={'icon_url': map_data['icon_url']}
+                defaults={'icon_url': map_data['icon_url'], 'icon': None}
             )
             if created:
                 self.stdout.write(self.style.SUCCESS(f'Map "{map_data["name"]}" created.'))
@@ -136,7 +136,7 @@ class Command(BaseCommand):
         for team_data in teams:
             team_obj, created = Team.objects.update_or_create(
                 name=team_data['name'],
-                defaults={'icon_url': team_data['icon_url']}
+                defaults={'icon_url': team_data['icon_url'], 'icon': None}
             )
             if created:
                 self.stdout.write(self.style.SUCCESS(f'Team "{team_data["name"]}" created.'))
