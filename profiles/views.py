@@ -157,6 +157,7 @@ def _lock_riot_fields(form, user):
         })
 
 
+@login_required(login_url='login_view')
 def input_profile(request):
     """Form page to input all profile data."""
 
