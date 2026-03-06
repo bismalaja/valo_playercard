@@ -29,7 +29,235 @@
 
 /* ACTIONS */
 .action-bar {
-    margin-bottom: 40px;
+    margin-bottom: 20px;
+}
+
+/* SEARCH SECTION */
+.search-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+}
+
+.search-bar {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+}
+
+.search-field-wrap {
+    display: flex;
+    align-items: center;
+    position: relative;
+    background: rgba(15, 25, 35, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: border-color 0.25s;
+}
+
+.search-field-wrap:focus-within {
+    border-color: #ff4655;
+    box-shadow: 0 0 0 2px rgba(255, 70, 85, 0.15);
+}
+
+.search-icon {
+    position: absolute;
+    left: 18px;
+    width: 20px;
+    height: 20px;
+    color: rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+    flex-shrink: 0;
+}
+
+.search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ece8e1;
+    font-family: "Oswald", sans-serif;
+    font-size: 1.15rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 18px 16px 18px 54px;
+    width: 100%;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+    letter-spacing: 3px;
+}
+
+/* Right-side action cluster */
+.search-right-actions {
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
+    height: 100%;
+}
+
+.search-clear {
+    background: none;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.search-clear:hover {
+    color: #ff4655;
+}
+
+/* Filter toggle button */
+.filter-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.45);
+    font-family: "Oswald", sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 0 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    white-space: nowrap;
+}
+
+.filter-toggle-btn:hover,
+.filter-toggle-btn--open {
+    background: rgba(255, 70, 85, 0.1);
+    color: #ff4655;
+    border-left-color: rgba(255, 70, 85, 0.3);
+}
+
+.filter-toggle-btn--active:not(.filter-toggle-btn--open) {
+    color: #ff4655;
+}
+
+.filter-active-dot {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 6px;
+    height: 6px;
+    background: #ff4655;
+    border-radius: 50%;
+}
+
+/* FILTER PANEL */
+.filter-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    width: 100%;
+    background: #0d1720;
+    border: 1px solid rgba(255, 70, 85, 0.35);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    z-index: 100;
+    display: none;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.filter-panel.open {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.filter-panel-inner {
+    padding: 20px 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.filter-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filter-section-label {
+    font-family: "Oswald", sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 3px;
+    color: rgba(255, 70, 85, 0.7);
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 70, 85, 0.2);
+    padding-bottom: 6px;
+}
+
+/* FILTER CHIPS */
+.filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(15, 25, 35, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    font-family: "Oswald", sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.filter-chip:hover {
+    border-color: rgba(255, 70, 85, 0.5);
+    color: #ece8e1;
+}
+
+.filter-chip.active {
+    background: rgba(255, 70, 85, 0.15);
+    border-color: #ff4655;
+    color: #ff4655;
+}
+
+.chip-logo {
+    height: 14px;
+    width: auto;
+    object-fit: contain;
+    opacity: 0.85;
+}
+
+.filter-reset {
+    align-self: flex-start;
+    font-family: "Oswald", sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.3);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 2px;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.filter-reset:hover {
+    color: #ff4655;
+    border-color: #ff4655;
 }
 
 .valorant-btn {

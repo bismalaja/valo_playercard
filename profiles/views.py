@@ -289,8 +289,22 @@ def display_profile(request, profile_id):
 
 
 def profile_list(request):
-    """List all profiles."""
+    """List all profiles with optional search/filter."""
     profiles = Profile.objects.all()
+
+    q = request.GET.get('q', '').strip()
+    team_filter = request.GET.get('team', '').strip()
+    role_filter = request.GET.get('role', '').strip()
+
+    if q:
+        profiles = profiles.filter(in_game_name__icontains=q)
+    if team_filter == 'free_agent':
+        profiles = profiles.filter(team__isnull=True)
+    elif team_filter:
+        profiles = profiles.filter(team__id=team_filter)
+    if role_filter:
+        profiles = profiles.filter(roles__id=role_filter)
+
     # Pass a set of profile IDs owned by this user (for template checks)
     owned_ids = set()
     if request.user.is_authenticated:
@@ -298,6 +312,11 @@ def profile_list(request):
     return render(request, 'profiles/profile_list.html', {
         'profiles': profiles,
         'owned_ids': owned_ids,
+        'teams': Team.objects.all().order_by('custom_order', 'name'),
+        'roles': Role.objects.all().order_by('name'),
+        'q': q,
+        'team_filter': team_filter,
+        'role_filter': role_filter,
     })
 
 

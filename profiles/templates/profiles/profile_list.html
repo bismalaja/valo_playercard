@@ -53,6 +53,76 @@
     {% endif %}
 </div>
 
+<!-- SEARCH & FILTER BAR -->
+<div class="search-section">
+    <form method="get" id="searchForm" class="search-bar" autocomplete="off">
+        <div class="search-field-wrap">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input
+                type="text"
+                name="q"
+                id="searchInput"
+                class="search-input"
+                placeholder="SEARCH PLAYERS..."
+                value="{{ q }}"
+            >
+            <!-- preserve active filters as hidden fields -->
+            {% if team_filter %}<input type="hidden" name="team" value="{{ team_filter }}">{% endif %}
+            {% if role_filter %}<input type="hidden" name="role" value="{{ role_filter }}">{% endif %}
+
+            <div class="search-right-actions">
+                {% if q %}
+                <button type="button" class="search-clear" id="searchClearBtn" title="Clear">&times;</button>
+                {% endif %}
+                <button
+                    type="button"
+                    class="filter-toggle-btn {% if team_filter or role_filter %}filter-toggle-btn--active{% endif %}"
+                    id="filterToggleBtn"
+                    title="Filters"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+                    FILTERS
+                    {% if team_filter or role_filter %}<span class="filter-active-dot"></span>{% endif %}
+                </button>
+            </div>
+        </div>
+
+        <!-- FILTER PANEL (dropdown) -->
+        <div class="filter-panel" id="filterPanel">
+            <div class="filter-panel-inner">
+                <div class="filter-section">
+                    <div class="filter-section-label">TEAM</div>
+                    <div class="filter-chips">
+                        <a href="?q={{ q }}&role={{ role_filter }}" class="filter-chip {% if not team_filter %}active{% endif %}">ALL</a>
+                        <a href="?q={{ q }}&team=free_agent&role={{ role_filter }}" class="filter-chip {% if team_filter == 'free_agent' %}active{% endif %}">FREE AGENT</a>
+                        {% for team in teams %}
+                        <a href="?q={{ q }}&team={{ team.id }}&role={{ role_filter }}" class="filter-chip {% if team_filter == team.id|stringformat:'s' %}active{% endif %}">
+                            {% with logo=team.get_icon_url %}{% if logo %}<img src="{{ logo }}" class="chip-logo" alt="">{% endif %}{% endwith %}
+                            {{ team.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-section-label">ROLE</div>
+                    <div class="filter-chips">
+                        <a href="?q={{ q }}&team={{ team_filter }}" class="filter-chip {% if not role_filter %}active{% endif %}">ALL</a>
+                        {% for role in roles %}
+                        <a href="?q={{ q }}&team={{ team_filter }}&role={{ role.id }}" class="filter-chip {% if role_filter == role.id|stringformat:'s' %}active{% endif %}">
+                            {% with icon=role.get_icon_url %}{% if icon %}<img src="{{ icon }}" class="chip-logo" alt="">{% endif %}{% endwith %}
+                            {{ role.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if team_filter or role_filter %}
+                <a href="?q={{ q }}" class="filter-reset">CLEAR FILTERS</a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
     <!-- Auth required modal -->
     <div class="auth-modal-overlay" id="authModal" onclick="if(event.target===this)this.classList.remove('active')">
         <div class="auth-card">
@@ -199,5 +269,37 @@
             delay: anime.stagger(100),
             easing: "easeOutExpo",
         });
+
+        // Filter panel toggle
+        var filterBtn = document.getElementById('filterToggleBtn');
+        var filterPanel = document.getElementById('filterPanel');
+        var clearBtn = document.getElementById('searchClearBtn');
+
+        if (filterBtn && filterPanel) {
+            filterBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                filterPanel.classList.toggle('open');
+                filterBtn.classList.toggle('filter-toggle-btn--open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!filterPanel.contains(e.target) && e.target !== filterBtn) {
+                    filterPanel.classList.remove('open');
+                    filterBtn.classList.remove('filter-toggle-btn--open');
+                }
+            });
+        }
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('searchForm').submit();
+            });
+        }
+
+        // Auto-open panel if filters are active
+        {% if team_filter or role_filter %}
+        if (filterPanel) filterPanel.classList.add('open');
+        if (filterBtn) filterBtn.classList.add('filter-toggle-btn--open');
+        {% endif %}
     </script>
 {% endblock %}
