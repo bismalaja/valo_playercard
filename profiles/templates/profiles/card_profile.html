@@ -191,6 +191,9 @@
         }
 
         .player-team {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-family: "Arimo", sans-serif;
             font-weight: 700;
             letter-spacing: 3px;
@@ -198,6 +201,13 @@
             color: #ff4655;
             text-transform: uppercase;
             margin-bottom: 0.5vh;
+        }
+
+        .team-logo {
+            height: 2.8vh;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 4px rgba(255, 70, 85, 0.4));
         }
 
         .player-name {
@@ -471,7 +481,12 @@
         <!-- Player Identity -->
         <div class="player-identity">
             {% if profile.team %}
-            <div class="player-team">{{ profile.team.name }}</div>
+            <div class="player-team">
+                {% with logo=profile.team.get_icon_url %}
+                {% if logo %}<img src="{{ logo }}" alt="{{ profile.team.name }}" class="team-logo">{% endif %}
+                {% endwith %}
+                {{ profile.team.name }}
+            </div>
             {% else %}
             <div class="player-team">FREE AGENT</div>
             {% endif %}
