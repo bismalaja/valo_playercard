@@ -1,0 +1,305 @@
+/* ======================================================
+   AUTH PAGES — login, signup, claim confirm
+   Inherits Arimo + Oswald from base.css
+   ====================================================== */
+
+.auth-wrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px 80px;
+    min-height: 70vh;
+}
+
+.auth-card {
+    background: rgba(15, 25, 35, 0.85);
+    border: 1px solid rgba(255, 70, 85, 0.35);
+    padding: 50px 44px 40px;
+    width: 100%;
+    max-width: 460px;
+    position: relative;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
+}
+
+/* Wide variant for sign up (two-column riot id/tag row) */
+.auth-card-wide {
+    max-width: 560px;
+}
+
+/* Red top accent bar */
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #ff4655 0%, transparent 100%);
+}
+
+.auth-badge {
+    font-family: "Oswald", sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    color: #ff4655;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+
+.auth-title {
+    font-family: "Oswald", sans-serif;
+    font-size: 3rem;
+    text-transform: uppercase;
+    color: #ece8e1;
+    margin: 0 0 8px;
+    line-height: 1;
+}
+
+.auth-subtitle {
+    font-size: 0.9rem;
+    color: #8fa1c1;
+    margin: 0 0 34px;
+    line-height: 1.5;
+}
+
+/* ---- Form layout ---- */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-label {
+    font-family: "Oswald", sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8fa1c1;
+}
+
+.required-star {
+    color: #ff4655;
+}
+
+.field-optional {
+    color: #4a5568;
+    font-size: 0.7rem;
+    font-family: "Arimo", sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+/* Inputs — override Django's class="form-control" */
+.auth-form .form-control,
+.auth-form input[type="text"],
+.auth-form input[type="password"],
+.auth-form input[type="email"],
+.auth-form input[type="url"] {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ece8e1;
+    font-family: "Arimo", sans-serif;
+    font-size: 1rem;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.auth-form .form-control:focus,
+.auth-form input:focus {
+    border-color: #ff4655;
+    background: rgba(255, 70, 85, 0.06);
+}
+
+.auth-form .form-control::placeholder,
+.auth-form input::placeholder {
+    color: #4a5568;
+}
+
+/* Field-level error */
+.field-error {
+    font-size: 0.78rem;
+    color: #ff4655;
+    letter-spacing: 0.5px;
+}
+
+/* Hint text below a field */
+.field-hint {
+    font-size: 0.77rem;
+    color: #4a5568;
+}
+
+/* Non-field / form-wide errors */
+.auth-errors {
+    background: rgba(255, 70, 85, 0.1);
+    border: 1px solid rgba(255, 70, 85, 0.4);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.auth-error-line {
+    font-size: 0.85rem;
+    color: #ff4655;
+}
+
+/* Divider with label */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #4a5568;
+    font-family: "Oswald", sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 4px 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Submit button */
+.auth-submit {
+    margin-top: 8px;
+    width: 100%;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-family: "Oswald", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    background: transparent;
+    color: #ff4655;
+    border: 1px solid #ff4655;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.25s, color 0.25s;
+}
+
+.auth-submit:hover {
+    background: #ff4655;
+    color: white;
+}
+
+/* Footer link row */
+.auth-footer {
+    margin-top: 28px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #8fa1c1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.auth-link {
+    color: #ff4655;
+    text-decoration: none;
+    font-family: "Oswald", sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+}
+
+.auth-link:hover {
+    color: #00f5ff;
+}
+
+/* ---- Claim profile preview ---- */
+.claim-profile-preview {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(0, 245, 255, 0.04);
+    border: 1px solid rgba(0, 245, 255, 0.2);
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.claim-pfp {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(0, 245, 255, 0.4);
+    flex-shrink: 0;
+}
+
+.claim-pfp-empty {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #1f2833;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    color: #8fa1c1;
+    flex-shrink: 0;
+}
+
+.claim-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.claim-tag {
+    font-size: 0.85rem;
+    color: #8fa1c1;
+    font-family: "Oswald", sans-serif;
+}
+
+.claim-name {
+    font-family: "Oswald", sans-serif;
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    color: #ece8e1;
+    line-height: 1;
+}
+
+.claim-team {
+    font-size: 0.85rem;
+    color: #ff4655;
+    font-family: "Oswald", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+    .auth-card,
+    .auth-card-wide {
+        padding: 36px 22px 30px;
+    }
+
+    .auth-title {
+        font-size: 2.2rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}

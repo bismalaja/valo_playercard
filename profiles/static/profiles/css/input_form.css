@@ -1,0 +1,303 @@
+/* ============================================================
+   INPUT FORM — form-specific styles (base.css loaded via base.html)
+   ============================================================ */
+
+/* ============================================================
+   PAGE HEADER
+   ============================================================ */
+
+.header {
+    margin-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 20px;
+}
+
+.header h1 {
+    font-family: "Oswald", sans-serif;
+    font-size: 3rem;
+    text-transform: uppercase;
+    color: #ece8e1;
+    margin: 0 0 8px 0;
+    line-height: 1;
+}
+
+.header p {
+    color: #ff4655;
+    font-family: "Oswald", sans-serif;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+/* ============================================================
+   FORM SHELL
+   ============================================================ */
+
+.valorant-form {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* ============================================================
+   FORM SECTIONS
+   ============================================================ */
+
+.form-section {
+    background: rgba(15, 25, 35, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    position: relative;
+}
+
+.form-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: #ff4655;
+}
+
+.section-title {
+    font-family: "Oswald", sans-serif;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #ff4655;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 70, 85, 0.2);
+}
+
+/* ============================================================
+   FORM FIELDS
+   ============================================================ */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-label {
+    display: block;
+    font-family: "Oswald", sans-serif;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #8fa1c1;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ece8e1;
+    font-family: "Arimo", sans-serif;
+    font-size: 1rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.form-control:focus {
+    border-color: #ff4655;
+    background: rgba(255, 70, 85, 0.05);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+select.form-control {
+    appearance: none;
+    cursor: pointer;
+}
+
+.help-text {
+    display: block;
+    font-size: 0.8rem;
+    color: #8fa1c1;
+    margin-top: 6px;
+}
+
+.error-message {
+    color: #ff4655;
+    font-size: 0.85rem;
+    margin-top: 6px;
+    font-family: "Arimo", sans-serif;
+}
+
+/* ============================================================
+   PROFILE PICTURE PREVIEW
+   ============================================================ */
+
+.current-pfp-preview {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.current-pfp-preview img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.current-pfp-preview span {
+    font-size: 0.85rem;
+    color: #8fa1c1;
+}
+
+/* ============================================================
+   SELECTION GRID (teams, roles, agents, maps)
+   ============================================================ */
+
+.selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+}
+
+.selection-item {
+    cursor: pointer;
+}
+
+/* hide the native radio/checkbox */
+.selection-item input[type="radio"],
+.selection-item input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.selection-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    min-height: 80px;
+}
+
+.selection-card:hover {
+    border-color: rgba(255, 70, 85, 0.5);
+    background: rgba(255, 70, 85, 0.07);
+    transform: translateY(-2px);
+}
+
+/* checked state */
+.selection-item input:checked + .selection-card {
+    border-color: #ff4655;
+    background: rgba(255, 70, 85, 0.15);
+    box-shadow: 0 0 12px rgba(255, 70, 85, 0.25);
+}
+
+.item-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.item-name {
+    font-family: "Oswald", sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ece8e1;
+    line-height: 1.2;
+}
+
+/* ============================================================
+   FORM ACTIONS (submit / cancel)
+   ============================================================ */
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    padding-top: 10px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 36px;
+    font-family: "Oswald", sans-serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.15),
+        transparent
+    );
+    transition: 0.4s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-primary {
+    background: rgba(255, 70, 85, 0.15);
+    border-color: #ff4655;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #ff4655;
+    color: #0f1923;
+    box-shadow: 0 0 20px rgba(255, 70, 85, 0.4);
+}
+
+.btn-secondary {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #8fa1c1;
+}
+
+.btn-secondary:hover {
+    border-color: #ece8e1;
+    color: #ece8e1;
+}

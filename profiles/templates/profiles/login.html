@@ -1,0 +1,81 @@
+{% extends "profiles/base.html" %}
+{% load static %}
+{% block title %}Login — Valorant Profiles{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'profiles/css/auth.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-badge">// AUTHENTICATION</div>
+        <h1 class="auth-title">LOGIN</h1>
+        <p class="auth-subtitle">Access your agent dossier</p>
+
+        <form method="post" novalidate class="auth-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="auth-errors">
+                {% for error in form.non_field_errors %}
+                <span class="auth-error-line">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <span class="field-error">{{ form.username.errors|join:", " }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <span class="field-error">{{ form.password.errors|join:", " }}</span>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="valorant-btn auth-submit">LOGIN</button>
+        </form>
+
+        <div class="auth-footer">
+            <span>No account?</span>
+            <a href="{% url 'signup_view' %}" class="auth-link">Sign Up</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    var granimInstance = new Granim({
+        element: "#gradient",
+        direction: "diagonal",
+        isPausedWhenNotInView: false,
+        stateTransitionSpeed: 200,
+        states: {
+            "default-state": {
+                gradients: [
+                    ["#a67963", "#171d3b"],
+                    ["#0f1923", "#ff4655"],
+                    ["#171d3b", "#a67963"],
+                ],
+                transitionSpeed: 5000,
+            },
+        },
+    });
+
+    anime({
+        targets: ".auth-card",
+        translateY: [40, 0],
+        opacity: [0, 1],
+        easing: "easeOutExpo",
+        duration: 800,
+    });
+</script>
+{% endblock %}

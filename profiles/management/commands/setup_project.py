@@ -25,13 +25,13 @@ class Command(BaseCommand):
         # 2. Handle Roles
         # Combining standard roles (Duelist, etc) with the custom ones the user had
         roles = [
-            {'name': 'Duelist', 'icon_url': 'https://kingdomarchives.com/uploads/agents/roles/Duelist.png'}, 
-            {'name': 'Initiator', 'icon_url': 'https://kingdomarchives.com/uploads/agents/roles/Initiator.png'},
-            {'name': 'Controller', 'icon_url': 'https://kingdomarchives.com/uploads/agents/roles/Controller.png'}, 
-            {'name': 'Sentinel', 'icon_url': 'https://kingdomarchives.com/uploads/agents/roles/Sentinel.png'},
-            {'name': '(Extra)IGL', 'icon_url': 'https://upload.wikimedia.org/wikipedia/commons/c/cf/Logo-brain.png'}, 
-            {'name': '(Extra)Leader', 'icon_url': 'https://www.pngkey.com/png/full/143-1437226_our-main-qualities-white-leader-icon-png.png'}, 
-            {'name': '(Extra)Manager', 'icon_url': 'https://cdn-icons-png.flaticon.com/512/7527/7527248.png'}
+            {'name': 'Duelist', 'icon_url': '/static/profiles/images/roles/Duelist.png'}, 
+            {'name': 'Initiator', 'icon_url': '/static/profiles/images/roles/Initiator.png'},
+            {'name': 'Controller', 'icon_url': '/static/profiles/images/roles/Controller.png'}, 
+            {'name': 'Sentinel', 'icon_url': '/static/profiles/images/roles/Sentinel.png'},
+            {'name': '(Extra)IGL', 'icon_url': '/static/profiles/images/roles/IGL.png'}, 
+            {'name': '(Extra)Leader', 'icon_url': '/static/profiles/images/roles/Leader.png'}, 
+            {'name': '(Extra)Manager', 'icon_url': '/static/profiles/images/roles/Manager.png'}
         ]
         
         for role_data in roles:
@@ -46,37 +46,37 @@ class Command(BaseCommand):
         
         agents = [
             # duelists
-            {'name': 'Waylay', 'role': 'Duelist', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Waylay.png'},
-            {'name': 'Jett', 'role': 'Duelist', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Jett.png'},
-            {'name': 'Iso', 'role': 'Duelist', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Iso.png'},
-            {'name': 'Reyna', 'role': 'Duelist', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Reyna.png'},
-            {'name': 'Phoenix', 'role': 'Duelist', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Phoenix.png'},
-            {'name': 'Raze', 'role': 'Duelist', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Raze.png'},
-            {'name': 'Yoru', 'role': 'Duelist', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Yoru.png'},
-            {'name': 'Neon', 'role': 'Duelist', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Neon.png'},
+            {'name': 'Waylay', 'role': 'Duelist', 'icon_url': '/static/profiles/images/agents/Waylay.png'},
+            {'name': 'Jett', 'role': 'Duelist', 'icon_url': '/static/profiles/images/agents/Jett.png'},
+            {'name': 'Iso', 'role': 'Duelist', 'icon_url': '/static/profiles/images/agents/Iso.png'},
+            {'name': 'Reyna', 'role': 'Duelist', 'icon_url': '/static/profiles/images/agents/Reyna.png'},
+            {'name': 'Phoenix', 'role': 'Duelist', 'icon_url': '/static/profiles/images/agents/Phoenix.png'},
+            {'name': 'Raze', 'role': 'Duelist', 'icon_url': '/static/profiles/images/agents/Raze.png'},
+            {'name': 'Yoru', 'role': 'Duelist', 'icon_url': '/static/profiles/images/agents/Yoru.png'},
+            {'name': 'Neon', 'role': 'Duelist', 'icon_url': '/static/profiles/images/agents/Neon.png'},
             # initiators
-            {'name': 'Sova', 'role': 'Initiator', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Sova.png'},
-            {'name': 'Breach', 'role': 'Initiator', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Breach.png'},
-            {'name': 'Skye', 'role': 'Initiator', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Skye.png'},
-            {'name': 'KAY/O', 'role': 'Initiator', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/KayO.png'},
-            {'name': 'Tejo', 'role': 'Initiator', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Tejo.png'},
-            {'name': 'Gekko', 'role': 'Initiator', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Gekko.png'},
-            {'name': 'Fade', 'role': 'Initiator', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Fade.png'},
+            {'name': 'Sova', 'role': 'Initiator', 'icon_url': '/static/profiles/images/agents/Sova.png'},
+            {'name': 'Breach', 'role': 'Initiator', 'icon_url': '/static/profiles/images/agents/Breach.png'},
+            {'name': 'Skye', 'role': 'Initiator', 'icon_url': '/static/profiles/images/agents/Skye.png'},
+            {'name': 'KAY/O', 'role': 'Initiator', 'icon_url': '/static/profiles/images/agents/KayO.png'},
+            {'name': 'Tejo', 'role': 'Initiator', 'icon_url': '/static/profiles/images/agents/Tejo.png'},
+            {'name': 'Gekko', 'role': 'Initiator', 'icon_url': '/static/profiles/images/agents/Gekko.png'},
+            {'name': 'Fade', 'role': 'Initiator', 'icon_url': '/static/profiles/images/agents/Fade.png'},
             # controllers
-            {'name': 'Omen', 'role': 'Controller', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Omen.png'},
-            {'name': 'Brimstone', 'role': 'Controller', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Brimstone.png'},
-            {'name': 'Viper', 'role': 'Controller', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Viper.png'},
-            {'name': 'Clove', 'role': 'Controller', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Clove.png'},
-            {'name': 'Astra', 'role': 'Controller', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Astra.png'},
-            {'name': 'Harbor', 'role': 'Controller', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Harbor.png'},
+            {'name': 'Omen', 'role': 'Controller', 'icon_url': '/static/profiles/images/agents/Omen.png'},
+            {'name': 'Brimstone', 'role': 'Controller', 'icon_url': '/static/profiles/images/agents/Brimstone.png'},
+            {'name': 'Viper', 'role': 'Controller', 'icon_url': '/static/profiles/images/agents/Viper.png'},
+            {'name': 'Clove', 'role': 'Controller', 'icon_url': '/static/profiles/images/agents/Clove.png'},
+            {'name': 'Astra', 'role': 'Controller', 'icon_url': '/static/profiles/images/agents/Astra.png'},
+            {'name': 'Harbor', 'role': 'Controller', 'icon_url': '/static/profiles/images/agents/Harbor.png'},
             # sentinels
-            {'name': 'Sage', 'role': 'Sentinel', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Sage.png'},
-            {'name': 'Cypher', 'role': 'Sentinel', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Cypher.png'},
-            {'name': 'Killjoy', 'role': 'Sentinel', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Killjoy.png'},
-            {'name': 'Deadlock', 'role': 'Sentinel', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Deadlock.png'},
-            {'name': 'Veto', 'role': 'Sentinel', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Veto.png'},
-            {'name': "Vyse", 'role': 'Sentinel', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Vyse.png'},
-            {'name': 'Chamber', 'role': 'Sentinel', 'icon_url': 'https://kingdomarchives.com/uploads/agents/thumbnails/Chamber.png'},
+            {'name': 'Sage', 'role': 'Sentinel', 'icon_url': '/static/profiles/images/agents/Sage.png'},
+            {'name': 'Cypher', 'role': 'Sentinel', 'icon_url': '/static/profiles/images/agents/Cypher.png'},
+            {'name': 'Killjoy', 'role': 'Sentinel', 'icon_url': '/static/profiles/images/agents/Killjoy.png'},
+            {'name': 'Deadlock', 'role': 'Sentinel', 'icon_url': '/static/profiles/images/agents/Deadlock.png'},
+            {'name': 'Veto', 'role': 'Sentinel', 'icon_url': '/static/profiles/images/agents/Veto.png'},
+            {'name': "Vyse", 'role': 'Sentinel', 'icon_url': '/static/profiles/images/agents/Vyse.png'},
+            {'name': 'Chamber', 'role': 'Sentinel', 'icon_url': '/static/profiles/images/agents/Chamber.png'},
         ]
         
         self.stdout.write("Setting up Agents...")
@@ -99,18 +99,18 @@ class Command(BaseCommand):
         self.stdout.write("Setting up Maps...")
         
         maps = [
-            {'name': 'Ascent', 'icon_url': 'https://static.wikia.nocookie.net/valorant/images/e/e7/Loading_Screen_Ascent.png/revision/latest/scale-to-width-down/536?cb=20200607180020'},
-            {'name': 'Bind', 'icon_url': 'https://static.wikia.nocookie.net/valorant/images/2/23/Loading_Screen_Bind.png/revision/latest/scale-to-width-down/536?cb=20200620202316'},
-            {'name': 'Breeze', 'icon_url': 'https://static.wikia.nocookie.net/valorant/images/1/10/Loading_Screen_Breeze.png/revision/latest/scale-to-width-down/536?cb=20260106175937'},
-            {'name': 'Fracture', 'icon_url': 'https://static.wikia.nocookie.net/valorant/images/f/fc/Loading_Screen_Fracture.png/revision/latest/scale-to-width-down/536?cb=20210908143656'},
-            {'name': 'Haven', 'icon_url': 'https://static.wikia.nocookie.net/valorant/images/7/70/Loading_Screen_Haven.png/revision/latest/scale-to-width-down/536?cb=20200620202335'},
-            {'name': 'Icebox', 'icon_url': 'https://static.wikia.nocookie.net/valorant/images/1/13/Loading_Screen_Icebox.png/revision/latest?cb=20250730171440'},
-            {'name': 'Lotus', 'icon_url': 'https://static.wikia.nocookie.net/valorant/images/d/d0/Loading_Screen_Lotus.png/revision/latest?cb=20230106163526'},
-            {'name': 'Pearl', 'icon_url': 'https://static.wikia.nocookie.net/valorant/images/a/af/Loading_Screen_Pearl.png/revision/latest/scale-to-width-down/536?cb=20220622132842'},
-            {'name': 'Split', 'icon_url': 'https://static.wikia.nocookie.net/valorant/images/d/d6/Loading_Screen_Split.png/revision/latest/scale-to-width-down/536?cb=20230411161807'},
-            {'name': 'Sunset', 'icon_url': 'https://static.wikia.nocookie.net/valorant/images/5/5c/Loading_Screen_Sunset.png/revision/latest?cb=20230829125442'},
-            {'name': 'Abyss', 'icon_url': 'https://static.wikia.nocookie.net/valorant/images/6/61/Loading_Screen_Abyss.png/revision/latest/scale-to-width-down/536?cb=20240730145619'},
-            {'name': 'Corrode', 'icon_url': 'https://static.wikia.nocookie.net/valorant/images/6/6f/Loading_Screen_Corrode.png/revision/latest/scale-to-width-down/536?cb=20250624201813'},
+            {'name': 'Ascent',   'icon_url': '/static/profiles/images/maps/Ascent.png'},
+            {'name': 'Bind',     'icon_url': '/static/profiles/images/maps/Bind.png'},
+            {'name': 'Breeze',   'icon_url': '/static/profiles/images/maps/Breeze.png'},
+            {'name': 'Fracture', 'icon_url': '/static/profiles/images/maps/Fracture.png'},
+            {'name': 'Haven',    'icon_url': '/static/profiles/images/maps/Haven.png'},
+            {'name': 'Icebox',   'icon_url': '/static/profiles/images/maps/Icebox.png'},
+            {'name': 'Lotus',    'icon_url': '/static/profiles/images/maps/Lotus.png'},
+            {'name': 'Pearl',    'icon_url': '/static/profiles/images/maps/Pearl.png'},
+            {'name': 'Split',    'icon_url': '/static/profiles/images/maps/Split.png'},
+            {'name': 'Sunset',   'icon_url': '/static/profiles/images/maps/Sunset.png'},
+            {'name': 'Abyss',    'icon_url': '/static/profiles/images/maps/Abyss.png'},
+            {'name': 'Corrode',  'icon_url': '/static/profiles/images/maps/Corrode.png'},
         ]
         
         for map_data in maps:
@@ -127,10 +127,10 @@ class Command(BaseCommand):
         self.stdout.write("Setting up Teams...")
 
         teams = [
-            {'name': '#1 House of Tyloo', 'icon_url': 'https://imgsvc.trackercdn.com/url/size(128),rgb-map(0.171441,0.003035,0.003035,1;1,0.242281,0.029557,1;0.049707,0.048172,0.051269,1)/https%3A%2F%2Ftrackercdn.com%2Fcdn%2Ftracker.gg%2Fvalorant%2Fpremier%2Fteam-icons%2F2534df0c-4d64-3ef1-2f3b-aabe659233f5.png/image.png'},
-            {'name': '#2 Inn of Tyloo', 'icon_url': 'https://imgsvc.trackercdn.com/url/size(128),rgb-map(0.171441,0.003035,0.003035,1;0.323143,0.076185,0.008023,1;0.049707,0.048172,0.051269,1)/https%3A%2F%2Ftrackercdn.com%2Fcdn%2Ftracker.gg%2Fvalorant%2Fpremier%2Fteam-icons%2F2534df0c-4d64-3ef1-2f3b-aabe659233f5.png/image.png'},
-            {'name': '#3 Den of Tyloo', 'icon_url': 'https://imgsvc.trackercdn.com/url/size(128),rgb-map(0.887923,0.052861,0.052861,1;1,0.242281,0.029557,1;0.049707,0.048172,0.051269,1)/https%3A%2F%2Ftrackercdn.com%2Fcdn%2Ftracker.gg%2Fvalorant%2Fpremier%2Fteam-icons%2F2534df0c-4d64-3ef1-2f3b-aabe659233f5.png/image.png'},
-            {'name': '#4 Nest of Tyloo', 'icon_url': 'https://imgsvc.trackercdn.com/url/size(128),rgb-map(0.171441,0.003035,0.003035,1;1,0.242281,0.029557,1;0.584079,1,0.973446,1)/https%3A%2F%2Ftrackercdn.com%2Fcdn%2Ftracker.gg%2Fvalorant%2Fpremier%2Fteam-icons%2F2534df0c-4d64-3ef1-2f3b-aabe659233f5.png/image.png'},
+            {'name': '#1 House of Tyloo', 'icon_url': '/static/profiles/images/teams/House_of_Tyloo.png'},
+            {'name': '#2 Inn of Tyloo',   'icon_url': '/static/profiles/images/teams/Inn_of_Tyloo.png'},
+            {'name': '#3 Den of Tyloo',   'icon_url': '/static/profiles/images/teams/Den_of_Tyloo.png'},
+            {'name': '#4 Nest of Tyloo',  'icon_url': '/static/profiles/images/teams/Nest_of_Tyloo.png'},
         ]
         
         for team_data in teams:

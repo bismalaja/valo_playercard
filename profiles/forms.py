@@ -1,12 +1,84 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 from .models import Profile, Ability
+
+
+# ---------------------------------------------------------------------------
+# AUTH FORMS
+# ---------------------------------------------------------------------------
+
+class SignUpForm(UserCreationForm):
+    riot_id = forms.CharField(
+        max_length=50,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Riot ID Name (e.g. Tyloo)',
+        }),
+        help_text='Your Riot ID name (without the #tag)',
+    )
+    riot_tag = forms.CharField(
+        max_length=10,
+        required=False,
+        validators=[
+            RegexValidator(
+                regex=r'^#[a-zA-Z0-9]{2,5}$',
+                message='Tag must start with # followed by 2-5 alphanumeric characters (e.g. #NA1)',
+            )
+        ],
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '#NA1  (optional)',
+        }),
+        help_text='Optional — the # tag portion of your Riot ID',
+    )
+
+    class Meta:
+        model = User
+        fields = ['username', 'password1', 'password2', 'riot_id', 'riot_tag']
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Username',
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Password',
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Confirm Password',
+        })
+        # Remove verbose default help texts
+        self.fields['username'].help_text = 'Required. 150 characters or fewer.'
+        self.fields['password1'].help_text = 'Your password must contain at least 8 characters.'
+        self.fields['password2'].help_text = 'Enter the same password again for verification.'
+
+
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Username',
+        })
+        self.fields['password'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Password',
+        })
 
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['in_game_name', 'riot_id', 'riot_tag', 'profile_picture', 'profile_picture_url', 'team', 'bio']
         widgets = {
-            'in_game_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your in-game name'}),
+            'in_game_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your Username'}),
             'riot_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Riot ID Name (e.g. Tyloo)'}),
             'riot_tag': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tag (e.g. #NA1)'}),
             'team': forms.Select(attrs={'class': 'form-control'}),

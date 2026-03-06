@@ -1,0 +1,114 @@
+{% extends "profiles/base.html" %}
+{% load static %}
+{% block title %}Sign Up — Valorant Profiles{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'profiles/css/auth.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card auth-card-wide">
+        <div class="auth-badge">// ENLIST</div>
+        <h1 class="auth-title">CREATE ACCOUNT</h1>
+        <p class="auth-subtitle">Join the roster — one account, one profile</p>
+
+        <form method="post" novalidate class="auth-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="auth-errors">
+                {% for error in form.non_field_errors %}
+                <span class="auth-error-line">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <span class="field-error">{{ form.username.errors|join:", " }}</span>
+                {% endif %}
+                <span class="field-hint">{{ form.username.help_text }}</span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Riot ID <span class="required-star">*</span></label>
+                    {{ form.riot_id }}
+                    {% if form.riot_id.errors %}
+                    <span class="field-error">{{ form.riot_id.errors|join:", " }}</span>
+                    {% endif %}
+                    <span class="field-hint">Your Riot name (without the # tag)</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Riot Tag <span class="field-optional">(optional)</span></label>
+                    {{ form.riot_tag }}
+                    {% if form.riot_tag.errors %}
+                    <span class="field-error">{{ form.riot_tag.errors|join:", " }}</span>
+                    {% endif %}
+                    <span class="field-hint">e.g. #NA1</span>
+                </div>
+            </div>
+
+            <div class="auth-divider">
+                <span>// PASSWORD</span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                <span class="field-error">{{ form.password1.errors|join:", " }}</span>
+                {% endif %}
+                <span class="field-hint">{{ form.password1.help_text }}</span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                <span class="field-error">{{ form.password2.errors|join:", " }}</span>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="valorant-btn auth-submit">ENLIST</button>
+        </form>
+
+        <div class="auth-footer">
+            <span>Already have an account?</span>
+            <a href="{% url 'login_view' %}" class="auth-link">Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    var granimInstance = new Granim({
+        element: "#gradient",
+        direction: "diagonal",
+        isPausedWhenNotInView: false,
+        stateTransitionSpeed: 200,
+        states: {
+            "default-state": {
+                gradients: [
+                    ["#a67963", "#171d3b"],
+                    ["#0f1923", "#ff4655"],
+                    ["#171d3b", "#a67963"],
+                ],
+                transitionSpeed: 5000,
+            },
+        },
+    });
+
+    anime({
+        targets: ".auth-card",
+        translateY: [40, 0],
+        opacity: [0, 1],
+        easing: "easeOutExpo",
+        duration: 800,
+    });
+</script>
+{% endblock %}

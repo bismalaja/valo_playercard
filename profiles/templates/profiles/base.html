@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{% block title %}Valorant Profiles{% endblock %}</title>
+        <link
+            rel="stylesheet"href="{% static 'profiles/css/base.css' %}"/>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Oswald:wght@200..700&display=swap" rel="stylesheet"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/granim/2.0.0/granim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+        <script src="{% static 'profiles/js/notifications.js' %}"></script>
+        {% block extra_head %}{% endblock %}
+    </head>
+    <body>
+        <canvas id="gradient"></canvas>
+        <nav class="navbar">
+            <a href="{% url 'profile_list' %}" class="navbar-brand">Valorant Profiles</a>
+            <div class="navbar-links">
+                <a href="{% url 'profile_list' %}" class="navbar-link">Home</a>
+                {% if user.is_authenticated %}
+                    {% if user.profile %}
+                        <a href="{% url 'display_profile' user.profile.id %}" class="navbar-link">{{ user.username }}</a>
+                        <form method="post" action="{% url 'unclaim_profile' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="navbar-link navbar-btn-link navbar-unclaim"
+                                onclick="return confirm('Unclaim your profile? It will become available for anyone matching your Riot ID to claim.')">
+                                Unclaim
+                            </button>
+                        </form>
+                    {% else %}
+                        <span class="navbar-link navbar-username">{{ user.username }}</span>
+                    {% endif %}
+                    <form method="post" action="{% url 'logout_view' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="navbar-link navbar-btn-link">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login_view' %}" class="navbar-link">Login</a>
+                    <a href="{% url 'signup_view' %}" class="navbar-link navbar-link-accent">Sign Up</a>
+                {% endif %}
+            </div>
+        </nav>
+
+        {# Django messages rendered as data elements — picked up by notifications.js #}
+        {% if messages %}
+        <div class="messages-data" style="display:none;">
+            {% for message in messages %}
+            <span class="message-item"
+                  data-message="{{ message|escapejs }}"
+                  data-tag="{{ message.tags }}"></span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+        <!-- Contact Us / Support Section -->
+        <footer class="support-line" style="
+                background: #1a2a3a;
+                color: #eaeeb2;
+                text-align: center;
+                padding: 2rem 0;
+                margin-top: 3rem;">
+            <div class="footer-support-items">
+                <h3 style="
+                        font-family: &quot;Oswald&quot;, sans-serif;
+                        margin-bottom: 0.5rem< / div>;">
+                    Contact Us
+                </h3>
+                <p>For support or inquiries,</p>
+                <p> email us at:
+                <a href="mailto:tyloo.discordsupport@proton.me" style="color: #ff4655">tyloo.discordsupport@proton.me</a>
+                </p>
+                <p>Tyloo Roster Management &copy 2026</p>
+            </div>
+        </footer>
+        {% block extra_scripts %}{% endblock %}
+    </body>
+</html>

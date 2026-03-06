@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Profile, Agent, Role, Ability, Team, Map, AbilityTemplate
+from .models import Profile, Agent, Role, Ability, Team, Map, AbilityTemplate, UserProfile
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ['user', 'riot_id', 'riot_tag']
+    search_fields = ['user__username', 'riot_id']
 
 
 @admin.register(Role)
@@ -43,11 +49,15 @@ class AbilityInline(admin.TabularInline):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['in_game_name', 'team', 'created_at']
+    list_display = ['in_game_name', 'team', 'user', 'is_claimed', 'created_at']
     search_fields = ['in_game_name', 'team__name']
     list_filter = ['team', 'created_at']
     filter_horizontal = ['agents', 'roles', 'maps']  # Nice UI for ManyToMany
     inlines = [AbilityInline]
+
+    def is_claimed(self, obj):
+        return obj.is_claimed
+    is_claimed.boolean = True
 
 
 @admin.register(Ability)

@@ -1,0 +1,73 @@
+{% extends "profiles/base.html" %}
+{% load static %}
+{% block title %}Claim Profile — {{ profile.in_game_name }}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'profiles/css/auth.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-badge">// CLAIM</div>
+        <h1 class="auth-title">CLAIM PROFILE</h1>
+        <p class="auth-subtitle">
+            Your Riot ID matches <strong style="color:#ff4655;">{{ profile.in_game_name }}</strong>.
+            Confirm to take ownership.
+        </p>
+
+        <div class="claim-profile-preview">
+            {% if profile.get_profile_picture_url %}
+            <img src="{{ profile.get_profile_picture_url }}" alt="{{ profile.in_game_name }}" class="claim-pfp" />
+            {% else %}
+            <div class="claim-pfp claim-pfp-empty">?</div>
+            {% endif %}
+            <div class="claim-meta">
+                <span class="claim-tag">{{ profile.riot_tag|default:"" }}</span>
+                <span class="claim-name">{{ profile.in_game_name }}</span>
+                {% if profile.team %}
+                <span class="claim-team">{{ profile.team.name }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            <button type="submit" class="valorant-btn auth-submit">CONFIRM CLAIM</button>
+        </form>
+
+        <div class="auth-footer">
+            <a href="{% url 'display_profile' profile.id %}" class="auth-link">Cancel</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    var granimInstance = new Granim({
+        element: "#gradient",
+        direction: "diagonal",
+        isPausedWhenNotInView: false,
+        stateTransitionSpeed: 200,
+        states: {
+            "default-state": {
+                gradients: [
+                    ["#a67963", "#171d3b"],
+                    ["#0f1923", "#ff4655"],
+                    ["#171d3b", "#a67963"],
+                ],
+                transitionSpeed: 5000,
+            },
+        },
+    });
+
+    anime({
+        targets: ".auth-card",
+        translateY: [40, 0],
+        opacity: [0, 1],
+        easing: "easeOutExpo",
+        duration: 800,
+    });
+</script>
+{% endblock %}

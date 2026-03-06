@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import User
 
 
 # ============================================
@@ -128,6 +129,38 @@ class AbilityTemplate(models.Model):
 
 
 # ============================================
+# AUTH EXTENSION MODEL
+# ============================================
+
+class UserProfile(models.Model):
+    """
+    Extends the built-in User with a Riot ID so we can match
+    accounts to existing (unclaimed) profiles.
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
+    riot_id = models.CharField(
+        max_length=50,
+        default='',
+        help_text="Your Riot ID name (e.g. 'Tyloo')"
+    )
+    riot_tag = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        validators=[
+            RegexValidator(
+                regex=r'^#[a-zA-Z0-9]{2,5}$',
+                message='Tag must start with # and be followed by 2-5 alphanumeric characters (e.g. #NA1)'
+            )
+        ],
+        help_text="Tag starting with # followed by 2-5 characters"
+    )
+
+    def __str__(self):
+        return f"{self.user.username} ({self.riot_id}{self.riot_tag or ''})"
+
+
+# ============================================
 # USER PROFILE MODEL
 # ============================================
 
@@ -166,6 +199,19 @@ class Profile(models.Model):
     bio = models.TextField(blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Ownership — null means this is an unclaimed legacy profile
+    user = models.OneToOneField(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='profile'
+    )
+
+    @property
+    def is_claimed(self):
+        return self.user is not None
 
     def get_profile_picture_url(self):
         """Returns profile picture URL - either from upload or external link"""
