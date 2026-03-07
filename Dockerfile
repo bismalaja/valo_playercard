@@ -13,10 +13,7 @@ RUN playwright install chromium
 # Copy project files
 COPY . .
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
-
 EXPOSE 8000
 
-# Migrate, seed, and start gunicorn
-CMD ["sh", "-c", "python manage.py migrate && python manage.py setup_project && gunicorn valorant_profile.wsgi --bind 0.0.0.0:8000 --log-file -"]
+# Migrate, seed, collect static, and start gunicorn
+CMD ["sh", "-c", "python manage.py migrate && python manage.py setup_project && python manage.py collectstatic --noinput && gunicorn valorant_profile.wsgi --bind 0.0.0.0:8000 --log-file -"]
