@@ -377,6 +377,112 @@
             background: #0f1923;
         }
 
+        /* DOWNLOAD PROGRESS MODAL */
+        .dl-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .dl-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .dl-card {
+            background: rgba(15, 25, 35, 0.97);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 420px;
+            padding: 40px;
+            font-family: "Oswald", sans-serif;
+            position: relative;
+            transform: translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dl-overlay.active .dl-card {
+            transform: translateY(0);
+        }
+
+        .dl-badge {
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            color: #ff4655;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .dl-title {
+            font-size: 1.8rem;
+            letter-spacing: 4px;
+            color: white;
+            text-transform: uppercase;
+            margin: 0 0 28px;
+        }
+
+        .dl-stages {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .dl-stage {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0.25;
+            transition: opacity 0.4s;
+        }
+
+        .dl-stage.active {
+            opacity: 1;
+        }
+
+        .dl-stage.done {
+            opacity: 0.5;
+        }
+
+        .dl-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff4655;
+            flex-shrink: 0;
+            transition: background 0.3s;
+        }
+
+        .dl-stage.done .dl-dot {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .dl-stage-text {
+            font-size: 1rem;
+            letter-spacing: 2px;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .dl-bar-track {
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dl-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: #ff4655;
+            transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
         /* RESPONSIVE */
         @media screen and (max-width: 1100px) {
             body {
@@ -465,10 +571,39 @@
         BACK
     </a>
 
-    <a href="{% url 'card_download' profile.id %}" class="download-btn">
+    <a href="{% url 'card_download' profile.id %}" class="download-btn" id="downloadBtn">
         <span></span>
         DOWNLOAD
     </a>
+
+    <!-- Download Progress Modal -->
+    <div class="dl-overlay" id="dlOverlay">
+        <div class="dl-card">
+            <div class="dl-badge">// EXPORT</div>
+            <h2 class="dl-title">GENERATING CARD</h2>
+            <div class="dl-stages">
+                <div class="dl-stage" id="dlStage0">
+                    <div class="dl-dot"></div>
+                    <span class="dl-stage-text">Initializing browser</span>
+                </div>
+                <div class="dl-stage" id="dlStage1">
+                    <div class="dl-dot"></div>
+                    <span class="dl-stage-text">Rendering card</span>
+                </div>
+                <div class="dl-stage" id="dlStage2">
+                    <div class="dl-dot"></div>
+                    <span class="dl-stage-text">Capturing screenshot</span>
+                </div>
+                <div class="dl-stage" id="dlStage3">
+                    <div class="dl-dot"></div>
+                    <span class="dl-stage-text">Download ready</span>
+                </div>
+            </div>
+            <div class="dl-bar-track">
+                <div class="dl-bar-fill" id="dlBarFill"></div>
+            </div>
+        </div>
+    </div>
 
     <canvas id="gradient"></canvas>
 
@@ -668,6 +803,77 @@
         if (new URLSearchParams(window.location.search).has('screenshot')) {
             document.querySelectorAll('.back-btn, .download-btn').forEach(el => el.style.display = 'none');
         }
+
+        // Download progress modal
+        (function () {
+            var btn = document.getElementById('downloadBtn');
+            var overlay = document.getElementById('dlOverlay');
+            var bar = document.getElementById('dlBarFill');
+            var stages = [0, 1, 2, 3].map(function (i) { return document.getElementById('dlStage' + i); });
+
+            var stageTimings = [0, 600, 2000, 3500]; // ms after click to activate each stage
+            var barTargets  = [10,  35,   70,   100]; // % bar fill per stage
+
+            function setStage(index) {
+                stages.forEach(function (el, i) {
+                    el.classList.remove('active', 'done');
+                    if (i < index)  el.classList.add('done');
+                    if (i === index) el.classList.add('active');
+                });
+                bar.style.width = barTargets[index] + '%';
+            }
+
+            function showOverlay() {
+                overlay.classList.add('active');
+                setStage(0);
+            }
+
+            function hideOverlay() {
+                overlay.classList.remove('active');
+                // reset for next use
+                stages.forEach(function (el) { el.classList.remove('active', 'done'); });
+                bar.style.width = '0%';
+            }
+
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                showOverlay();
+
+                var timers = [];
+                for (var i = 1; i < stageTimings.length - 1; i++) {
+                    (function (idx) {
+                        timers.push(setTimeout(function () { setStage(idx); }, stageTimings[idx]));
+                    })(i);
+                }
+
+                fetch(btn.getAttribute('href'))
+                    .then(function (res) {
+                        if (!res.ok) throw new Error('Server returned ' + res.status);
+                        return res.blob();
+                    })
+                    .then(function (blob) {
+                        timers.forEach(clearTimeout);
+                        setStage(3);
+
+                        // Trigger file download
+                        var url = URL.createObjectURL(blob);
+                        var a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'playercard_{{ profile.id }}.png';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        URL.revokeObjectURL(url);
+
+                        setTimeout(hideOverlay, 1200);
+                    })
+                    .catch(function (err) {
+                        timers.forEach(clearTimeout);
+                        hideOverlay();
+                        console.error('Download failed:', err);
+                    });
+            });
+        })();
 
     </script>
 </body>
