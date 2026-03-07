@@ -483,6 +483,63 @@
             transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        .dl-bar-fill.error {
+            background: rgba(255, 70, 85, 0.4);
+        }
+
+        /* ERROR BLOCK */
+        .dl-error {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .dl-error-label {
+            font-family: "Oswald", sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            color: #ff4655;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .dl-error-detail {
+            font-family: monospace;
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 70, 85, 0.07);
+            border: 1px solid rgba(255, 70, 85, 0.25);
+            padding: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 160px;
+            overflow-y: auto;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* OKAY BUTTON */
+        .dl-okay-btn {
+            display: none;
+            margin-top: 24px;
+            width: 100%;
+            font-family: "Oswald", sans-serif;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: rgba(15, 25, 35, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dl-okay-btn:hover {
+            background: #ff4655;
+            border-color: #ff4655;
+            color: #0f1923;
+        }
+
         /* RESPONSIVE */
         @media screen and (max-width: 1100px) {
             body {
@@ -573,7 +630,7 @@
 
     <a href="{% url 'card_download' profile.id %}" class="download-btn" id="downloadBtn">
         <span></span>
-        DOWNLOAD PLS
+        DOWNLOAD fail?
     </a>
 
     <!-- Download Progress Modal -->
@@ -602,6 +659,11 @@
             <div class="dl-bar-track">
                 <div class="dl-bar-fill" id="dlBarFill"></div>
             </div>
+            <div class="dl-error" id="dlError">
+                <div class="dl-error-label">// ERROR</div>
+                <pre class="dl-error-detail" id="dlErrorDetail"></pre>
+            </div>
+            <button class="dl-okay-btn" id="dlOkayBtn">OKAY</button>
         </div>
     </div>
 
@@ -806,13 +868,17 @@
 
         // Download progress modal
         (function () {
-            var btn = document.getElementById('downloadBtn');
-            var overlay = document.getElementById('dlOverlay');
-            var bar = document.getElementById('dlBarFill');
-            var stages = [0, 1, 2, 3].map(function (i) { return document.getElementById('dlStage' + i); });
+            var btn        = document.getElementById('downloadBtn');
+            var overlay    = document.getElementById('dlOverlay');
+            var bar        = document.getElementById('dlBarFill');
+            var errorBlock = document.getElementById('dlError');
+            var errorDetail= document.getElementById('dlErrorDetail');
+            var okayBtn    = document.getElementById('dlOkayBtn');
+            var titleEl    = overlay.querySelector('.dl-title');
+            var stages     = [0, 1, 2, 3].map(function (i) { return document.getElementById('dlStage' + i); });
 
             var stageTimings = [0, 600, 2000, 3500]; // ms after click to activate each stage
-            var barTargets  = [10,  35,   70,   100]; // % bar fill per stage
+            var barTargets   = [10,  35,   70,  100]; // % bar fill per stage
 
             function setStage(index) {
                 stages.forEach(function (el, i) {
@@ -824,16 +890,41 @@
             }
 
             function showOverlay() {
+                // Reset state
+                titleEl.textContent = 'GENERATING CARD';
+                titleEl.style.color = '';
+                errorBlock.style.display = 'none';
+                errorDetail.textContent = '';
+                okayBtn.style.display = 'none';
+                bar.classList.remove('error');
+                bar.style.width = '0%';
+                stages.forEach(function (el) { el.classList.remove('active', 'done'); });
                 overlay.classList.add('active');
                 setStage(0);
             }
 
             function hideOverlay() {
                 overlay.classList.remove('active');
-                // reset for next use
-                stages.forEach(function (el) { el.classList.remove('active', 'done'); });
-                bar.style.width = '0%';
             }
+
+            function showError(message, detail) {
+                titleEl.textContent = 'DOWNLOAD FAILED';
+                titleEl.style.color = '#ff4655';
+                bar.classList.add('error');
+                errorDetail.textContent = detail ? message + '\n\n' + detail : message;
+                errorBlock.style.display = 'block';
+                okayBtn.style.display = 'block';
+                console.error('[CardDownload] ' + message);
+                if (detail) console.error(detail);
+            }
+
+            // Dismiss on OKAY button
+            okayBtn.addEventListener('click', hideOverlay);
+
+            // Dismiss on backdrop click (outside the card)
+            overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) hideOverlay();
+            });
 
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -848,14 +939,26 @@
 
                 fetch(btn.getAttribute('href'))
                     .then(function (res) {
-                        if (!res.ok) throw new Error('Server returned ' + res.status);
+                        if (!res.ok) {
+                            // Read server error body for debugging details
+                            return res.text().then(function (body) {
+                                var msg = 'Server error ' + res.status;
+                                var detail = body;
+                                try {
+                                    var json = JSON.parse(body);
+                                    msg    = json.error    || msg;
+                                    detail = json.traceback || body;
+                                } catch (_) {}
+                                throw { message: msg, detail: detail };
+                            });
+                        }
                         return res.blob();
                     })
                     .then(function (blob) {
                         timers.forEach(clearTimeout);
                         setStage(3);
 
-                        // Trigger file download
+                        // Trigger file save
                         var url = URL.createObjectURL(blob);
                         var a = document.createElement('a');
                         a.href = url;
@@ -865,12 +968,14 @@
                         a.remove();
                         URL.revokeObjectURL(url);
 
-                        setTimeout(hideOverlay, 1200);
+                        // Show OKAY button — user must dismiss manually
+                        okayBtn.style.display = 'block';
                     })
                     .catch(function (err) {
                         timers.forEach(clearTimeout);
-                        hideOverlay();
-                        console.error('Download failed:', err);
+                        var msg    = err.message || String(err);
+                        var detail = err.detail  || err.stack || '';
+                        showError(msg, detail);
                     });
             });
         })();

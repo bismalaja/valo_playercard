@@ -420,8 +420,9 @@ def card_profile(request, profile_id):
 
 def download_card_png(request, profile_id):
     """Capture the card page at 1920x1080 via Playwright and serve as a PNG download."""
+    import traceback as tb_module
     from playwright.sync_api import sync_playwright
-    from django.http import HttpResponse
+    from django.http import HttpResponse, JsonResponse
 
     get_object_or_404(Profile, id=profile_id)  # 404 guard
 
@@ -430,28 +431,36 @@ def download_card_png(request, profile_id):
 
     card_url = request.build_absolute_uri(f'/profile/{profile_id}/card/?screenshot=1')
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(viewport={"width": 1920, "height": 1080})
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(viewport={"width": 1920, "height": 1080})
 
-        cookies = []
-        if session_cookie:
-            cookies.append({"name": "sessionid", "value": session_cookie, "domain": request.get_host().split(':')[0], "path": "/"})
-        if csrftoken:
-            cookies.append({"name": "csrftoken", "value": csrftoken, "domain": request.get_host().split(':')[0], "path": "/"})
-        if cookies:
-            context.add_cookies(cookies)
+            cookies = []
+            if session_cookie:
+                cookies.append({"name": "sessionid", "value": session_cookie, "domain": request.get_host().split(':')[0], "path": "/"})
+            if csrftoken:
+                cookies.append({"name": "csrftoken", "value": csrftoken, "domain": request.get_host().split(':')[0], "path": "/"})
+            if cookies:
+                context.add_cookies(cookies)
 
-        page = context.new_page()
-        page.goto(card_url, wait_until="networkidle")
-        page.wait_for_timeout(2000)  # Let Granim and Anime.js animations settle
+            page = context.new_page()
+            page.goto(card_url, wait_until="networkidle")
+            page.wait_for_timeout(2000)  # Let Granim and Anime.js animations settle
 
-        screenshot = page.screenshot(full_page=False)
-        browser.close()
+            screenshot = page.screenshot(full_page=False)
+            browser.close()
 
-    response = HttpResponse(screenshot, content_type='image/png')
-    response['Content-Disposition'] = f'attachment; filename="playercard_{profile_id}.png"'
-    return response
+        response = HttpResponse(screenshot, content_type='image/png')
+        response['Content-Disposition'] = f'attachment; filename="playercard_{profile_id}.png"'
+        return response
+
+    except Exception as exc:
+        full_traceback = tb_module.format_exc()
+        return JsonResponse(
+            {'error': str(exc), 'traceback': full_traceback},
+            status=500
+        )
 
 
 def delete_profile(request, profile_id):
