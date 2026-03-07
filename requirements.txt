@@ -6,3 +6,4 @@ whitenoise
 cloudinary
 django-cloudinary-storage
 honcho
+playwright

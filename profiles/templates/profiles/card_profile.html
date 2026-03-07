@@ -337,6 +337,46 @@
             background: #0f1923;
         }
 
+        /* DOWNLOAD BUTTON */
+        .download-btn {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            left: auto;
+            z-index: 200;
+            color: white;
+            text-decoration: none;
+            font-family: "Oswald", sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            padding: 12px 24px;
+            background: rgba(15, 25, 35, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .download-btn:hover {
+            background: #ff4655;
+            border-color: #ff4655;
+            color: #0f1923;
+        }
+
+        .download-btn span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #ff4655;
+            transition: background 0.3s;
+        }
+
+        .download-btn:hover span {
+            background: #0f1923;
+        }
+
         /* RESPONSIVE */
         @media screen and (max-width: 1100px) {
             body {
@@ -423,6 +463,11 @@
     <a href="{% url 'display_profile' profile.id %}" class="back-btn">
         <span></span>
         BACK
+    </a>
+
+    <a href="{% url 'card_download' profile.id %}" class="download-btn">
+        <span></span>
+        DOWNLOAD
     </a>
 
     <canvas id="gradient"></canvas>
@@ -619,6 +664,10 @@
                 opacity: [0, 1],
                 delay: anime.stagger(200)
             }, '-=500');
+
+        if (new URLSearchParams(window.location.search).has('screenshot')) {
+            document.querySelectorAll('.back-btn, .download-btn').forEach(el => el.style.display = 'none');
+        }
 
     </script>
 </body>
