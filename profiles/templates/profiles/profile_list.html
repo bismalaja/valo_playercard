@@ -146,7 +146,7 @@
         {% for profile in profiles %}
         <div
             class="profile-card"
-            onclick="window.location.href='{% url 'display_profile' profile.id %}'"
+            data-href="{% url 'display_profile' profile.id %}"
         >
             <span class="corner-decor top-left"></span>
             <span class="corner-decor bottom-right"></span>
@@ -180,8 +180,9 @@
                         >Edit</a
                     >
                     <button
-                        onclick="confirmDelete('{% url 'delete_profile' profile.id %}', '{{ profile.in_game_name|escapejs }}')"
                         class="menu-item delete"
+                        data-delete-url="{% url 'delete_profile' profile.id %}"
+                        data-delete-name="{{ profile.in_game_name|escapejs }}"
                     >
                         Delete
                     </button>
@@ -270,6 +271,20 @@
             easing: "easeOutExpo",
         });
 
+        document.querySelectorAll('.profile-card[data-href]').forEach(function(card) {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function() {
+                window.location.href = this.dataset.href;
+            });
+        });
+
+        document.querySelectorAll('.menu-item.delete[data-delete-url]').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                confirmDelete(this.dataset.deleteUrl, this.dataset.deleteName);
+            });
+        });
+
         // Filter panel toggle
         var filterBtn = document.getElementById('filterToggleBtn');
         var filterPanel = document.getElementById('filterPanel');
@@ -297,9 +312,9 @@
         }
 
         // Auto-open panel if filters are active
-        {% if team_filter or role_filter %}
-        if (filterPanel) filterPanel.classList.add('open');
-        if (filterBtn) filterBtn.classList.add('filter-toggle-btn--open');
-        {% endif %}
+        if (filterBtn && filterBtn.classList.contains('filter-toggle-btn--active')) {
+            if (filterPanel) filterPanel.classList.add('open');
+            filterBtn.classList.add('filter-toggle-btn--open');
+        }
     </script>
 {% endblock %}
