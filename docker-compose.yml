@@ -7,8 +7,8 @@ services:
       - media_data:/app/media
       - db_data:/app/db.sqlite3
     environment:
-      - SECRET_KEY=${SECRET_KEY:-django-insecure-change-me-in-production}
-      - DEBUG=${DEBUG:-False}
+      - SECRET_KEY=${SECRET_KEY}
+
     restart: unless-stopped
 
 volumes:
