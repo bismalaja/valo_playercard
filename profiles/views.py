@@ -429,23 +429,29 @@ def download_card_png(request, profile_id):
     session_cookie = request.COOKIES.get('sessionid')
     csrftoken = request.COOKIES.get('csrftoken')
 
-    card_url = request.build_absolute_uri(f'/profile/{profile_id}/card/?screenshot=1')
+    # Use localhost internally so Playwright doesn't route through the public internet.
+    # The container's gunicorn always listens on 127.0.0.1:8000.
+    internal_url = f'http://127.0.0.1:8000/profile/{profile_id}/card/?screenshot=1'
+    public_host = request.get_host().split(':')[0]  # e.g. "valo-playercard.xyz"
 
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            context = browser.new_context(viewport={"width": 1920, "height": 1080})
+            context = browser.new_context(
+                viewport={"width": 1920, "height": 1080},
+                extra_http_headers={"Host": public_host},
+            )
 
             cookies = []
             if session_cookie:
-                cookies.append({"name": "sessionid", "value": session_cookie, "domain": request.get_host().split(':')[0], "path": "/"})
+                cookies.append({"name": "sessionid", "value": session_cookie, "domain": "127.0.0.1", "path": "/"})
             if csrftoken:
-                cookies.append({"name": "csrftoken", "value": csrftoken, "domain": request.get_host().split(':')[0], "path": "/"})
+                cookies.append({"name": "csrftoken", "value": csrftoken, "domain": "127.0.0.1", "path": "/"})
             if cookies:
                 context.add_cookies(cookies)
 
             page = context.new_page()
-            page.goto(card_url, wait_until="networkidle")
+            page.goto(internal_url, wait_until="networkidle")
             page.wait_for_timeout(2000)  # Let Granim and Anime.js animations settle
 
             screenshot = page.screenshot(full_page=False)
