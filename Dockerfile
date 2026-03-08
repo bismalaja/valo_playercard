@@ -13,6 +13,9 @@ RUN playwright install chromium
 # Copy project files
 COPY . .
 
+# Ensure the data directory exists for the SQLite database
+RUN mkdir -p /app/data
+
 EXPOSE 8000
 
 # Migrate, seed, collect static, and start gunicorn
