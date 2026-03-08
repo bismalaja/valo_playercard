@@ -430,17 +430,15 @@ def download_card_png(request, profile_id):
     csrftoken = request.COOKIES.get('csrftoken')
 
     # Use localhost internally so Playwright doesn't route through the public internet.
-    # The container's gunicorn always listens on 127.0.0.1:8000.
+    # The container's gunicorn always listens on 0.0.0.0:8000, so 127.0.0.1:8000 works.
+    # We do NOT set a custom Host header — Chromium rejects Host overrides (ERR_INVALID_ARGUMENT).
+    # ALLOWED_HOSTS=['*'] means Django accepts Host: 127.0.0.1:8000 without issue.
     internal_url = f'http://127.0.0.1:8000/profile/{profile_id}/card/?screenshot=1'
-    public_host = request.get_host().split(':')[0]  # e.g. "valo-playercard.xyz"
 
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            context = browser.new_context(
-                viewport={"width": 1920, "height": 1080},
-                extra_http_headers={"Host": public_host},
-            )
+            context = browser.new_context(viewport={"width": 1920, "height": 1080})
 
             cookies = []
             if session_cookie:
