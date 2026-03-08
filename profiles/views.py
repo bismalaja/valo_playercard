@@ -421,7 +421,6 @@ def card_profile(request, profile_id):
 def download_card_png(request, profile_id):
     """Capture the card page at 1920x1080 via Playwright and serve as a PNG download."""
     import traceback as tb_module
-    from playwright.sync_api import sync_playwright
     from django.http import HttpResponse, JsonResponse
 
     get_object_or_404(Profile, id=profile_id)  # 404 guard
@@ -430,12 +429,14 @@ def download_card_png(request, profile_id):
     csrftoken = request.COOKIES.get('csrftoken')
 
     # Use localhost internally so Playwright doesn't route through the public internet.
-    # The container's gunicorn always listens on 0.0.0.0:8000, so 127.0.0.1:8000 works.
+    # Gunicorn must run with --workers > 1 so this internal request gets a free worker
+    # (with 1 worker the download view occupies it and Playwright deadlocks waiting for a response).
     # We do NOT set a custom Host header — Chromium rejects Host overrides (ERR_INVALID_ARGUMENT).
     # ALLOWED_HOSTS=['*'] means Django accepts Host: 127.0.0.1:8000 without issue.
     internal_url = f'http://127.0.0.1:8000/profile/{profile_id}/card/?screenshot=1'
 
     try:
+        from playwright.sync_api import sync_playwright
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             context = browser.new_context(viewport={"width": 1920, "height": 1080})
