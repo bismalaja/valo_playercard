@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Agent, Role, Ability, Team, Map, AbilityTemplate, UserProfile
+from .models import Profile, Agent, Role, Team, Map, UserProfile
 
 
 @admin.register(UserProfile)
@@ -35,36 +35,13 @@ class MapAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
-@admin.register(AbilityTemplate)
-class AbilityTemplateAdmin(admin.ModelAdmin):
-    list_display = ['name', 'key_binding', 'icon']
-    list_filter = ['key_binding']
-    search_fields = ['name']
-
-
-class AbilityInline(admin.TabularInline):
-    model = Ability
-    extra = 1
-
-
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ['in_game_name', 'team', 'user', 'is_claimed', 'created_at']
     search_fields = ['in_game_name', 'team__name']
     list_filter = ['team', 'created_at']
     filter_horizontal = ['agents', 'roles', 'maps']  # Nice UI for ManyToMany
-    inlines = [AbilityInline]
 
     def is_claimed(self, obj):
         return obj.is_claimed
     is_claimed.boolean = True
-
-
-@admin.register(Ability)
-class AbilityAdmin(admin.ModelAdmin):
-    list_display = ['ability_name', 'get_template_key', 'profile']
-    list_filter = ['profile', 'template__key_binding']
-
-    def get_template_key(self, obj):
-        return obj.template.key_binding if obj.template else '-'
-    get_template_key.short_description = 'Key'

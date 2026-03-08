@@ -2,29 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .models import Profile, Agent, Role, Ability, Team, Map, AbilityTemplate, UserProfile
+from .models import Profile, Agent, Role, Team, Map, UserProfile
 from .forms import ProfileForm, SignUpForm, LoginForm
 
 
 # ---------------------------------------------------------------------------
 # HELPERS
 # ---------------------------------------------------------------------------
-
-def get_ability_rows(profile=None):
-    """Helper to prepare ability rows for the template."""
-    templates = AbilityTemplate.objects.all()
-    existing_map = {}
-    if profile:
-        existing_map = {a.template.id: a for a in profile.abilities.all() if a.template}
-    
-    rows = []
-    for t in templates:
-        rows.append({
-            'template': t,
-            'ability': existing_map.get(t.id)
-        })
-    return rows
-
 
 def _user_owns_profile(user, profile):
     """Return True if the logged-in user owns this profile."""
@@ -221,19 +205,6 @@ def input_profile(request):
                     map_ids = map_ids[:3]
                 profile.maps.set(map_ids)
             
-            # Save abilities (linked to templates)
-            for template in AbilityTemplate.objects.all():
-                ability_name = request.POST.get(f'ability_name_{template.id}')
-                ability_description = request.POST.get(f'ability_description_{template.id}')
-                
-                if ability_name and ability_description:
-                    Ability.objects.create(
-                        profile=profile,
-                        template=template,
-                        ability_name=ability_name,
-                        ability_description=ability_description
-                    )
-            
             messages.success(request, 'Profile created successfully!')
             return redirect('display_profile', profile_id=profile.id)
     else:
@@ -257,7 +228,6 @@ def input_profile(request):
         'available_roles': Role.objects.all(),
         'available_teams': Team.objects.all(),
         'available_maps': Map.objects.all(),
-        'ability_rows': get_ability_rows(),
         'selected_agent_ids': selected_agent_ids,
         'selected_role_ids': selected_role_ids,
         'selected_map_ids': selected_map_ids,
@@ -277,9 +247,6 @@ def display_profile(request, profile_id):
 
     context = {
         'profile': profile,
-        'agents': profile.agents.all(),
-        'roles': profile.roles.all(),
-        'abilities': profile.abilities.all(),
         'teammates': teammates,
         'user_has_profile': user_has_profile,
         'is_owner': _user_owns_profile(request.user, profile),
@@ -360,20 +327,6 @@ def edit_profile(request, profile_id):
                  map_ids = map_ids[:3]
             profile.maps.set(map_ids if map_ids else [])
             
-            profile.abilities.all().delete()
-            
-            for template in AbilityTemplate.objects.all():
-                ability_name = request.POST.get(f'ability_name_{template.id}')
-                ability_description = request.POST.get(f'ability_description_{template.id}')
-                
-                if ability_name and ability_description:
-                    Ability.objects.create(
-                        profile=profile,
-                        template=template,
-                        ability_name=ability_name,
-                        ability_description=ability_description
-                    )
-            
             messages.success(request, 'Profile updated successfully!')
             return redirect('display_profile', profile_id=profile.id)
     else:
@@ -385,19 +338,14 @@ def edit_profile(request, profile_id):
     context = {
         'profile_form': profile_form,
         'profile': profile,
-        'agents': profile.agents.all(),
-        'roles': profile.roles.all(),
-        'abilities': profile.abilities.all(),
         'is_edit': True,
         'available_agents': Agent.objects.select_related('role').all(),
         'available_roles': Role.objects.all(),
         'available_teams': Team.objects.all(),
         'available_maps': Map.objects.all(),
-        'ability_rows': get_ability_rows(profile),
         'selected_agent_ids': selected_agent_ids,
         'selected_role_ids': selected_role_ids,
         'selected_map_ids': selected_map_ids,
-        'custom_errors': {},
     }
     
     return render(request, 'profiles/input_form.html', context)
@@ -413,7 +361,6 @@ def card_profile(request, profile_id):
 
     return render(request, 'profiles/card_profile.html', {
         'profile': profile,
-        'agents': profile.agents.all(),
         'teammates': teammates
     })
 

@@ -42,8 +42,7 @@ All logic lives in `profiles/`. `valorant_profile/` is just configuration (setti
 Every media model has **two image fields**: an `ImageField` (upload) and a `URLField` (`_url` suffix). Always access images via the `get_icon_url()` method — it checks if the uploaded file physically exists before returning its URL, and falls back to the URL field. Static assets use paths like `/static/profiles/images/agents/Jett.png`.
 
 ### Storage Backend
-- **Dev**: local filesystem (`MEDIA_ROOT`)
-- **Production**: Cloudinary — activated automatically when `CLOUDINARY_API_KEY` env var is set (see `settings.py`)
+- Local filesystem (`MEDIA_ROOT`) — uploaded media files are always stored locally
 
 ---
 
@@ -65,7 +64,7 @@ Tag must match `^#[a-zA-Z0-9]{2,5}$` (e.g. `#NA1`). This validator is defined id
 
 ## External Dependencies & Deployment
 
-- **Deployment target**: Railway (`https://valo-playercard.xyz`) — `CSRF_TRUSTED_ORIGINS` is hardcoded in settings
+- **Deployment target**: `https://valo-playercard.xyz` — `CSRF_TRUSTED_ORIGINS` is hardcoded in settings
 - **Static files**: WhiteNoise serves statics in production; `collectstatic` must run before deploy
 - **Procfile**: `web: python manage.py migrate && python manage.py setup_project && gunicorn valorant_profile.wsgi`
 - **No test suite** is currently present in the project
@@ -77,4 +76,4 @@ Tag must match `^#[a-zA-Z0-9]{2,5}$` (e.g. `#NA1`). This validator is defined id
 - [`profiles/views.py`](profiles/views.py) — all views including auth, claim/unclaim, CRUD
 - [`profiles/utils/card_image.py`](profiles/utils/card_image.py) — Pillow card compositor
 - [`profiles/management/commands/setup_project.py`](profiles/management/commands/setup_project.py) — reference data seed + superuser
-- [`valorant_profile/settings.py`](valorant_profile/settings.py) — storage backend switching, Cloudinary config
+- [`valorant_profile/settings.py`](valorant_profile/settings.py) — storage backend, CSRF config

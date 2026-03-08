@@ -3,7 +3,5 @@ Pillow
 requests
 gunicorn
 whitenoise
-cloudinary
-django-cloudinary-storage
 honcho
 playwright

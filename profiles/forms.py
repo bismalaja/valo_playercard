@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from .models import Profile, Ability
+from .models import Profile
 
 
 # ---------------------------------------------------------------------------
@@ -137,12 +137,3 @@ class ProfileForm(forms.ModelForm):
 
         return cleaned_data
 
-
-class AbilityForm(forms.ModelForm):
-    class Meta:
-        model = Ability
-        fields = ['ability_name', 'ability_description']
-        widgets = {
-            'ability_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ability name'}),
-            'ability_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Describe this ability...'}),
-        }

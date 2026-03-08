@@ -118,38 +118,6 @@ class Map(models.Model):
         ordering = ['name']
 
 
-class AbilityTemplate(models.Model):
-    """
-    Predefined abilities (C, Q, E, X) for the UI slots.
-    Managed via Django admin.
-    """
-    KEY_CHOICES = [
-        ('C', 'C'),
-        ('Q', 'Q'),
-        ('E', 'E'),
-        ('X', 'X'),
-    ]
-    name = models.CharField(max_length=50, help_text="e.g. 'Ability 1', 'Ultimate'")
-    key_binding = models.CharField(max_length=1, choices=KEY_CHOICES)
-    icon = models.ImageField(upload_to='abilities/', blank=True, null=True)
-    icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
-    
-    def get_icon_url(self):
-        if self.icon:
-            try:
-                if os.path.exists(self.icon.path):
-                    return self.icon.url
-            except (ValueError, NotImplementedError):
-                pass
-        return self.icon_url or ''
-    
-    def __str__(self):
-        return f"{self.name} ({self.key_binding})"
-
-    class Meta:
-        ordering = ['key_binding']
-
-
 # ============================================
 # AUTH EXTENSION MODEL
 # ============================================
@@ -248,16 +216,4 @@ class Profile(models.Model):
         ordering = ['-created_at']
 
 
-class Ability(models.Model):
-    """Player's characteristic abilities (up to 4)."""
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='abilities')
-    template = models.ForeignKey(AbilityTemplate, on_delete=models.CASCADE, related_name='player_abilities', null=True)
-    ability_name = models.CharField(max_length=100)
-    ability_description = models.TextField()
 
-    def __str__(self):
-        return f"{self.profile.in_game_name} - {self.ability_name}"
-
-    class Meta:
-        verbose_name_plural = 'Abilities'
-        unique_together = ['profile', 'template']

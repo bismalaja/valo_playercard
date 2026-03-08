@@ -368,6 +368,83 @@
         {% csrf_token %}
     </form>
 
+    <!-- Delete confirmation modal -->
+    <div id="delete-modal" style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.75);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    " onclick="if(event.target===this) this.style.display='none';">
+        <div style="
+            background: #0f1923;
+            border: 1px solid #ff4655;
+            padding: 40px 50px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(255,70,85,0.3);
+        ">
+            <div style="
+                font-family: 'Oswald', sans-serif;
+                color: #ff4655;
+                font-size: 0.8rem;
+                letter-spacing: 3px;
+                text-transform: uppercase;
+                margin-bottom: 16px;
+            ">// CONFIRM ACTION</div>
+            <h2 style="
+                font-family: 'Oswald', sans-serif;
+                color: #ece8e1;
+                font-size: 1.8rem;
+                text-transform: uppercase;
+                margin: 0 0 12px;
+            ">Delete Profile?</h2>
+            <p style="color: #8fa1c1; margin: 0 0 32px; line-height: 1.6;">
+                Agent <strong style="color:#ece8e1;">{{ profile.in_game_name }}</strong> will be permanently removed.
+                This action cannot be undone.
+            </p>
+            <div style="display: flex; gap: 16px; justify-content: center;">
+                <button
+                    onclick="document.getElementById('delete-modal').style.display='none';"
+                    style="
+                        padding: 12px 30px;
+                        font-family: 'Oswald', sans-serif;
+                        text-transform: uppercase;
+                        background: transparent;
+                        color: #8fa1c1;
+                        border: 1px solid rgba(255,255,255,0.2);
+                        cursor: pointer;
+                        font-size: 1rem;
+                        letter-spacing: 1px;
+                        transition: all 0.2s;
+                    "
+                    onmouseover="this.style.background='rgba(255,255,255,0.08)';"
+                    onmouseout="this.style.background='transparent';"
+                >Cancel</button>
+                <button
+                    onclick="document.getElementById('delete-form').submit();"
+                    style="
+                        padding: 12px 30px;
+                        font-family: 'Oswald', sans-serif;
+                        text-transform: uppercase;
+                        background: #ff4655;
+                        color: white;
+                        border: 1px solid #ff4655;
+                        cursor: pointer;
+                        font-size: 1rem;
+                        letter-spacing: 1px;
+                        transition: all 0.2s;
+                    "
+                    onmouseover="this.style.background='#cc2030';"
+                    onmouseout="this.style.background='#ff4655';"
+                >Delete</button>
+            </div>
+        </div>
+    </div>
+
     <!-- HEADER -->
     <div class="profile-header">
         {% if profile.profile_picture %}
@@ -472,7 +549,7 @@
         <button
             class="valorant-btn"
             style="background: #ff4655; color: white"
-            onclick="if(confirm('Delete Agent {{ profile.in_game_name }}? This action is irreversible.')) document.getElementById('delete-form').submit(); return false;"
+            onclick="document.getElementById('delete-modal').style.display='flex'; return false;"
         >
             Delete Profile
         </button>

@@ -23,9 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',
     'django.contrib.staticfiles',
-    'cloudinary',
     'profiles',
 ]
 
@@ -116,17 +114,6 @@ LOGOUT_REDIRECT_URL = '/'
 # CSRF Settings for production
 CSRF_COOKIE_SECURE = not DEBUG
 CSRF_TRUSTED_ORIGINS = [
-    'https://web-production-cb0c0.up.railway.app',
-    'https://valo-playercard.xyz',        
+    'https://valo-playercard.xyz',
 ]
 
-# Cloudinary Storage Configuration
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
-}
-
-# Only use Cloudinary if the keys are set (Production)
-if os.environ.get('CLOUDINARY_API_KEY'):
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

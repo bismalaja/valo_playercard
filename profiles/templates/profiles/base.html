@@ -27,13 +27,7 @@
                 {% if user.is_authenticated %}
                     {% if user.profile %}
                         <a href="{% url 'display_profile' user.profile.id %}" class="navbar-link">{{ user.username }}</a>
-                        <form method="post" action="{% url 'unclaim_profile' %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="navbar-link navbar-btn-link navbar-unclaim"
-                                onclick="return confirm('Unclaim your profile? It will become available for anyone matching your Riot ID to claim.')">
-                                Unclaim
-                            </button>
-                        </form>
+                        <a href="{% url 'unclaim_profile' %}" class="navbar-link navbar-btn-link navbar-unclaim">Unclaim</a>
                     {% else %}
                         <span class="navbar-link navbar-username">{{ user.username }}</span>
                     {% endif %}
