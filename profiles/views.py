@@ -304,6 +304,7 @@ def edit_profile(request, profile_id):
     selected_map_ids = []
     if request.method == 'POST':
         profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+        _lock_riot_fields(profile_form, request.user)
         
         if request.POST.getlist('agent_id'):
             selected_agent_ids = [int(id) for id in request.POST.getlist('agent_id')]
@@ -313,7 +314,17 @@ def edit_profile(request, profile_id):
             selected_map_ids = [int(id) for id in request.POST.getlist('map_id')]
 
         if profile_form.is_valid():
-            profile = profile_form.save()
+            profile = profile_form.save(commit=False)
+
+            # Enforce Riot credentials from UserProfile — can't be changed via the form
+            try:
+                up = request.user.userprofile
+                profile.riot_id = up.riot_id
+                profile.riot_tag = up.riot_tag
+            except UserProfile.DoesNotExist:
+                pass
+
+            profile.save()
             
             agent_ids = request.POST.getlist('agent_id')
             profile.agents.set(agent_ids if agent_ids else [])
@@ -331,6 +342,7 @@ def edit_profile(request, profile_id):
             return redirect('display_profile', profile_id=profile.id)
     else:
         profile_form = ProfileForm(instance=profile)
+        _lock_riot_fields(profile_form, request.user)
         selected_agent_ids = list(profile.agents.values_list('id', flat=True))
         selected_role_ids = list(profile.roles.values_list('id', flat=True))
         selected_map_ids = list(profile.maps.values_list('id', flat=True))
