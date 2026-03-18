@@ -2,6 +2,10 @@
 // Handles floating toast notifications for Django messages and client-side events
 
 (function() {
+    // Preserve any toasts queued before this script finished loading.
+    window.__toastQueue = window.__toastQueue || [];
+    let container = null;
+
     // 1. Inject CSS Styles
     const style = document.createElement('style');
     style.textContent = `
@@ -63,16 +67,29 @@
     `;
     document.head.appendChild(style);
 
-    // 2. Create Container
-    let container = document.getElementById('toast-container');
-    if (!container) {
+    // 2. Create Container lazily (script can load before <body> exists)
+    function ensureContainer() {
+        if (container && container.parentNode) return container;
+
+        container = document.getElementById('toast-container');
+        if (container) return container;
+
+        if (!document.body) return null;
+
         container = document.createElement('div');
         container.id = 'toast-container';
         document.body.appendChild(container);
+        return container;
     }
 
     // 3. Define Global Function
     window.showToast = function(message, type = 'info') {
+        const target = ensureContainer();
+        if (!target) {
+            window.__toastQueue.push({ message, type });
+            return;
+        }
+
         // Map Django types to our CSS classes
         const typeMap = {
             'success': 'success',
@@ -96,11 +113,25 @@
         closeBtn.onclick = () => removeToast(toast);
         toast.appendChild(closeBtn);
 
-        container.appendChild(toast);
+        target.appendChild(toast);
 
         // Auto remove
         setTimeout(() => removeToast(toast), 5000);
     };
+
+    // Allow pages to dispatch global toast events.
+    window.addEventListener('app:toast', (event) => {
+        const detail = event.detail || {};
+        window.showToast(detail.message || '', detail.type || 'info');
+    });
+
+    // Flush any queued toasts captured before showToast was defined.
+    if (window.__toastQueue.length) {
+        window.__toastQueue.forEach((entry) => {
+            window.showToast(entry.message, entry.type || 'info');
+        });
+        window.__toastQueue = [];
+    }
 
     function removeToast(toast) {
         toast.style.animation = 'fadeOut 0.5s ease-out forwards';
@@ -111,6 +142,8 @@
 
     // 4. Initialize from existing HTML messages (Django integration)
     document.addEventListener('DOMContentLoaded', () => {
+        ensureContainer();
+
         const messageContainer = document.querySelector('.messages-data');
         if (messageContainer) {
             const messages = messageContainer.querySelectorAll('.message-item');
@@ -118,6 +151,14 @@
                 const text = item.getAttribute('data-message');
                 const tag = item.getAttribute('data-tag');
                 showToast(text, tag);
+            });
+        }
+
+        if (window.__toastQueue.length) {
+            const pending = [...window.__toastQueue];
+            window.__toastQueue = [];
+            pending.forEach((entry) => {
+                window.showToast(entry.message, entry.type || 'info');
             });
         }
     });

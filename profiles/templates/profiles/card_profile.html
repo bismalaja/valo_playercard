@@ -232,6 +232,31 @@
             margin-top: 0.5vh;
         }
 
+        .player-peak {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7vh;
+            font-family: "Oswald", sans-serif;
+            font-size: 1.5vh;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #00f5ff;
+            border: 1px solid rgba(0, 245, 255, 0.35);
+            background: rgba(0, 245, 255, 0.08);
+            margin-top: 1vh;
+            padding: 0.45vh 0.9vh;
+            line-height: 1;
+        }
+
+        .player-peak-icon {
+            width: 2.1vh;
+            height: 2.1vh;
+            min-width: 16px;
+            min-height: 16px;
+            object-fit: contain;
+            display: block;
+        }
+
         .map-grid {
             display: flex;
             flex-direction: column;
@@ -710,10 +735,10 @@
 
     <!-- CENTER: PFP -->
     <div class="pfp-container">
-        {% if profile.profile_picture %}
-        <img src="{{ profile.profile_picture.url }}" class="pfp-img pfp-b" alt="">
-        <img src="{{ profile.profile_picture.url }}" class="pfp-img pfp-s" alt="">
-        <img src="{{ profile.profile_picture.url }}" class="pfp-img pfp-main" alt="{{ profile.in_game_name }}">
+        {% if profile.get_profile_picture_url %}
+        <img src="{{ profile.get_profile_picture_url }}" class="pfp-img pfp-b" alt="">
+        <img src="{{ profile.get_profile_picture_url }}" class="pfp-img pfp-s" alt="">
+        <img src="{{ profile.get_profile_picture_url }}" class="pfp-img pfp-main" alt="{{ profile.in_game_name }}">
         {% else %}
         <div class="pfp-img pfp-main"
             style="display:flex; align-items:center; justify-content:center; color:white; font-size:100px;">?</div>
@@ -741,6 +766,13 @@
             {% if profile.riot_tag %}
             <div class="player-tag">{{ profile.riot_tag }}</div>
             {% endif %}
+
+            <div class="player-peak">
+                {% if profile.peak_rank_icon %}
+                <img src="{{ profile.peak_rank_icon }}" alt="Peak rank icon" class="player-peak-icon" />
+                {% endif %}
+                <span>Peak Rank: {{ profile.peak_rank|default:"Unranked" }}</span>
+            </div>
         </div>
 
         <!-- Roles (Moved to Right) -->
@@ -768,8 +800,8 @@
                 <div class="map-card" style="width: auto; padding-right: 20px;">
                     <div class="map-img"
                         style="width: 5vh; height: 5vh; min-width: 40px; border-radius: 50%; overflow: hidden; border: none; margin-right: 10px;">
-                        {% if teammate.profile_picture %}
-                        <img src="{{ teammate.profile_picture.url }}" alt="{{ teammate.in_game_name }}"
+                        {% if teammate.get_profile_picture_url %}
+                        <img src="{{ teammate.get_profile_picture_url }}" alt="{{ teammate.in_game_name }}"
                             style="width: 100%; height: 100%; object-fit: cover;">
                         {% else %}
                         <div

@@ -74,24 +74,55 @@ class LoginForm(AuthenticationForm):
         })
 
 class ProfileForm(forms.ModelForm):
+    remove_profile_picture = forms.BooleanField(
+        required=False,
+        label='Remove current profile picture',
+    )
+
     class Meta:
         model = Profile
-        fields = ['in_game_name', 'riot_id', 'riot_tag', 'profile_picture', 'profile_picture_url', 'team', 'bio']
+        fields = ['in_game_name', 'riot_id', 'riot_tag', 'peak_rank', 'peak_rank_icon', 'profile_picture', 'profile_picture_url', 'team', 'bio']
         widgets = {
             'in_game_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your Username'}),
             'riot_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Riot ID Name (e.g. Tyloo)'}),
             'riot_tag': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tag (e.g. #NA1)'}),
             'team': forms.Select(attrs={'class': 'form-control'}),
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Tell us about yourself...'}),
+            'peak_rank': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Gold 2'}),
+            'peak_rank_icon': forms.HiddenInput(),
             'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
             'profile_picture_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Optional: Paste image URL'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['remove_profile_picture'].widget.attrs.update({'class': 'remove-picture-checkbox'})
+        self._new_profile_picture = self.files.get('profile_picture') if hasattr(self, 'files') else None
+
+        # Hide remove checkbox when there's nothing to remove.
+        if not self.instance.pk or not self.instance.get_profile_picture_url():
+            self.fields['remove_profile_picture'].widget = forms.HiddenInput()
 
     def clean(self):
         cleaned_data = super().clean()
         in_game_name = cleaned_data.get('in_game_name')
         riot_id = cleaned_data.get('riot_id')
         riot_tag = cleaned_data.get('riot_tag')
+        profile_picture_url = (cleaned_data.get('profile_picture_url') or '').strip()
+        remove_profile_picture = bool(cleaned_data.get('remove_profile_picture'))
+
+        has_new_upload = bool(self._new_profile_picture)
+        cleaned_data['profile_picture_url'] = profile_picture_url
+
+        # Keep image source singular to avoid hidden precedence bugs.
+        # Priority: new upload > explicit remove > URL value.
+        if has_new_upload:
+            cleaned_data['profile_picture_url'] = ''
+        elif remove_profile_picture:
+            cleaned_data['profile_picture'] = None
+            cleaned_data['profile_picture_url'] = ''
+        elif profile_picture_url:
+            cleaned_data['profile_picture'] = None
 
         # Check for duplicate duplicate in_game_name
         if in_game_name:
@@ -136,4 +167,35 @@ class ProfileForm(forms.ModelForm):
                     self.add_error('riot_tag', 'Combination taken.')
 
         return cleaned_data
+
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+
+        remove_profile_picture = bool(self.cleaned_data.get('remove_profile_picture'))
+        profile_picture_url = (self.cleaned_data.get('profile_picture_url') or '').strip()
+        has_new_upload = bool(self._new_profile_picture)
+
+        existing_upload = None
+        if self.instance.pk and getattr(self.instance, 'profile_picture', None):
+            existing_upload = self.instance.profile_picture
+
+        # If switching to URL or explicit remove, clear old uploaded file first.
+        if remove_profile_picture or profile_picture_url:
+            if existing_upload:
+                existing_upload.delete(save=False)
+            profile.profile_picture = None
+
+        if has_new_upload:
+            profile.profile_picture = self._new_profile_picture
+            profile.profile_picture_url = ''
+        elif remove_profile_picture:
+            profile.profile_picture = None
+            profile.profile_picture_url = ''
+        elif profile_picture_url:
+            profile.profile_picture_url = profile_picture_url
+
+        if commit:
+            profile.save()
+            self.save_m2m()
+        return profile
 

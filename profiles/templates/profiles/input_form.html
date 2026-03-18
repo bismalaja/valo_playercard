@@ -17,6 +17,9 @@
 
     <form method="post" enctype="multipart/form-data" class="valorant-form">
         {% csrf_token %}
+        {{ profile_form.peak_rank_icon }}
+
+        {% include 'profiles/tracker_autofill_widget.html' %}
 
         <!-- SECTION 1: BASIC INFO -->
         <div class="form-section">
@@ -53,13 +56,33 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label">Peak Rank</label>
+                {{ profile_form.peak_rank }}
+                {% if profile_form.peak_rank.errors %}
+                <div class="error-message">
+                    {{ profile_form.peak_rank.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group" id="profile-picture-upload-group">
                 <label class="form-label">Profile Picture (Upload)</label>
                 {% if is_edit and profile %}
                     {% with pic=profile.profile_picture pic_url=profile.profile_picture_url %}
                     {% if pic or pic_url %}
                     <div class="current-pfp-preview">
                         <img src="{% if pic %}{{ pic.url }}{% else %}{{ pic_url }}{% endif %}" alt="Current picture" />
-                        <span>Current picture — leave blank to keep it</span>
+                        <div class="current-pfp-meta">
+                            <span>Current picture — leave blank to keep it</span>
+                            {% if not profile_form.remove_profile_picture.is_hidden %}
+                            <label class="remove-picture-btn" title="Remove current profile picture">
+                                {{ profile_form.remove_profile_picture }}
+                                <span>Remove Picture</span>
+                            </label>
+                            {% else %}
+                                {{ profile_form.remove_profile_picture }}
+                            {% endif %}
+                        </div>
                     </div>
                     {% endif %}
                     {% endwith %}
@@ -73,7 +96,7 @@
                 {% endif %}
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="profile-picture-url-group">
                 <label class="form-label">Or Profile Picture URL</label>
                 {{ profile_form.profile_picture_url }}
                 <span class="help-text">Paste a direct link to an image (ends in .jpg, .png,etc.)</span>
@@ -82,6 +105,10 @@
                     {{ profile_form.profile_picture_url.errors.0 }}
                 </div>
                 {% endif %}
+            </div>
+
+            <div class="form-group">
+                <span class="help-text">Tip: uploading a file clears the URL, and entering a URL replaces an uploaded file.</span>
             </div>
 
             <div class="form-group">
@@ -151,7 +178,7 @@
         <!-- SECTION 4: AGENTS -->
         <div class="form-section">
             <div class="section-title">
-                Active Agents <span style="color: #ff4655">*</span>
+                Active Agents (Max 5) <span style="color: #ff4655">*</span>
             </div>
             {% if custom_errors.agents %}
             <div class="error-message" style="margin-bottom: 10px">
@@ -166,7 +193,7 @@
                     <input
                         type="checkbox"
                         name="agent_id"
-                        value="{{ agent.id }}" {% if agent.id in selected_agent_ids %}checked{% endif %}/>
+                        value="{{ agent.id }}" class="agent-checkbox" {% if agent.id in selected_agent_ids %}checked{% endif %}/>
                     <div class="selection-card">
                         <img src="{{ agent.get_icon_url }}" class="item-icon" alt="{{ agent.name }}"/>
                         <span class="item-name">{{ agent.name }}</span>
@@ -222,6 +249,20 @@
 
 {% block extra_scripts %}
 <script>
+    function notifyLimit(message) {
+        if (typeof window.showToast === "function") {
+            window.showToast(message, "warning");
+            return;
+        }
+
+        window.__toastQueue = window.__toastQueue || [];
+        window.__toastQueue.push({ message: message, type: "warning" });
+
+        window.dispatchEvent(new CustomEvent("app:toast", {
+            detail: { message: message, type: "warning" }
+        }));
+    }
+
     // Add class to default django rendered inputs
     document
         .querySelectorAll('input[type="text"], input[type="number"], textarea, select')
@@ -238,10 +279,89 @@
             const checkedCount = document.querySelectorAll(".map-checkbox:checked").length;
             if (checkedCount > MAX_MAPS) {
                 checkbox.checked = false;
-                alert("You can only select up to " + MAX_MAPS + " maps.");
+                notifyLimit("You can only select up to " + MAX_MAPS + " maps.");
             }
         });
     });
+
+    // Agent Checkbox Limit
+    const agentCheckboxes = document.querySelectorAll(".agent-checkbox");
+    const MAX_AGENTS = 5;
+
+    agentCheckboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
+            const checkedCount = document.querySelectorAll(".agent-checkbox:checked").length;
+            if (checkedCount > MAX_AGENTS) {
+                checkbox.checked = false;
+                notifyLimit("You can only select up to " + MAX_AGENTS + " agents.");
+            }
+        });
+    });
+
+    const uploadGroup = document.getElementById("profile-picture-upload-group");
+    const urlGroup = document.getElementById("profile-picture-url-group");
+    const uploadInput = document.getElementById("id_profile_picture");
+    const urlInput = document.getElementById("id_profile_picture_url");
+    const removeInput = document.getElementById("id_remove_profile_picture");
+
+    function syncPictureInputState() {
+        if (!uploadInput || !urlInput || !uploadGroup || !urlGroup) {
+            return;
+        }
+
+        const hasUpload = !!(uploadInput.files && uploadInput.files.length > 0);
+        const hasUrl = !!urlInput.value.trim();
+
+        // If removing picture, clear both sources and re-enable both inputs.
+        if (removeInput && removeInput.checked) {
+            uploadInput.disabled = false;
+            urlInput.disabled = false;
+            uploadGroup.classList.remove("media-input-disabled");
+            urlGroup.classList.remove("media-input-disabled");
+
+            uploadInput.value = "";
+            urlInput.value = "";
+            return;
+        }
+
+        if (hasUpload) {
+            urlInput.disabled = true;
+            urlGroup.classList.add("media-input-disabled");
+        } else {
+            urlInput.disabled = false;
+            urlGroup.classList.remove("media-input-disabled");
+        }
+
+        if (hasUrl) {
+            uploadInput.disabled = true;
+            uploadGroup.classList.add("media-input-disabled");
+        } else {
+            uploadInput.disabled = false;
+            uploadGroup.classList.remove("media-input-disabled");
+        }
+    }
+
+    if (uploadInput) {
+        uploadInput.addEventListener("change", () => {
+            if (removeInput) removeInput.checked = false;
+            syncPictureInputState();
+        });
+    }
+
+    if (urlInput) {
+        ["input", "change"].forEach((evt) => {
+            urlInput.addEventListener(evt, () => {
+                if (removeInput) removeInput.checked = false;
+                syncPictureInputState();
+            });
+        });
+    }
+
+    if (removeInput) {
+        removeInput.addEventListener("change", syncPictureInputState);
+    }
+
+    syncPictureInputState();
 
     anime({
         targets: ".valorant-form",

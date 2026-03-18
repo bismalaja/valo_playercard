@@ -457,6 +457,44 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.rank-badge {
+    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.rank-icon {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    display: block;
+}
+
+.rank-label {
+    font-family: "Oswald", sans-serif;
+    font-size: 0.82rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #ece8e1;
+}
+
+.team-icon-badge {
+    padding: 4px;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.team-list-icon {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    display: block;
+}
+
 .card-actions {
     display: flex;
     gap: 10px;

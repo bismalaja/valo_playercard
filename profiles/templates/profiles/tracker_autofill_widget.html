@@ -1,0 +1,195 @@
+{# Tracker.gg auto-fill widget - modal popup #}
+<div class="tracker-launch-row">
+  <button type="button" id="tracker-open-btn" class="btn btn-secondary tracker-open-btn">
+    Auto-fill from Tracker.gg
+  </button>
+</div>
+
+<div class="tracker-modal-overlay" id="tracker-modal-overlay" aria-hidden="true">
+  <div class="tracker-modal" role="dialog" aria-modal="true" aria-labelledby="tracker-modal-title">
+    <button type="button" id="tracker-close-btn" class="tracker-close-btn" aria-label="Close tracker modal">
+      x
+    </button>
+
+    <h3 id="tracker-modal-title" class="tracker-modal-title">Auto-fill from Tracker.gg</h3>
+
+    <div class="tracker-input-row">
+      <input
+        type="text"
+        id="tracker-url-input"
+        class="form-control"
+        placeholder="https://tracker.gg/valorant/profile/riot/Name%23TAG/overview"
+        autocomplete="off"
+      />
+      <button type="button" id="tracker-fetch-btn" class="btn btn-primary tracker-fetch-btn">
+        Fetch Stats
+      </button>
+    </div>
+
+    <div id="tracker-status" class="tracker-status"></div>
+
+    <div id="tracker-preview" class="tracker-preview tracker-hidden">
+      <div class="tracker-head-row">
+        <img id="tracker-avatar" src="" alt="Player avatar" class="tracker-avatar" />
+        <div>
+          <div class="tracker-name" id="tracker-name"></div>
+          <div class="tracker-region" id="tracker-region"></div>
+        </div>
+      </div>
+
+      <div class="tracker-stats-grid">
+        <div><span class="tracker-label">Current Rank:</span> <span id="tracker-rank"></span></div>
+        <div><span class="tracker-label">K/D:</span> <span id="tracker-kd"></span></div>
+        <div><span class="tracker-label">Peak Rank:</span> <span id="tracker-peak-rank"></span></div>
+        <div><span class="tracker-label">Peak Act:</span> <span id="tracker-peak-act"></span></div>
+      </div>
+
+      <div class="tracker-agents-row">
+        <span class="tracker-label">Top Agents:</span>
+        <span id="tracker-agents"></span>
+      </div>
+
+      <button type="button" id="tracker-apply-btn" class="btn btn-primary tracker-apply-btn">
+        Apply to form
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  function getCookie(name) {
+    var value = '; ' + document.cookie;
+    var parts = value.split('; ' + name + '=');
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return '';
+  }
+
+  var openBtn    = document.getElementById('tracker-open-btn');
+  var closeBtn   = document.getElementById('tracker-close-btn');
+  var overlayEl  = document.getElementById('tracker-modal-overlay');
+  var urlInput   = document.getElementById('tracker-url-input');
+  var fetchBtn   = document.getElementById('tracker-fetch-btn');
+  var statusEl   = document.getElementById('tracker-status');
+  var previewEl  = document.getElementById('tracker-preview');
+  var applyBtn   = document.getElementById('tracker-apply-btn');
+  var avatarEl   = document.getElementById('tracker-avatar');
+  var nameEl     = document.getElementById('tracker-name');
+  var regionEl   = document.getElementById('tracker-region');
+  var rankEl     = document.getElementById('tracker-rank');
+  var kdEl       = document.getElementById('tracker-kd');
+  var peakRankEl = document.getElementById('tracker-peak-rank');
+  var peakActEl  = document.getElementById('tracker-peak-act');
+  var agentsEl   = document.getElementById('tracker-agents');
+
+  var lastData = null;
+
+  function openModal() {
+    overlayEl.classList.add('active');
+    overlayEl.setAttribute('aria-hidden', 'false');
+    if (urlInput) urlInput.focus();
+  }
+
+  function closeModal() {
+    overlayEl.classList.remove('active');
+    overlayEl.setAttribute('aria-hidden', 'true');
+  }
+
+  openBtn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+
+  overlayEl.addEventListener('click', function (event) {
+    if (event.target === overlayEl) {
+      closeModal();
+    }
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && overlayEl.classList.contains('active')) {
+      closeModal();
+    }
+  });
+
+  fetchBtn.addEventListener('click', function () {
+    var trackerUrl = urlInput.value.trim();
+    if (!trackerUrl) {
+      statusEl.textContent = 'Please enter a tracker.gg profile URL.';
+      return;
+    }
+    statusEl.textContent = 'Fetching...';
+    previewEl.classList.add('tracker-hidden');
+    fetchBtn.disabled = true;
+
+    fetch('/api/fetch-tracker/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({ tracker_url: trackerUrl })
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (json) {
+      if (json.ok) {
+        lastData = json.data;
+        avatarEl.src           = json.data.avatar_url || '';
+        nameEl.textContent     = (json.data.riot_id || '') + (json.data.riot_tag || '');
+        regionEl.textContent   = json.data.region || '';
+        rankEl.textContent     = json.data.current_rank || 'Unranked';
+        kdEl.textContent       = json.data.kd_ratio || 'N/A';
+        peakRankEl.textContent = json.data.peak_rank || 'N/A';
+        peakActEl.textContent  = json.data.peak_act || '';
+        agentsEl.textContent   = (json.data.top_agents || [])
+          .map(function (a) { return a.name; }).join(', ');
+        previewEl.classList.remove('tracker-hidden');
+        statusEl.textContent   = '';
+      } else {
+        statusEl.textContent = json.error || 'Unknown error.';
+      }
+    })
+    .catch(function (err) {
+      statusEl.textContent = 'Network error: ' + err.message;
+    })
+    .finally(function () {
+      fetchBtn.disabled = false;
+    });
+  });
+
+  applyBtn.addEventListener('click', function () {
+    if (!lastData) return;
+    function set(id, val) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.value = val || '';
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+    set('id_in_game_name',        lastData.riot_id);
+    set('id_riot_id',             lastData.riot_id);
+    set('id_riot_tag',            lastData.riot_tag);
+    set('id_profile_picture_url', lastData.avatar_url);
+    set('id_peak_rank',           lastData.peak_rank);
+    set('id_peak_rank_icon',      lastData.peak_rank_icon);
+
+    // Pre-select agent checkboxes matching top agent names
+    var topNames = (lastData.top_agents || []).map(function (a) {
+      return a.name.trim().toLowerCase();
+    });
+    if (topNames.length) {
+      document.querySelectorAll('input[name="agent_id"]').forEach(function (cb) {
+        var label = cb.closest('label');
+        if (!label) return;
+        var nameEl = label.querySelector('.item-name');
+        if (!nameEl) return;
+        if (topNames.indexOf(nameEl.textContent.trim().toLowerCase()) !== -1) {
+          cb.checked = true;
+        }
+      });
+    }
+
+    closeModal();
+
+  });
+}());
+</script>

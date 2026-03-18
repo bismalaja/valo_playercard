@@ -190,9 +190,9 @@
                 </div>
             </div>
 
-            {% if profile.profile_picture %}
+            {% if profile.get_profile_picture_url %}
             <img
-                src="{{ profile.profile_picture.url }}"
+                src="{{ profile.get_profile_picture_url }}"
                 alt="{{ profile.in_game_name }}"
                 class="card-pfp"
             />
@@ -210,12 +210,17 @@
             </div>
 
             <div class="card-stats">
-                <div class="stat-badge">
-                    {{ profile.agents.count }} AGENTS
+                <div class="stat-badge rank-badge" title="Peak Rank: {{ profile.peak_rank|default:'Unranked' }}">
+                    {% if profile.peak_rank_icon %}
+                    <img src="{{ profile.peak_rank_icon }}" alt="Peak rank" class="rank-icon" />
+                    {% endif %}
+                    <span class="rank-label">{{ profile.peak_rank|default:"Unranked" }}</span>
                 </div>
-                <div class="stat-badge">
-                    {{ profile.maps.count }} MAPS
+                {% if profile.team and profile.team.get_icon_url %}
+                <div class="stat-badge team-icon-badge" title="Team: {{ profile.team.name }}">
+                    <img src="{{ profile.team.get_icon_url }}" alt="{{ profile.team.name }}" class="team-list-icon" />
                 </div>
+                {% endif %}
             </div>
         </div>
         {% empty %}

@@ -58,7 +58,7 @@
         font-size: 5rem;
         text-transform: uppercase;
         line-height: 0.9;
-        margin: 0;
+        margin: 0 0 14px;
         color: #ece8e1;
     }
 
@@ -67,6 +67,29 @@
         color: #8fa1c1;
         font-size: 2rem;
         margin-bottom: 10px;
+        display: block;
+    }
+
+    .header-peak {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "Oswald", sans-serif;
+        font-size: 0.95rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #00f5ff;
+        border: 1px solid rgba(0, 245, 255, 0.35);
+        background: rgba(0, 245, 255, 0.08);
+        padding: 6px 10px;
+        margin-bottom: 12px;
+        line-height: 1;
+    }
+
+    .header-peak-icon {
+        width: 22px;
+        height: 22px;
+        object-fit: contain;
         display: block;
     }
 
@@ -447,9 +470,9 @@
 
     <!-- HEADER -->
     <div class="profile-header">
-        {% if profile.profile_picture %}
+        {% if profile.get_profile_picture_url %}
         <img
-            src="{{ profile.profile_picture.url }}"
+            src="{{ profile.get_profile_picture_url }}"
             class="header-pfp"
             alt="{{ profile.in_game_name }}"
         />
@@ -473,6 +496,12 @@
                 >{{ profile.riot_tag|default:"#XXXX" }}</span
             >
             <h1>{{ profile.in_game_name }}</h1>
+            <div class="header-peak">
+                {% if profile.peak_rank_icon %}
+                <img src="{{ profile.peak_rank_icon }}" alt="Peak rank icon" class="header-peak-icon" />
+                {% endif %}
+                <span>Peak Rank: {{ profile.peak_rank|default:"Unranked" }}</span>
+            </div>
 
             <div
                 class="header-affiliation"
@@ -516,9 +545,9 @@
                         class="teammate-avatar"
                         title="{{ teammate.in_game_name }}"
                     >
-                        {% if teammate.profile_picture %}
+                        {% if teammate.get_profile_picture_url %}
                         <img
-                            src="{{ teammate.profile_picture.url }}"
+                            src="{{ teammate.get_profile_picture_url }}"
                             alt="{{ teammate.in_game_name }}"
                         />
                         {% else %}
