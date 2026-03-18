@@ -118,3 +118,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://valo-playercard.xyz',
 ]
 
+# Tracker.GG integration — paste cf_clearance cookie value from browser DevTools here.
+# Expires every 30 minutes. See profiles/services/tracker_api.py for details.
+TRACKER_CF_CLEARANCE = os.environ.get("TRACKER_CF_CLEARANCE", "")
+TRACKER_EXTRA_COOKIES = os.environ.get("TRACKER_EXTRA_COOKIES", "")
+

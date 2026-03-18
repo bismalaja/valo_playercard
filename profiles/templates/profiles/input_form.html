@@ -18,6 +18,8 @@
     <form method="post" enctype="multipart/form-data" class="valorant-form">
         {% csrf_token %}
 
+        {% include 'profiles/tracker_autofill_widget.html' %}
+
         <!-- SECTION 1: BASIC INFO -->
         <div class="form-section">
             <div class="section-title">Identity</div>
@@ -53,13 +55,33 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label">Peak Rank</label>
+                {{ profile_form.peak_rank }}
+                {% if profile_form.peak_rank.errors %}
+                <div class="error-message">
+                    {{ profile_form.peak_rank.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group" id="profile-picture-upload-group">
                 <label class="form-label">Profile Picture (Upload)</label>
                 {% if is_edit and profile %}
                     {% with pic=profile.profile_picture pic_url=profile.profile_picture_url %}
                     {% if pic or pic_url %}
                     <div class="current-pfp-preview">
                         <img src="{% if pic %}{{ pic.url }}{% else %}{{ pic_url }}{% endif %}" alt="Current picture" />
-                        <span>Current picture — leave blank to keep it</span>
+                        <div class="current-pfp-meta">
+                            <span>Current picture — leave blank to keep it</span>
+                            {% if not profile_form.remove_profile_picture.is_hidden %}
+                            <label class="remove-picture-btn" title="Remove current profile picture">
+                                {{ profile_form.remove_profile_picture }}
+                                <span>Remove Picture</span>
+                            </label>
+                            {% else %}
+                                {{ profile_form.remove_profile_picture }}
+                            {% endif %}
+                        </div>
                     </div>
                     {% endif %}
                     {% endwith %}
@@ -73,7 +95,7 @@
                 {% endif %}
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="profile-picture-url-group">
                 <label class="form-label">Or Profile Picture URL</label>
                 {{ profile_form.profile_picture_url }}
                 <span class="help-text">Paste a direct link to an image (ends in .jpg, .png,etc.)</span>
@@ -82,6 +104,10 @@
                     {{ profile_form.profile_picture_url.errors.0 }}
                 </div>
                 {% endif %}
+            </div>
+
+            <div class="form-group">
+                <span class="help-text">Tip: uploading a file clears the URL, and entering a URL replaces an uploaded file.</span>
             </div>
 
             <div class="form-group">
@@ -242,6 +268,71 @@
             }
         });
     });
+
+    const uploadGroup = document.getElementById("profile-picture-upload-group");
+    const urlGroup = document.getElementById("profile-picture-url-group");
+    const uploadInput = document.getElementById("id_profile_picture");
+    const urlInput = document.getElementById("id_profile_picture_url");
+    const removeInput = document.getElementById("id_remove_profile_picture");
+
+    function syncPictureInputState() {
+        if (!uploadInput || !urlInput || !uploadGroup || !urlGroup) {
+            return;
+        }
+
+        const hasUpload = !!(uploadInput.files && uploadInput.files.length > 0);
+        const hasUrl = !!urlInput.value.trim();
+
+        // If removing picture, clear both sources and re-enable both inputs.
+        if (removeInput && removeInput.checked) {
+            uploadInput.disabled = false;
+            urlInput.disabled = false;
+            uploadGroup.classList.remove("media-input-disabled");
+            urlGroup.classList.remove("media-input-disabled");
+
+            uploadInput.value = "";
+            urlInput.value = "";
+            return;
+        }
+
+        if (hasUpload) {
+            urlInput.disabled = true;
+            urlGroup.classList.add("media-input-disabled");
+        } else {
+            urlInput.disabled = false;
+            urlGroup.classList.remove("media-input-disabled");
+        }
+
+        if (hasUrl) {
+            uploadInput.disabled = true;
+            uploadGroup.classList.add("media-input-disabled");
+        } else {
+            uploadInput.disabled = false;
+            uploadGroup.classList.remove("media-input-disabled");
+        }
+    }
+
+    if (uploadInput) {
+        uploadInput.addEventListener("change", () => {
+            if (removeInput) removeInput.checked = false;
+            syncPictureInputState();
+        });
+    }
+
+    if (urlInput) {
+        ["input", "change"].forEach((evt) => {
+            urlInput.addEventListener(evt, () => {
+                if (removeInput) removeInput.checked = false;
+                syncPictureInputState();
+            });
+        });
+    }
+
+    if (removeInput) {
+        removeInput.addEventListener("change", syncPictureInputState);
+    }
+
+    syncPictureInputState();
 
     anime({
         targets: ".valorant-form",

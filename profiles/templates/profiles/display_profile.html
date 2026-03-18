@@ -447,9 +447,9 @@
 
     <!-- HEADER -->
     <div class="profile-header">
-        {% if profile.profile_picture %}
+        {% if profile.get_profile_picture_url %}
         <img
-            src="{{ profile.profile_picture.url }}"
+            src="{{ profile.get_profile_picture_url }}"
             class="header-pfp"
             alt="{{ profile.in_game_name }}"
         />
@@ -516,9 +516,9 @@
                         class="teammate-avatar"
                         title="{{ teammate.in_game_name }}"
                     >
-                        {% if teammate.profile_picture %}
+                        {% if teammate.get_profile_picture_url %}
                         <img
-                            src="{{ teammate.profile_picture.url }}"
+                            src="{{ teammate.get_profile_picture_url }}"
                             alt="{{ teammate.in_game_name }}"
                         />
                         {% else %}

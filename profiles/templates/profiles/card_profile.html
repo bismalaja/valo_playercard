@@ -710,10 +710,10 @@
 
     <!-- CENTER: PFP -->
     <div class="pfp-container">
-        {% if profile.profile_picture %}
-        <img src="{{ profile.profile_picture.url }}" class="pfp-img pfp-b" alt="">
-        <img src="{{ profile.profile_picture.url }}" class="pfp-img pfp-s" alt="">
-        <img src="{{ profile.profile_picture.url }}" class="pfp-img pfp-main" alt="{{ profile.in_game_name }}">
+        {% if profile.get_profile_picture_url %}
+        <img src="{{ profile.get_profile_picture_url }}" class="pfp-img pfp-b" alt="">
+        <img src="{{ profile.get_profile_picture_url }}" class="pfp-img pfp-s" alt="">
+        <img src="{{ profile.get_profile_picture_url }}" class="pfp-img pfp-main" alt="{{ profile.in_game_name }}">
         {% else %}
         <div class="pfp-img pfp-main"
             style="display:flex; align-items:center; justify-content:center; color:white; font-size:100px;">?</div>
@@ -768,8 +768,8 @@
                 <div class="map-card" style="width: auto; padding-right: 20px;">
                     <div class="map-img"
                         style="width: 5vh; height: 5vh; min-width: 40px; border-radius: 50%; overflow: hidden; border: none; margin-right: 10px;">
-                        {% if teammate.profile_picture %}
-                        <img src="{{ teammate.profile_picture.url }}" alt="{{ teammate.in_game_name }}"
+                        {% if teammate.get_profile_picture_url %}
+                        <img src="{{ teammate.get_profile_picture_url }}" alt="{{ teammate.in_game_name }}"
                             style="width: 100%; height: 100%; object-fit: cover;">
                         {% else %}
                         <div

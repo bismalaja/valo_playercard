@@ -190,9 +190,9 @@
                 </div>
             </div>
 
-            {% if profile.profile_picture %}
+            {% if profile.get_profile_picture_url %}
             <img
-                src="{{ profile.profile_picture.url }}"
+                src="{{ profile.get_profile_picture_url }}"
                 alt="{{ profile.in_game_name }}"
                 class="card-pfp"
             />

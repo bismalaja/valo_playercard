@@ -177,6 +177,8 @@ class Profile(models.Model):
     profile_picture_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
     team = models.ForeignKey(Team, on_delete=models.PROTECT, null=True, blank=True)
     
+    peak_rank = models.CharField(max_length=100, blank=True, default='')
+
     # ManyToMany: Users can select multiple agents they play
     agents = models.ManyToManyField(Agent, blank=True, related_name='player_profiles')
     

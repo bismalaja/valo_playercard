@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views_tracker import fetch_tracker_stats
 
 urlpatterns = [
     path('', views.profile_list, name='profile_list'),
@@ -15,4 +16,6 @@ urlpatterns = [
     path('accounts/login/', views.login_view, name='login_view'),
     path('accounts/logout/', views.logout_view, name='logout_view'),
     path('accounts/unclaim/', views.unclaim_profile_view, name='unclaim_profile'),
+    # Tracker.gg auto-fill API
+    path('api/fetch-tracker/', fetch_tracker_stats, name='fetch_tracker_stats'),
 ]
