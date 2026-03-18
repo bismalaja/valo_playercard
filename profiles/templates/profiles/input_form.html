@@ -17,6 +17,7 @@
 
     <form method="post" enctype="multipart/form-data" class="valorant-form">
         {% csrf_token %}
+        {{ profile_form.peak_rank_icon }}
 
         {% include 'profiles/tracker_autofill_widget.html' %}
 
@@ -177,7 +178,7 @@
         <!-- SECTION 4: AGENTS -->
         <div class="form-section">
             <div class="section-title">
-                Active Agents <span style="color: #ff4655">*</span>
+                Active Agents (Max 5) <span style="color: #ff4655">*</span>
             </div>
             {% if custom_errors.agents %}
             <div class="error-message" style="margin-bottom: 10px">
@@ -192,7 +193,7 @@
                     <input
                         type="checkbox"
                         name="agent_id"
-                        value="{{ agent.id }}" {% if agent.id in selected_agent_ids %}checked{% endif %}/>
+                        value="{{ agent.id }}" class="agent-checkbox" {% if agent.id in selected_agent_ids %}checked{% endif %}/>
                     <div class="selection-card">
                         <img src="{{ agent.get_icon_url }}" class="item-icon" alt="{{ agent.name }}"/>
                         <span class="item-name">{{ agent.name }}</span>
@@ -248,6 +249,20 @@
 
 {% block extra_scripts %}
 <script>
+    function notifyLimit(message) {
+        if (typeof window.showToast === "function") {
+            window.showToast(message, "warning");
+            return;
+        }
+
+        window.__toastQueue = window.__toastQueue || [];
+        window.__toastQueue.push({ message: message, type: "warning" });
+
+        window.dispatchEvent(new CustomEvent("app:toast", {
+            detail: { message: message, type: "warning" }
+        }));
+    }
+
     // Add class to default django rendered inputs
     document
         .querySelectorAll('input[type="text"], input[type="number"], textarea, select')
@@ -264,7 +279,21 @@
             const checkedCount = document.querySelectorAll(".map-checkbox:checked").length;
             if (checkedCount > MAX_MAPS) {
                 checkbox.checked = false;
-                alert("You can only select up to " + MAX_MAPS + " maps.");
+                notifyLimit("You can only select up to " + MAX_MAPS + " maps.");
+            }
+        });
+    });
+
+    // Agent Checkbox Limit
+    const agentCheckboxes = document.querySelectorAll(".agent-checkbox");
+    const MAX_AGENTS = 5;
+
+    agentCheckboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
+            const checkedCount = document.querySelectorAll(".agent-checkbox:checked").length;
+            if (checkedCount > MAX_AGENTS) {
+                checkbox.checked = false;
+                notifyLimit("You can only select up to " + MAX_AGENTS + " agents.");
             }
         });
     });

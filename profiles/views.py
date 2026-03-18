@@ -157,6 +157,7 @@ def input_profile(request):
     selected_agent_ids = []
     selected_role_ids = []
     selected_map_ids = []
+    custom_errors = {}
 
     if request.method == 'POST':
         profile_form = ProfileForm(request.POST, request.FILES)
@@ -168,11 +169,15 @@ def input_profile(request):
         if request.POST.getlist('map_id'):
             selected_map_ids = [int(id) for id in request.POST.getlist('map_id')]
 
+        if len(selected_agent_ids) > 5:
+            custom_errors['agents'] = 'You can select up to 5 agents.'
+            messages.error(request, 'You can select up to 5 agents.')
+
         # Re-apply lock so widget state is correct if form re-renders on error
         if request.user.is_authenticated:
             _lock_riot_fields(profile_form, request.user)
 
-        if profile_form.is_valid():
+        if profile_form.is_valid() and not custom_errors:
             profile = profile_form.save(commit=False)
 
             # Auto-assign to logged-in user and enforce their Riot credentials
@@ -231,6 +236,7 @@ def input_profile(request):
         'selected_agent_ids': selected_agent_ids,
         'selected_role_ids': selected_role_ids,
         'selected_map_ids': selected_map_ids,
+        'custom_errors': custom_errors,
     })
 
 
@@ -302,6 +308,7 @@ def edit_profile(request, profile_id):
     selected_agent_ids = []
     selected_role_ids = []
     selected_map_ids = []
+    custom_errors = {}
     if request.method == 'POST':
         profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
         _lock_riot_fields(profile_form, request.user)
@@ -313,7 +320,11 @@ def edit_profile(request, profile_id):
         if request.POST.getlist('map_id'):
             selected_map_ids = [int(id) for id in request.POST.getlist('map_id')]
 
-        if profile_form.is_valid():
+        if len(selected_agent_ids) > 5:
+            custom_errors['agents'] = 'You can select up to 5 agents.'
+            messages.error(request, 'You can select up to 5 agents.')
+
+        if profile_form.is_valid() and not custom_errors:
             profile = profile_form.save(commit=False)
 
             # Enforce Riot credentials from UserProfile — can't be changed via the form
@@ -358,6 +369,7 @@ def edit_profile(request, profile_id):
         'selected_agent_ids': selected_agent_ids,
         'selected_role_ids': selected_role_ids,
         'selected_map_ids': selected_map_ids,
+        'custom_errors': custom_errors,
     }
     
     return render(request, 'profiles/input_form.html', context)

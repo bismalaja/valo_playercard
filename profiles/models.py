@@ -178,6 +178,7 @@ class Profile(models.Model):
     team = models.ForeignKey(Team, on_delete=models.PROTECT, null=True, blank=True)
     
     peak_rank = models.CharField(max_length=100, blank=True, default='')
+    peak_rank_icon = models.URLField(max_length=500, blank=True, default='')
 
     # ManyToMany: Users can select multiple agents they play
     agents = models.ManyToManyField(Agent, blank=True, related_name='player_profiles')

@@ -190,6 +190,10 @@ def _parse_profile(data, playlist="competitive", season_id=""):
         peak_rank_icon = peak_meta.get("iconUrl", "")
         peak_act = peak_meta.get("actName", "")
 
+    # Some tracker responses omit peak icon metadata; use current rank icon as fallback.
+    if not peak_rank_icon:
+        peak_rank_icon = current_rank_icon
+
     # ── Other season stats ───────────────────────────────────────────────
     kd_ratio = ""
     for kd_key in ("kDRatio", "kdRatio", "kd", "killDeathRatio"):

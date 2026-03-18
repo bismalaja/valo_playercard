@@ -81,7 +81,7 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ['in_game_name', 'riot_id', 'riot_tag', 'peak_rank', 'profile_picture', 'profile_picture_url', 'team', 'bio']
+        fields = ['in_game_name', 'riot_id', 'riot_tag', 'peak_rank', 'peak_rank_icon', 'profile_picture', 'profile_picture_url', 'team', 'bio']
         widgets = {
             'in_game_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your Username'}),
             'riot_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Riot ID Name (e.g. Tyloo)'}),
@@ -89,6 +89,7 @@ class ProfileForm(forms.ModelForm):
             'team': forms.Select(attrs={'class': 'form-control'}),
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Tell us about yourself...'}),
             'peak_rank': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Gold 2'}),
+            'peak_rank_icon': forms.HiddenInput(),
             'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
             'profile_picture_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Optional: Paste image URL'}),
         }
