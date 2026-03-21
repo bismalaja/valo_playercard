@@ -4,6 +4,7 @@ Django settings for valorant_profile project.
 
 from pathlib import Path
 import os
+from urllib.parse import urlparse
 
 
 def _env_bool(name, default=False):
@@ -17,6 +18,32 @@ def _env_list(name, default=''):
     raw = os.environ.get(name, default)
     return [item.strip() for item in raw.split(',') if item.strip()]
 
+
+def _normalize_host(value):
+    host = value.strip()
+    if not host:
+        return ''
+
+    if '://' in host:
+        parsed = urlparse(host)
+        host = parsed.netloc or parsed.path
+
+    host = host.split('/')[0]
+    if host.startswith('['):
+        # Preserve bracketed IPv6 host; strip optional :port suffix after closing bracket.
+        end = host.find(']')
+        if end != -1:
+            return host[:end + 1]
+
+    if ':' in host:
+        host = host.split(':', 1)[0]
+
+    return host.strip()
+
+
+def _env_hosts(name, default=''):
+    return [host for host in (_normalize_host(item) for item in _env_list(name, default)) if host]
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,7 +53,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-only-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = _env_bool('DEBUG', default=True)
 
-ALLOWED_HOSTS = _env_list('ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver')
+ALLOWED_HOSTS = _env_hosts('ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver')
 if not ALLOWED_HOSTS:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 
