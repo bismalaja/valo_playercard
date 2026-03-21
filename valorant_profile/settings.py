@@ -52,7 +52,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-only-key')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = _env_bool('DEBUG', default=True)
+DEBUG = True
 
 
 # ALLOWED_HOSTS is set unconditionally for debugging (unsafe for production!)
