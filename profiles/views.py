@@ -2,8 +2,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.http import Http404
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_POST
+from django_ratelimit.decorators import ratelimit
+import logging
 from .models import Profile, Agent, Role, Team, Map, UserProfile
 from .forms import ProfileForm, SignUpForm, LoginForm
+
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -34,9 +43,15 @@ def _apply_tracker_peak_rank(profile, request):
 # AUTH VIEWS
 # ---------------------------------------------------------------------------
 
+@ratelimit(key='ip', rate='3/m', method='POST', block=False)
 def signup_view(request):
     if request.user.is_authenticated:
         return redirect('profile_list')
+
+    if request.method == 'POST' and getattr(request, 'limited', False):
+        form = SignUpForm(request.POST)
+        form.add_error(None, 'Too many signup attempts. Please wait about 60 seconds and try again.')
+        return render(request, 'profiles/signup.html', {'form': form}, status=429)
 
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -57,9 +72,16 @@ def signup_view(request):
     return render(request, 'profiles/signup.html', {'form': form})
 
 
+@ratelimit(key='ip', rate='3/m', method='POST', block=False)
+@ratelimit(key='post:username', rate='5/m', method='POST', block=False)
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('profile_list')
+
+    if request.method == 'POST' and getattr(request, 'limited', False):
+        form = LoginForm(request, data=request.POST)
+        form.add_error(None, 'Too many login attempts. Please wait about 60 seconds and try again.')
+        return render(request, 'profiles/login.html', {'form': form}, status=429)
 
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
@@ -68,6 +90,12 @@ def login_view(request):
             login(request, user)
             messages.success(request, f'Welcome back, {user.username}!')
             next_url = request.GET.get('next', 'profile_list')
+            if not url_has_allowed_host_and_scheme(
+                url=next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+            ):
+                next_url = 'profile_list'
             return redirect(next_url)
     else:
         form = LoginForm(request)
@@ -75,10 +103,10 @@ def login_view(request):
     return render(request, 'profiles/login.html', {'form': form})
 
 
+@require_POST
 def logout_view(request):
-    if request.method == 'POST':
-        logout(request)
-        messages.success(request, 'You have been logged out.')
+    logout(request)
+    messages.success(request, 'You have been logged out.')
     return redirect('profile_list')
 
 
@@ -114,8 +142,21 @@ def claim_profile_view(request, profile_id):
 
     if user_riot_id == profile_riot_id and user_riot_tag == profile_riot_tag:
         if request.method == 'POST':
-            profile.user = request.user
-            profile.save()
+            try:
+                with transaction.atomic():
+                    locked_profile = Profile.objects.select_for_update().get(id=profile_id)
+                    if locked_profile.is_claimed:
+                        messages.error(request, 'This profile has already been claimed.')
+                        return redirect('display_profile', profile_id=profile_id)
+                    if _user_has_any_profile(request.user):
+                        messages.error(request, 'You already have a profile — you cannot claim another.')
+                        return redirect('display_profile', profile_id=request.user.profile.id)
+
+                    locked_profile.user = request.user
+                    locked_profile.save()
+            except Profile.DoesNotExist as exc:
+                raise Http404('Profile not found.') from exc
+
             messages.success(request, f'Profile "{profile.in_game_name}" has been claimed!')
             return redirect('display_profile', profile_id=profile_id)
         # GET — show confirmation page
@@ -412,7 +453,6 @@ def card_profile(request, profile_id):
 
 def download_card_png(request, profile_id):
     """Capture the card page at 1920x1080 via Playwright and serve as a PNG download."""
-    import traceback as tb_module
     from django.http import HttpResponse, JsonResponse
 
     get_object_or_404(Profile, id=profile_id)  # 404 guard
@@ -452,14 +492,15 @@ def download_card_png(request, profile_id):
         response['Content-Disposition'] = f'attachment; filename="playercard_{profile_id}.png"'
         return response
 
-    except Exception as exc:
-        full_traceback = tb_module.format_exc()
+    except Exception:
+        logger.exception('Card PNG generation failed for profile_id=%s', profile_id)
         return JsonResponse(
-            {'error': str(exc), 'traceback': full_traceback},
+            {'error': 'Failed to generate card image.'},
             status=500
         )
 
 
+@require_POST
 def delete_profile(request, profile_id):
     """Delete a profile — owner only."""
     profile = get_object_or_404(Profile, id=profile_id)
@@ -472,13 +513,10 @@ def delete_profile(request, profile_id):
         messages.error(request, 'You can only delete your own profile.')
         return redirect('display_profile', profile_id=profile_id)
     
-    if request.method == 'POST':
-        name = profile.in_game_name
-        profile.delete()
-        messages.success(request, f'Profile "{name}" has been deleted successfully!')
-        return redirect('profile_list')
-    
-    return redirect('display_profile', profile_id=profile_id)
+    name = profile.in_game_name
+    profile.delete()
+    messages.success(request, f'Profile "{name}" has been deleted successfully!')
+    return redirect('profile_list')
 
 
 # ---------------------------------------------------------------------------

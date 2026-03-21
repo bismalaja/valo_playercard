@@ -5,16 +5,30 @@ Django settings for valorant_profile project.
 from pathlib import Path
 import os
 
+
+def _env_bool(name, default=False):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() in ('1', 'true', 'yes', 'on')
+
+
+def _env_list(name, default=''):
+    raw = os.environ.get(name, default)
+    return [item.strip() for item in raw.split(',') if item.strip()]
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-your-secret-key-change-this-in-production'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-only-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = _env_bool('DEBUG', default=True)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = _env_list('ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver')
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 
 # Application definition
 INSTALLED_APPS = [
@@ -114,9 +128,24 @@ LOGOUT_REDIRECT_URL = '/'
 
 # CSRF Settings for production
 CSRF_COOKIE_SECURE = not DEBUG
-CSRF_TRUSTED_ORIGINS = [
-    'https://valo-playercard.xyz',
-]
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+X_FRAME_OPTIONS = 'DENY'
+CSRF_TRUSTED_ORIGINS = _env_list('CSRF_TRUSTED_ORIGINS', default='https://valo-playercard.xyz')
+
+# Security headers / HTTPS behavior (production-oriented)
+SECURE_SSL_REDIRECT = _env_bool('SECURE_SSL_REDIRECT', default=not DEBUG)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Upload abuse guardrails
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 
 # Tracker.GG integration — paste cf_clearance cookie value from browser DevTools here.
 # Expires every 30 minutes. See profiles/services/tracker_api.py for details.

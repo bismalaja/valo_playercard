@@ -2,12 +2,20 @@ import json
 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django_ratelimit.decorators import ratelimit
 
 from .services.tracker_api import fetch_tracker_profile, parse_tracker_url
 
 
 @require_POST
+@ratelimit(key='ip', rate='10/m', method='POST', block=False)
 def fetch_tracker_stats(request):
+    if getattr(request, 'limited', False):
+        return JsonResponse(
+            {"error": "Too many tracker requests. Please wait about 60 seconds and try again."},
+            status=429,
+        )
+
     if not request.user.is_authenticated:
         return JsonResponse({"error": "Login required."}, status=401)
 

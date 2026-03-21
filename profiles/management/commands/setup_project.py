@@ -1,26 +1,66 @@
+import os
+
+from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from profiles.models import Role, Agent, Map, Team
 
 class Command(BaseCommand):
     help = 'Sets up the project with initial data: superuser and roles.'
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--rotate-admin-password',
+            action='store_true',
+            help='Rotate bootstrap admin password if the user already exists.',
+        )
+
     def handle(self, *args, **kwargs):
         User = get_user_model()
-        
-        # 1. Handle Superuser
-        username = 'admin'
-        email = 'admin@example.com'
-        password = 'admin'
 
-        if not User.objects.filter(username=username).exists():
-            User.objects.create_superuser(username, email, password)
-            self.stdout.write(self.style.SUCCESS(f'Superuser "{username}" created successfully.'))
+        # 1. Handle Superuser
+        username = os.environ.get('BOOTSTRAP_ADMIN_USERNAME', 'admin')
+        email = os.environ.get('BOOTSTRAP_ADMIN_EMAIL', 'admin@example.com')
+        password = os.environ.get('BOOTSTRAP_ADMIN_PASSWORD')
+        rotate_admin_password = bool(kwargs.get('rotate_admin_password'))
+
+        if not password:
+            message = (
+                'BOOTSTRAP_ADMIN_PASSWORD is not set. '
+                'Skipping bootstrap admin creation/update.'
+            )
+            if settings.DEBUG:
+                self.stdout.write(self.style.WARNING(message))
+            else:
+                raise CommandError(message)
         else:
-            user = User.objects.get(username=username)
-            user.set_password(password)
-            user.save()
-            self.stdout.write(self.style.SUCCESS(f'Superuser "{username}" password updated.'))
+            bootstrap_user = User.objects.filter(username=username).first()
+
+            if bootstrap_user and not rotate_admin_password:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f'Superuser "{username}" already exists. '
+                        'Password rotation skipped (use --rotate-admin-password to rotate).'
+                    )
+                )
+            else:
+                try:
+                    user_for_validation = bootstrap_user or User(username=username, email=email)
+                    validate_password(password, user=user_for_validation)
+                except ValidationError as exc:
+                    raise CommandError(f'Invalid bootstrap admin password: {"; ".join(exc.messages)}') from exc
+
+                if not bootstrap_user:
+                    User.objects.create_superuser(username, email, password)
+                    self.stdout.write(self.style.SUCCESS(f'Superuser "{username}" created successfully.'))
+                else:
+                    bootstrap_user.email = email
+                    bootstrap_user.set_password(password)
+                    bootstrap_user.save(update_fields=['email', 'password'])
+                    self.stdout.write(self.style.SUCCESS(f'Superuser "{username}" password updated.'))
 
         # 2. Handle Roles
         # Combining standard roles (Duelist, etc) with the custom ones the user had

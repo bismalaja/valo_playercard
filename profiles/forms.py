@@ -74,6 +74,14 @@ class LoginForm(AuthenticationForm):
         })
 
 class ProfileForm(forms.ModelForm):
+    MAX_PROFILE_PICTURE_SIZE = 5 * 1024 * 1024
+    ALLOWED_PROFILE_PICTURE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp'}
+    ALLOWED_PROFILE_PICTURE_CONTENT_TYPES = {
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+    }
+
     peak_rank_display = forms.CharField(
         required=False,
         disabled=True,
@@ -124,6 +132,36 @@ class ProfileForm(forms.ModelForm):
 
         has_new_upload = bool(self._new_profile_picture)
         cleaned_data['profile_picture_url'] = profile_picture_url
+
+        if has_new_upload:
+            upload = self._new_profile_picture
+            ext = ''
+            if upload.name and '.' in upload.name:
+                ext = upload.name[upload.name.rfind('.'):].lower()
+
+            if ext not in self.ALLOWED_PROFILE_PICTURE_EXTENSIONS:
+                self.add_error(
+                    'profile_picture',
+                    'Only .jpg, .jpeg, .png, and .webp files are allowed.',
+                )
+
+            if upload.size > self.MAX_PROFILE_PICTURE_SIZE:
+                self.add_error('profile_picture', 'Image must be 5MB or smaller.')
+
+            content_type = getattr(upload, 'content_type', '') or ''
+            if content_type and content_type not in self.ALLOWED_PROFILE_PICTURE_CONTENT_TYPES:
+                self.add_error(
+                    'profile_picture',
+                    'Invalid image type. Use JPEG, PNG, or WebP.',
+                )
+
+        if profile_picture_url:
+            allowed_prefixes = ('https://', 'http://', '/static/', '/media/')
+            if not profile_picture_url.startswith(allowed_prefixes):
+                self.add_error(
+                    'profile_picture_url',
+                    'Image URL must start with http://, https://, /static/, or /media/.',
+                )
 
         # Keep image source singular to avoid hidden precedence bugs.
         # Priority: new upload > explicit remove > URL value.
