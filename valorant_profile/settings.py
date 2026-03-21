@@ -51,12 +51,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-only-key')
 
 
-# SECURITY WARNING: DEBUG is ON for all environments (unsafe for production!)
-DEBUG = True
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = _env_bool('DEBUG', default=True)
 
-ALLOWED_HOSTS = _env_hosts('ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver')
-if not ALLOWED_HOSTS:
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
+
+# ALLOWED_HOSTS is set unconditionally for debugging (unsafe for production!)
+ALLOWED_HOSTS = ['valo-playercard.xyz', 'www.valo-playercard.xyz', 'localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
