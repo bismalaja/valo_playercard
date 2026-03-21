@@ -65,6 +65,21 @@ The `Procfile` handles migrations and seeding automatically on deploy:
 web: python manage.py migrate && python manage.py setup_project && gunicorn valorant_profile.wsgi --log-file -
 ```
 
+Set these config vars in production before first deploy:
+
+```bash
+SECRET_KEY=<strong-random-secret>
+DEBUG=False
+ALLOWED_HOSTS=valo-playercard.xyz,www.valo-playercard.xyz
+CSRF_TRUSTED_ORIGINS=https://valo-playercard.xyz,https://www.valo-playercard.xyz
+BOOTSTRAP_ADMIN_USERNAME=admin
+BOOTSTRAP_ADMIN_EMAIL=admin@example.com
+BOOTSTRAP_ADMIN_PASSWORD=<strong-admin-password>
+```
+
+`BOOTSTRAP_ADMIN_PASSWORD` is required for first-time admin bootstrap in production.
+After the admin exists, startup continues even if it is not set.
+
 ---
 
 ## Static Images
@@ -80,13 +95,16 @@ Map and team icons are loaded from external URLs defined in `setup_project.py`.
 
 ---
 
-## Default Admin
+## Admin Bootstrap
 
-Created automatically by `setup_project`:
+`setup_project` can bootstrap a superuser using environment variables:
 
-| Field    | Value   |
-|----------|---------|
-| Username | `admin` |
-| Password | `admin` |
+- `BOOTSTRAP_ADMIN_USERNAME`
+- `BOOTSTRAP_ADMIN_EMAIL`
+- `BOOTSTRAP_ADMIN_PASSWORD`
 
-> Change the password after first login.
+Password rotation is explicit:
+
+```bash
+python manage.py setup_project --rotate-admin-password
+```

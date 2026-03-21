@@ -26,19 +26,27 @@ class Command(BaseCommand):
         email = os.environ.get('BOOTSTRAP_ADMIN_EMAIL', 'admin@example.com')
         password = os.environ.get('BOOTSTRAP_ADMIN_PASSWORD')
         rotate_admin_password = bool(kwargs.get('rotate_admin_password'))
+        bootstrap_user = User.objects.filter(username=username).first()
 
         if not password:
             message = (
                 'BOOTSTRAP_ADMIN_PASSWORD is not set. '
                 'Skipping bootstrap admin creation/update.'
             )
-            if settings.DEBUG:
+            if bootstrap_user:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f'{message} Existing superuser "{username}" detected; continuing without admin changes.'
+                    )
+                )
+            elif settings.DEBUG:
                 self.stdout.write(self.style.WARNING(message))
             else:
-                raise CommandError(message)
+                raise CommandError(
+                    'BOOTSTRAP_ADMIN_PASSWORD is required in production when bootstrap admin user '
+                    f'"{username}" does not exist.'
+                )
         else:
-            bootstrap_user = User.objects.filter(username=username).first()
-
             if bootstrap_user and not rotate_admin_password:
                 self.stdout.write(
                     self.style.WARNING(
