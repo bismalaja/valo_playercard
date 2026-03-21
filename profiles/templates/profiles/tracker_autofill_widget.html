@@ -49,6 +49,13 @@
         <span id="tracker-agents"></span>
       </div>
 
+      <div class="tracker-apply-options" style="margin: 16px 0 8px 0;">
+        <label><input type="checkbox" id="apply-agents" checked> Agents</label>
+        <label><input type="checkbox" id="apply-rank" checked> Rank</label>
+        <label><input type="checkbox" id="apply-avatar" checked> Avatar</label>
+        <label><input type="checkbox" id="apply-id" checked> Riot ID/Tag</label>
+      </div>
+
       <button type="button" id="tracker-apply-btn" class="btn btn-primary tracker-apply-btn">
         Apply to form
       </button>
@@ -165,32 +172,39 @@
         el.dispatchEvent(new Event('change', { bubbles: true }));
       }
     }
-    set('id_in_game_name',        lastData.riot_id);
-    set('id_riot_id',             lastData.riot_id);
-    set('id_riot_tag',            lastData.riot_tag);
-    set('id_profile_picture_url', lastData.avatar_url);
-    set('id_peak_rank_display',   lastData.peak_rank);
-    set('id_peak_rank',           lastData.peak_rank);
-    set('id_peak_rank_icon',      lastData.peak_rank_icon);
+    var applyAgents = document.getElementById('apply-agents').checked;
+    var applyRank   = document.getElementById('apply-rank').checked;
+    var applyAvatar = document.getElementById('apply-avatar').checked;
+    var applyId     = document.getElementById('apply-id').checked;
 
-    // Pre-select agent checkboxes matching top agent names
-    var topNames = (lastData.top_agents || []).map(function (a) {
-      return a.name.trim().toLowerCase();
-    });
-    if (topNames.length) {
+    if (applyId) {
+      set('id_in_game_name', lastData.riot_id);
+      set('id_riot_id', lastData.riot_id);
+      set('id_riot_tag', lastData.riot_tag);
+    }
+    if (applyAvatar) {
+      set('id_profile_picture_url', lastData.avatar_url);
+    }
+    if (applyRank) {
+      set('id_peak_rank_display', lastData.peak_rank);
+      set('id_peak_rank', lastData.peak_rank);
+      set('id_peak_rank_icon', lastData.peak_rank_icon);
+    }
+    if (applyAgents) {
+      // Overwrite: uncheck all, then check only tracker agents
+      var topNames = (lastData.top_agents || []).map(function (a) {
+        return a.name.trim().toLowerCase();
+      });
       document.querySelectorAll('input[name="agent_id"]').forEach(function (cb) {
         var label = cb.closest('label');
         if (!label) return;
         var nameEl = label.querySelector('.item-name');
         if (!nameEl) return;
-        if (topNames.indexOf(nameEl.textContent.trim().toLowerCase()) !== -1) {
-          cb.checked = true;
-        }
+        var agentName = nameEl.textContent.trim().toLowerCase();
+        cb.checked = topNames.indexOf(agentName) !== -1;
       });
     }
-
     closeModal();
-
   });
 }());
 </script>
