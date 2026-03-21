@@ -17,7 +17,6 @@
 
     <form method="post" enctype="multipart/form-data" class="valorant-form">
         {% csrf_token %}
-        {{ profile_form.peak_rank_icon }}
 
         {% include 'profiles/tracker_autofill_widget.html' %}
 
@@ -56,13 +55,9 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Peak Rank</label>
-                {{ profile_form.peak_rank }}
-                {% if profile_form.peak_rank.errors %}
-                <div class="error-message">
-                    {{ profile_form.peak_rank.errors.0 }}
-                </div>
-                {% endif %}
+                <label class="form-label">Peak Rank (Tracker.gg)</label>
+                {{ profile_form.peak_rank_display }}
+                <span class="help-text">This value is read-only and only updates from Tracker.gg fetch.</span>
             </div>
 
             <div class="form-group" id="profile-picture-upload-group">
@@ -125,7 +120,7 @@
         <!-- SECTION 2: TEAM SELECTION -->
         <div class="form-section">
             <div class="section-title">Team Affiliation</div>
-            <div class="selection-grid">
+            <div class="selection-grid team-selection-grid">
                 <!-- FREE AGENT OPTION -->
                 <label class="selection-item">
                     <input

@@ -22,6 +22,14 @@ def _user_has_any_profile(user):
     return Profile.objects.filter(user=user).exists()
 
 
+def _apply_tracker_peak_rank(profile, request):
+    """Apply peak-rank fields captured from the tracker fetch endpoint."""
+    tracker_data = request.session.get('tracker_autofill_profile') or {}
+    if tracker_data:
+        profile.peak_rank = tracker_data.get('peak_rank') or ''
+        profile.peak_rank_icon = tracker_data.get('peak_rank_icon') or ''
+
+
 # ---------------------------------------------------------------------------
 # AUTH VIEWS
 # ---------------------------------------------------------------------------
@@ -159,6 +167,9 @@ def input_profile(request):
     selected_map_ids = []
     custom_errors = {}
 
+    if request.method == 'GET':
+        request.session.pop('tracker_autofill_profile', None)
+
     if request.method == 'POST':
         profile_form = ProfileForm(request.POST, request.FILES)
 
@@ -190,7 +201,10 @@ def input_profile(request):
                 except UserProfile.DoesNotExist:
                     pass
 
+            _apply_tracker_peak_rank(profile, request)
+
             profile.save()
+            request.session.pop('tracker_autofill_profile', None)
             
             # Save selected agents (ManyToMany)
             agent_ids = request.POST.getlist('agent_id')
@@ -309,6 +323,10 @@ def edit_profile(request, profile_id):
     selected_role_ids = []
     selected_map_ids = []
     custom_errors = {}
+
+    if request.method == 'GET':
+        request.session.pop('tracker_autofill_profile', None)
+
     if request.method == 'POST':
         profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
         _lock_riot_fields(profile_form, request.user)
@@ -335,7 +353,10 @@ def edit_profile(request, profile_id):
             except UserProfile.DoesNotExist:
                 pass
 
+            _apply_tracker_peak_rank(profile, request)
+
             profile.save()
+            request.session.pop('tracker_autofill_profile', None)
             
             agent_ids = request.POST.getlist('agent_id')
             profile.agents.set(agent_ids if agent_ids else [])

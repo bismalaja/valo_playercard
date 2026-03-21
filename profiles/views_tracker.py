@@ -56,4 +56,9 @@ def fetch_tracker_stats(request):
             status=500,
         )
 
+    request.session['tracker_autofill_profile'] = {
+        'peak_rank': data.get('peak_rank') or '',
+        'peak_rank_icon': data.get('peak_rank_icon') or '',
+    }
+
     return JsonResponse({"ok": True, "data": data})

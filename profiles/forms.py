@@ -74,6 +74,18 @@ class LoginForm(AuthenticationForm):
         })
 
 class ProfileForm(forms.ModelForm):
+    peak_rank_display = forms.CharField(
+        required=False,
+        disabled=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Fetched from Tracker.gg',
+            'readonly': True,
+            'tabindex': '-1',
+            'style': 'opacity: 0.55; cursor: not-allowed; pointer-events: none;',
+        }),
+    )
+
     remove_profile_picture = forms.BooleanField(
         required=False,
         label='Remove current profile picture',
@@ -81,21 +93,20 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ['in_game_name', 'riot_id', 'riot_tag', 'peak_rank', 'peak_rank_icon', 'profile_picture', 'profile_picture_url', 'team', 'bio']
+        fields = ['in_game_name', 'riot_id', 'riot_tag', 'profile_picture', 'profile_picture_url', 'team', 'bio']
         widgets = {
             'in_game_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your Username'}),
             'riot_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Riot ID Name (e.g. Tyloo)'}),
             'riot_tag': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tag (e.g. #NA1)'}),
             'team': forms.Select(attrs={'class': 'form-control'}),
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Tell us about yourself...'}),
-            'peak_rank': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Gold 2'}),
-            'peak_rank_icon': forms.HiddenInput(),
             'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
             'profile_picture_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Optional: Paste image URL'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['peak_rank_display'].initial = (self.instance.peak_rank if self.instance and self.instance.pk else '')
         self.fields['remove_profile_picture'].widget.attrs.update({'class': 'remove-picture-checkbox'})
         self._new_profile_picture = self.files.get('profile_picture') if hasattr(self, 'files') else None
 
