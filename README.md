@@ -1,6 +1,6 @@
 # Valorant Profiles
 
-A Django web app for managing and displaying Valorant player profiles, including agent selections, roles, maps, team affiliations, abilities, and player cards.
+A Django project for managing and displaying Valorant player profiles, including agent selections, roles, maps, team affiliations, abilities, and player cards.
 
 ---
 
