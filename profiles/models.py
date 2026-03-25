@@ -4,11 +4,6 @@ from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 
-
-# ============================================
-# REFERENCE DATA MODELS (Admin manages these)
-# ============================================
-
 class Role(models.Model):
     """
     Valorant roles that exist independently.
@@ -20,7 +15,7 @@ class Role(models.Model):
     icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
     
     def get_icon_url(self):
-        """Returns icon URL - verifies uploaded file exists before returning its URL"""
+        # Returns icon URL - verifies uploaded file exists before returning its URL
         if self.icon:
             try:
                 if os.path.exists(self.icon.path):
@@ -49,7 +44,7 @@ class Agent(models.Model):
     icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
     
     def get_icon_url(self):
-        """Returns icon URL - verifies uploaded file exists before returning its URL"""
+        # Returns icon URL - verifies uploaded file exists before returning its URL
         if self.icon:
             try:
                 if os.path.exists(self.icon.path):
@@ -76,7 +71,7 @@ class Team(models.Model):
     custom_order = models.PositiveIntegerField(default=0, help_text="Higher numbers appear later in the list")
     
     def get_icon_url(self):
-        """Returns icon URL - verifies uploaded file exists before returning its URL"""
+        # Returns icon URL - verifies uploaded file exists before returning its URL
         if self.icon:
             try:
                 if os.path.exists(self.icon.path):
@@ -102,7 +97,7 @@ class Map(models.Model):
     icon_url = models.URLField(max_length=500, blank=True, null=True, help_text='Alternative: Provide image URL instead of upload')
     
     def get_icon_url(self):
-        """Returns icon URL - verifies uploaded file exists before returning its URL"""
+        # Returns icon URL - verifies uploaded file exists before returning its URL
         if self.icon:
             try:
                 if os.path.exists(self.icon.path):
@@ -117,16 +112,11 @@ class Map(models.Model):
     class Meta:
         ordering = ['name']
 
-
-# ============================================
-# AUTH EXTENSION MODEL
-# ============================================
-
 class UserProfile(models.Model):
-    """
-    Extends the built-in User with a Riot ID so we can match
-    accounts to existing (unclaimed) profiles.
-    """
+
+    # Extends the built-in User with a Riot ID so we can match
+    # accounts to existing (unclaimed) profiles.
+  
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
     riot_id = models.CharField(
         max_length=50,
@@ -150,15 +140,11 @@ class UserProfile(models.Model):
         return f"{self.user.username} ({self.riot_id}{self.riot_tag or ''})"
 
 
-# ============================================
-# USER PROFILE MODEL
-# ============================================
-
 class Profile(models.Model):
-    """
-    Player profile with basic info and selections.
-    Users select from pre-existing agents, roles, and teams.
-    """
+    
+    # Player profile with basic info and selections.
+    # Users select from pre-existing agents, roles, and teams.
+    
     in_game_name = models.CharField(max_length=100)
     riot_id = models.CharField(max_length=50, default='', help_text="Your Riot ID name (e.g. 'Tyloo')")
     riot_tag = models.CharField(
