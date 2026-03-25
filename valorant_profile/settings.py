@@ -1,3 +1,7 @@
+# Disable SSL redirect during tests to prevent 301 redirects from breaking test assertions
+import sys
+if 'test' in sys.argv:
+    SECURE_SSL_REDIRECT = False
 """
 Django settings for valorant_profile project.
 """
