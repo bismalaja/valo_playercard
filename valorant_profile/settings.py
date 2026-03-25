@@ -1,6 +1,11 @@
-# Disable SSL redirect during tests to prevent 301 redirects from breaking test assertions
+# Disable SSL redirect during tests or CI to prevent 301 redirects from breaking test assertions
+import os
 import sys
-if 'test' in sys.argv:
+if (
+    'test' in sys.argv
+    or os.environ.get("CI") == "true"
+    or os.environ.get("DJANGO_ENV") == "test"
+):
     SECURE_SSL_REDIRECT = False
 """
 Django settings for valorant_profile project.
