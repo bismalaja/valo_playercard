@@ -1,3 +1,4 @@
+APPEND_SLASH = True
 # Disable SSL redirect during tests or CI to prevent 301 redirects from breaking test assertions
 import os
 import sys
