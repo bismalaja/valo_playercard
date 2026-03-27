@@ -45,6 +45,12 @@ def _apply_tracker_peak_rank(profile, request):
 
 @ratelimit(key='ip', rate='3/m', method='POST', block=False)
 def signup_view(request):
+        import sys
+        from django.conf import settings
+        print("DEBUG: signup_view called", file=sys.stderr)
+        print("DEBUG: request.is_secure() =", request.is_secure(), file=sys.stderr)
+        print("DEBUG: request.get_host() =", request.get_host(), file=sys.stderr)
+        print("DEBUG: SECURE_SSL_REDIRECT =", getattr(settings, 'SECURE_SSL_REDIRECT', None), file=sys.stderr)
     if request.user.is_authenticated:
         return redirect('profile_list')
 
@@ -75,6 +81,12 @@ def signup_view(request):
 @ratelimit(key='ip', rate='3/m', method='POST', block=False)
 @ratelimit(key='post:username', rate='5/m', method='POST', block=False)
 def login_view(request):
+        import sys
+        from django.conf import settings
+        print("DEBUG: login_view called", file=sys.stderr)
+        print("DEBUG: request.is_secure() =", request.is_secure(), file=sys.stderr)
+        print("DEBUG: request.get_host() =", request.get_host(), file=sys.stderr)
+        print("DEBUG: SECURE_SSL_REDIRECT =", getattr(settings, 'SECURE_SSL_REDIRECT', None), file=sys.stderr)
     if request.user.is_authenticated:
         return redirect('profile_list')
 
@@ -105,6 +117,12 @@ def login_view(request):
 
 @require_POST
 def logout_view(request):
+        import sys
+        from django.conf import settings
+        print("DEBUG: logout_view called", file=sys.stderr)
+        print("DEBUG: request.is_secure() =", request.is_secure(), file=sys.stderr)
+        print("DEBUG: request.get_host() =", request.get_host(), file=sys.stderr)
+        print("DEBUG: SECURE_SSL_REDIRECT =", getattr(settings, 'SECURE_SSL_REDIRECT', None), file=sys.stderr)
     logout(request)
     messages.success(request, 'You have been logged out.')
     return redirect('profile_list')

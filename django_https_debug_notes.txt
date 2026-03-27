@@ -1,0 +1,39 @@
+Django HTTPS/SSL Debugging Conversation
+=====================================
+
+1. Problem: Website fails when DEBUG=False, likely due to HTTPS enforcement.
+
+2. Analysis:
+   - SECURE_SSL_REDIRECT is enabled by default when DEBUG=False.
+   - CSRF_COOKIE_SECURE and SESSION_COOKIE_SECURE are also enabled when DEBUG=False.
+   - If your server does not terminate SSL and forward requests as HTTPS, Django will see HTTP and redirect or block cookies.
+   - request.is_secure() is used in views for security checks and redirects.
+
+3. Debug Print Suggestions:
+   - Add debug prints to settings.py for SECURE_SSL_REDIRECT, CSRF_COOKIE_SECURE, SESSION_COOKIE_SECURE.
+   - Add debug prints to signup_view, login_view, and logout_view for request.is_secure(), request.get_host(), and SECURE_SSL_REDIRECT.
+
+4. Example Debug Prints:
+   - In settings.py:
+     print("DEBUG: SECURE_SSL_REDIRECT =", SECURE_SSL_REDIRECT)
+     print("DEBUG: CSRF_COOKIE_SECURE =", CSRF_COOKIE_SECURE)
+     print("DEBUG: SESSION_COOKIE_SECURE =", SESSION_COOKIE_SECURE)
+
+   - In views.py (inside each view):
+     import sys
+     from django.conf import settings
+     print("DEBUG: <view_name> called", file=sys.stderr)
+     print("DEBUG: request.is_secure() =", request.is_secure(), file=sys.stderr)
+     print("DEBUG: request.get_host() =", request.get_host(), file=sys.stderr)
+     print("DEBUG: SECURE_SSL_REDIRECT =", getattr(settings, 'SECURE_SSL_REDIRECT', None), file=sys.stderr)
+
+5. Likely Fixes:
+   - If you want to allow HTTP in production, set SECURE_SSL_REDIRECT = False and CSRF_COOKIE_SECURE = False, SESSION_COOKIE_SECURE = False in your environment or settings.
+   - If you want HTTPS, ensure your reverse proxy (nginx, etc.) is forwarding the correct headers (X-Forwarded-Proto) and is terminating SSL.
+
+6. Implementation:
+   - Debug prints were added to settings.py and profiles/views.py as described above.
+   - Check your server logs or console output for these debug messages during requests.
+
+7. Next Steps:
+   - Use the debug output to determine if requests are being seen as secure or not, and adjust your deployment (proxy, SSL, settings) accordingly.
