@@ -9,6 +9,7 @@ services:
     environment:
       - SECRET_KEY=${SECRET_KEY:-django-insecure-change-me-in-production}
       - DEBUG=${DEBUG:-False}
+      - SECURE_SSL_REDIRECT=False
     restart: unless-stopped
 
 volumes:
