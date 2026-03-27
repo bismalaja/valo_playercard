@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import Http404
@@ -45,12 +45,6 @@ def _apply_tracker_peak_rank(profile, request):
 
 @ratelimit(key='ip', rate='3/m', method='POST', block=False)
 def signup_view(request):
-        import sys
-        from django.conf import settings
-        print("DEBUG: signup_view called", file=sys.stderr)
-        print("DEBUG: request.is_secure() =", request.is_secure(), file=sys.stderr)
-        print("DEBUG: request.get_host() =", request.get_host(), file=sys.stderr)
-        print("DEBUG: SECURE_SSL_REDIRECT =", getattr(settings, 'SECURE_SSL_REDIRECT', None), file=sys.stderr)
     if request.user.is_authenticated:
         return redirect('profile_list')
 
@@ -63,7 +57,6 @@ def signup_view(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Create the associated UserProfile with Riot credentials
             UserProfile.objects.create(
                 user=user,
                 riot_id=form.cleaned_data['riot_id'],
@@ -81,12 +74,6 @@ def signup_view(request):
 @ratelimit(key='ip', rate='3/m', method='POST', block=False)
 @ratelimit(key='post:username', rate='5/m', method='POST', block=False)
 def login_view(request):
-        import sys
-        from django.conf import settings
-        print("DEBUG: login_view called", file=sys.stderr)
-        print("DEBUG: request.is_secure() =", request.is_secure(), file=sys.stderr)
-        print("DEBUG: request.get_host() =", request.get_host(), file=sys.stderr)
-        print("DEBUG: SECURE_SSL_REDIRECT =", getattr(settings, 'SECURE_SSL_REDIRECT', None), file=sys.stderr)
     if request.user.is_authenticated:
         return redirect('profile_list')
 
@@ -117,12 +104,6 @@ def login_view(request):
 
 @require_POST
 def logout_view(request):
-        import sys
-        from django.conf import settings
-        print("DEBUG: logout_view called", file=sys.stderr)
-        print("DEBUG: request.is_secure() =", request.is_secure(), file=sys.stderr)
-        print("DEBUG: request.get_host() =", request.get_host(), file=sys.stderr)
-        print("DEBUG: SECURE_SSL_REDIRECT =", getattr(settings, 'SECURE_SSL_REDIRECT', None), file=sys.stderr)
     logout(request)
     messages.success(request, 'You have been logged out.')
     return redirect('profile_list')
@@ -136,17 +117,14 @@ def logout_view(request):
 def claim_profile_view(request, profile_id):
     profile = get_object_or_404(Profile, id=profile_id)
 
-    # Profile is already claimed
     if profile.is_claimed:
         messages.error(request, 'This profile has already been claimed.')
         return redirect('display_profile', profile_id=profile_id)
 
-    # User already owns a profile
     if _user_has_any_profile(request.user):
         messages.error(request, 'You already have a profile — you cannot claim another.')
         return redirect('display_profile', profile_id=request.user.profile.id)
 
-    # Check riot id/tag match
     try:
         user_profile = request.user.userprofile
     except UserProfile.DoesNotExist:
@@ -177,7 +155,6 @@ def claim_profile_view(request, profile_id):
 
             messages.success(request, f'Profile "{profile.in_game_name}" has been claimed!')
             return redirect('display_profile', profile_id=profile_id)
-        # GET — show confirmation page
         return render(request, 'profiles/claim_confirm.html', {'profile': profile})
     else:
         messages.error(
@@ -212,15 +189,10 @@ def _lock_riot_fields(form, user):
 def input_profile(request):
     """Form page to input all profile data."""
 
-    # If logged in and already has a profile, redirect to edit
     if request.user.is_authenticated and _user_has_any_profile(request.user):
-        messages.info(
-            request,
-            'You already have a profile — you can edit yours instead.'
-        )
+        messages.info(request, 'You already have a profile — you can edit yours instead.')
         return redirect('edit_profile', profile_id=request.user.profile.id)
 
-    # Prepare variables for persisting selection on potential error
     selected_agent_ids = []
     selected_role_ids = []
     selected_map_ids = []
@@ -243,14 +215,12 @@ def input_profile(request):
             custom_errors['agents'] = 'You can select up to 5 agents.'
             messages.error(request, 'You can select up to 5 agents.')
 
-        # Re-apply lock so widget state is correct if form re-renders on error
         if request.user.is_authenticated:
             _lock_riot_fields(profile_form, request.user)
 
         if profile_form.is_valid() and not custom_errors:
             profile = profile_form.save(commit=False)
 
-            # Auto-assign to logged-in user and enforce their Riot credentials
             if request.user.is_authenticated:
                 profile.user = request.user
                 try:
@@ -261,32 +231,27 @@ def input_profile(request):
                     pass
 
             _apply_tracker_peak_rank(profile, request)
-
             profile.save()
             request.session.pop('tracker_autofill_profile', None)
-            
-            # Save selected agents (ManyToMany)
+
             agent_ids = request.POST.getlist('agent_id')
             if agent_ids:
                 profile.agents.set(agent_ids)
-            
-            # Save selected roles (ManyToMany)
+
             role_ids = request.POST.getlist('role_id')
             if role_ids:
                 profile.roles.set(role_ids)
 
-            # Save selected maps (ManyToMany)
             map_ids = request.POST.getlist('map_id')
             if map_ids:
                 if len(map_ids) > 3:
                     messages.warning(request, "You can select up to 3 maps. Only the first 3 were saved.")
                     map_ids = map_ids[:3]
                 profile.maps.set(map_ids)
-            
+
             messages.success(request, 'Profile created successfully!')
             return redirect('display_profile', profile_id=profile.id)
     else:
-        # GET: pre-fill and lock riot fields for logged-in users
         if request.user.is_authenticated:
             try:
                 up = request.user.userprofile
@@ -316,22 +281,19 @@ def input_profile(request):
 def display_profile(request, profile_id):
     """Display page showing all profile data."""
     profile = get_object_or_404(Profile, id=profile_id)
-    
+
     teammates = []
     if profile.team:
         teammates = Profile.objects.filter(team=profile.team).exclude(id=profile.id)
 
-    # Does the viewing user already own a different profile?
     user_has_profile = _user_has_any_profile(request.user)
 
-    context = {
+    return render(request, 'profiles/display_profile.html', {
         'profile': profile,
         'teammates': teammates,
         'user_has_profile': user_has_profile,
         'is_owner': _user_owns_profile(request.user, profile),
-    }
-    
-    return render(request, 'profiles/display_profile.html', context)
+    })
 
 
 def profile_list(request):
@@ -351,10 +313,10 @@ def profile_list(request):
     if role_filter:
         profiles = profiles.filter(roles__id=role_filter)
 
-    # Pass a set of profile IDs owned by this user (for template checks)
     owned_ids = set()
     if request.user.is_authenticated:
         owned_ids = set(Profile.objects.filter(user=request.user).values_list('id', flat=True))
+
     return render(request, 'profiles/profile_list.html', {
         'profiles': profiles,
         'owned_ids': owned_ids,
@@ -370,7 +332,6 @@ def edit_profile(request, profile_id):
     """Edit an existing profile — owner only."""
     profile = get_object_or_404(Profile, id=profile_id)
 
-    # Only the owner may edit
     if not _user_owns_profile(request.user, profile):
         if not request.user.is_authenticated:
             messages.error(request, 'You must be logged in to edit a profile.')
@@ -389,7 +350,7 @@ def edit_profile(request, profile_id):
     if request.method == 'POST':
         profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
         _lock_riot_fields(profile_form, request.user)
-        
+
         if request.POST.getlist('agent_id'):
             selected_agent_ids = [int(id) for id in request.POST.getlist('agent_id')]
         if request.POST.getlist('role_id'):
@@ -404,7 +365,6 @@ def edit_profile(request, profile_id):
         if profile_form.is_valid() and not custom_errors:
             profile = profile_form.save(commit=False)
 
-            # Enforce Riot credentials from UserProfile — can't be changed via the form
             try:
                 up = request.user.userprofile
                 profile.riot_id = up.riot_id
@@ -413,22 +373,21 @@ def edit_profile(request, profile_id):
                 pass
 
             _apply_tracker_peak_rank(profile, request)
-
             profile.save()
             request.session.pop('tracker_autofill_profile', None)
-            
+
             agent_ids = request.POST.getlist('agent_id')
             profile.agents.set(agent_ids if agent_ids else [])
-            
+
             role_ids = request.POST.getlist('role_id')
             profile.roles.set(role_ids if role_ids else [])
 
             map_ids = request.POST.getlist('map_id')
             if map_ids and len(map_ids) > 3:
-                 messages.warning(request, "You can select up to 3 maps. Selection was truncated.")
-                 map_ids = map_ids[:3]
+                messages.warning(request, "You can select up to 3 maps. Selection was truncated.")
+                map_ids = map_ids[:3]
             profile.maps.set(map_ids if map_ids else [])
-            
+
             messages.success(request, 'Profile updated successfully!')
             return redirect('display_profile', profile_id=profile.id)
     else:
@@ -437,8 +396,8 @@ def edit_profile(request, profile_id):
         selected_agent_ids = list(profile.agents.values_list('id', flat=True))
         selected_role_ids = list(profile.roles.values_list('id', flat=True))
         selected_map_ids = list(profile.maps.values_list('id', flat=True))
-    
-    context = {
+
+    return render(request, 'profiles/input_form.html', {
         'profile_form': profile_form,
         'profile': profile,
         'is_edit': True,
@@ -450,22 +409,20 @@ def edit_profile(request, profile_id):
         'selected_role_ids': selected_role_ids,
         'selected_map_ids': selected_map_ids,
         'custom_errors': custom_errors,
-    }
-    
-    return render(request, 'profiles/input_form.html', context)
+    })
 
 
 def card_profile(request, profile_id):
     """Display the profile as a stylized card."""
     profile = get_object_or_404(Profile, id=profile_id)
-    
+
     teammates = None
     if profile.team:
         teammates = Profile.objects.filter(team=profile.team).exclude(id=profile.id)
 
     return render(request, 'profiles/card_profile.html', {
         'profile': profile,
-        'teammates': teammates
+        'teammates': teammates,
     })
 
 
@@ -473,16 +430,11 @@ def download_card_png(request, profile_id):
     """Capture the card page at 1920x1080 via Playwright and serve as a PNG download."""
     from django.http import HttpResponse, JsonResponse
 
-    get_object_or_404(Profile, id=profile_id)  # 404 guard
+    get_object_or_404(Profile, id=profile_id)
 
     session_cookie = request.COOKIES.get('sessionid')
     csrftoken = request.COOKIES.get('csrftoken')
 
-    # Use localhost internally so Playwright doesn't route through the public internet.
-    # Gunicorn must run with --workers > 1 so this internal request gets a free worker
-    # (with 1 worker the download view occupies it and Playwright deadlocks waiting for a response).
-    # We do NOT set a custom Host header — Chromium rejects Host overrides (ERR_INVALID_ARGUMENT).
-    # ALLOWED_HOSTS=['*'] means Django accepts Host: 127.0.0.1:8000 without issue.
     internal_url = f'http://127.0.0.1:8000/profile/{profile_id}/card/?screenshot=1'
 
     try:
@@ -501,7 +453,7 @@ def download_card_png(request, profile_id):
 
             page = context.new_page()
             page.goto(internal_url, wait_until="networkidle")
-            page.wait_for_timeout(2000)  # Let Granim and Anime.js animations settle
+            page.wait_for_timeout(2000)
 
             screenshot = page.screenshot(full_page=False)
             browser.close()
@@ -512,10 +464,8 @@ def download_card_png(request, profile_id):
 
     except Exception:
         logger.exception('Card PNG generation failed for profile_id=%s', profile_id)
-        return JsonResponse(
-            {'error': 'Failed to generate card image.'},
-            status=500
-        )
+        from django.http import JsonResponse
+        return JsonResponse({'error': 'Failed to generate card image.'}, status=500)
 
 
 @require_POST
@@ -523,14 +473,13 @@ def delete_profile(request, profile_id):
     """Delete a profile — owner only."""
     profile = get_object_or_404(Profile, id=profile_id)
 
-    # Only the owner may delete
     if not _user_owns_profile(request.user, profile):
         if not request.user.is_authenticated:
             messages.error(request, 'You must be logged in to delete a profile.')
             return redirect('login_view')
         messages.error(request, 'You can only delete your own profile.')
         return redirect('display_profile', profile_id=profile_id)
-    
+
     name = profile.in_game_name
     profile.delete()
     messages.success(request, f'Profile "{name}" has been deleted successfully!')
@@ -556,6 +505,5 @@ def unclaim_profile_view(request):
         messages.success(request, 'Profile unclaimed. You can now claim a different profile.')
         return redirect('display_profile', profile_id=profile_id)
 
-    # GET — show a confirmation page
     profile = request.user.profile
     return render(request, 'profiles/unclaim_confirm.html', {'profile': profile})
