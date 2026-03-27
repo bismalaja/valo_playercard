@@ -26,8 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Read from environment variable — no hardcoded fallback in prod
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-only-key')
 
-# THIS is the fix — read DEBUG from environment, default to False (safe)
-DEBUG = _env_bool('DEBUG', default=False)
+
+# DEBUG = _env_bool('DEBUG', default=False)
+DEBUG = True
 
 ALLOWED_HOSTS = ['valo-playercard.xyz', 'www.valo-playercard.xyz', 'localhost', '127.0.0.1']
 
