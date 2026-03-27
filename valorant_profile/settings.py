@@ -27,8 +27,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-only-key')
 
 
-# DEBUG = _env_bool('DEBUG', default=False)
-DEBUG = True
+DEBUG = _env_bool('DEBUG', default=False)
+# DEBUG = True
 
 ALLOWED_HOSTS = ['valo-playercard.xyz', 'www.valo-playercard.xyz', 'localhost', '127.0.0.1']
 
