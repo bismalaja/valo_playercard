@@ -4,8 +4,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - media_data:/app/media
-      - db_data:/app/data
+      - ./media:/app/media    # Host directory mapping: persists uploads on the host!
+      - db_data:/app/data     # DB volume, stays Docker-managed
     environment:
       - SECRET_KEY=${SECRET_KEY:-django-insecure-change-me-in-production}
       - DEBUG=${DEBUG:-False}
@@ -13,5 +13,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  media_data:
   db_data:
